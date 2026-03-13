@@ -1,10 +1,12 @@
 {
-  "name": "Almox CT UFPB",
-  "short_name": "AlmoxCT",
-  "start_url": "index.html",
+  "name": "Almox Fácil CT",
+  "short_name": "Almox CT",
+  "description": "Sistema de gestão de almoxarifado do Centro de Tecnologia da UFPB",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#EEF4FF",
-  "theme_color": "#174A96",
+  "background_color": "#0A4B8C",
+  "theme_color": "#0A4B8C",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon.png",
@@ -15,7 +17,8 @@
     {
       "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
