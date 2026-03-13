@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" id="theme-color-meta" content="#1976D2">
+    <title>Gestão de Estoque</title>
+    <style>
+        /* =========================================
+           1. ESTRUTURA VISUAL E BLINDAGEM
+        ========================================= */
+        :root {
+            --bg-color: #f4f4f9;
+            --text-main: #333;
+            --text-muted: #777;
+            --danger: #e53935;
+            --success: #43a047;
+            --theme-color: #1976D2; /* Padrão: Estoque */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+        /* Blindagem de Navegador */
+        body {
+            background-color: var(--bg-color);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            overflow-x: hidden;
+        }
+
+        /* Exceção para inputs permitirem digitação */
+        input, select, textarea {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        /* Temas Dinâmicos */
+        body.theme-estoque { --theme-color: #1976D2; } /* Azul */
+        body.theme-agua { --theme-color: #00BCD4; }    /* Ciano */
+        body.theme-admin { --theme-color: #424242; }   /* Cinza Escuro */
+
+        .app-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--theme-color);
+            color: white;
+            display: flex;
+            justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* =========================================
+           2. COMPONENTES DE UI
+        ========================================= */
+        /* Header */
+        .header {
+            background-color: var(--theme-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+
+        .header select {
+            background: transparent;
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            outline: none;
+            appearance: none;
+        }
+        .header select option { color: black; }
+        
+        .header-actions button {
+            background: rgba(255,255,255,0.2);
+            border: none; color: white;
+            padding: 8px 12px; border-radius: 5px;
+            font-size: 20px;
+        }
+
+        /* Filtros (Chips) */
+        .chip-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 15px;
+            gap: 10px;
+            background: white;
+        }
+        .chip-container::-webkit-scrollbar { display: none; }
+        .chip {
+            padding: 8px 16px;
+            background: #eee;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .chip.active {
+            background: rgba(0,0,0,0.05);
+            border-color: var(--text-muted);
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        /* Listas e Itens */
+        .list-container { flex: 1; overflow-y: auto; padding: 10px; }
+        .list { list-style: none; }
+        .item {
+            display: flex;
+            background: white;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .item-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--theme-color);
+            color: white;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .item-info { flex: 1; display: flex; flex-direction: column; }
+        .item-title { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        .item-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .item-status { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        
+        .status-1 { background: #fff3e0; color: #ef6c00; } /* Pendente */
+        .status-2 { background: #e3f2fd; color: #1565c0; } /* Separado */
+        .status-3 { background: #e8f5e9; color: #2e7d32; } /* Entregue */
+
+        /* Modais */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; width: 90%; max-width: 400px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header {
+            padding: 15px; font-size: 18px; font-weight: bold;
+            border-bottom: 3px solid var(--theme-color);
+        }
+        .modal-body { padding: 20px; }
+        .modal-body input {
+            width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; margin-top: 10px;
+        }
+        .modal-footer {
+            padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px;
+            background: #f9f9f9;
+        }
+        button { border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; }
+        .btn-cancel { background: transparent; color: var(--text-muted); }
+        .btn-action { background: var(--theme-color); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        /* Estilo Específico Admin Input */
+        .admin-input {
+            text-align: center; font-size: 24px !important; letter-spacing: 10px;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;" class="theme-estoque">
+
+    <div id="splash-screen">Carregando App...</div>
+
+    <div class="app-container">
+        <header class="header" id="main-header">
+            <select id="mode-select" onchange="app.changeMode(this.value)">
+                <option value="estoque">Solicitar Material</option>
+                <option value="agua">Solicitar Água</option>
+                <option value="admin">Gestão (Admin)</option>
+            </select>
+            <div class="header-actions">
+                <button onclick="app.openNewRequestModal()">+</button>
+            </div>
+        </header>
+
+        <div class="chip-container" id="chip-container">
+            <div class="chip active" onclick="app.setFilter('all')">Todos</div>
+            <div class="chip" onclick="app.setFilter('1')">Pendentes</div>
+            <div class="chip" onclick="app.setFilter('2')">Separados</div>
+            <div class="chip" onclick="app.setFilter('3')">Entregues</div>
+        </div>
+
+        <div class="list-container">
+            <ul class="list" id="item-list">
+                </ul>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-request">
+        <div class="modal">
+            <div class="modal-header">Nova Solicitação</div>
+            <div class="modal-body">
+                <p>Item desejado:</p>
+                <input type="text" id="input-item-name" placeholder="Ex: Caderno, Água 20L">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="app.closeModals()">Cancelar</button>
+                <button class="btn-action" onclick="app.saveRequest()">Solicitar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-admin">
+        <div class="modal">
+            <div class="modal-header" style="border-color: #424242;">Acesso Restrito</div>
+            <div class="modal-body">
+                <p style="text-align:center; color:#777;">Digite a senha (1999)</p>
+                <input type="password" id="input-admin-pass" class="admin-input" 
+                       inputmode="numeric" pattern="[0-9]*" 
+                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); app.checkAdminPassword(this)">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="app.cancelAdminMode()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            // =========================================
+            // 5. BANCO DE DADOS LOCAL & CONFIGURAÇÃO
+            // =========================================
+            db: {
+                requests: [],
+                config: {
+                    dadosBaixados: false,
+                    lastSync: 0
+                }
+            },
+            currentMode: 'estoque', // 'estoque', 'agua', 'admin'
+            currentFilter: 'all',
+            recentInteractions: new Set(), // Trava de 15s (Efeito Fantasma)
+            statusWeights: { 1: 1, 2: 2, 3: 3, 4: 0 }, // Hierarquia
+
+            init: function() {
+                this.handleSplashScreen();
+                this.loadLocalDb();
+                this.renderList();
+                this.setupTouchGestures();
+                this.startSyncEngine();
+            },
+
+            // Splash Screen Controlada por sessionStorage
+            handleSplashScreen: function() {
+                const splash = document.getElementById('splash-screen');
+                if (!sessionStorage.getItem('splashShown')) {
+                    setTimeout(() => {
+                        splash.style.opacity = '0';
+                        setTimeout(() => splash.remove(), 500);
+                        sessionStorage.setItem('splashShown', 'true');
+                    }, 2000);
+                } else {
+                    splash.remove();
+                }
+            },
+
+            // Troca de Tema Dinâmico
+            changeMode: function(mode) {
+                if (mode === 'admin') {
+                    document.getElementById('mode-select').value = this.currentMode; // Reverte visualmente até aprovar
+                    document.getElementById('modal-admin').classList.add('active');
+                    setTimeout(() => document.getElementById('input-admin-pass').focus(), 100);
+                    return;
+                }
+                
+                this.currentMode = mode;
+                document.body.className = `theme-${mode}`;
+                
+                // Atualiza meta theme-color
+                const themeColors = { 'estoque': '#1976D2', 'agua': '#00BCD4', 'admin': '#424242' };
+                document.getElementById('theme-color-meta').content = themeColors[mode];
+                
+                this.renderList();
+            },
+
+            // =========================================
+            // 3. MECÂNICA DE AUTO-LOGIN
+            // =========================================
+            checkAdminPassword: function(input) {
+                if (input.value === '1999') {
+                    input.blur();
+                    input.value = '';
+                    this.closeModals();
+                    
+                    this.currentMode = 'admin';
+                    document.getElementById('mode-select').value = 'admin';
+                    document.body.className = `theme-admin`;
+                    document.getElementById('theme-color-meta').content = '#424242';
+                    this.renderList();
+                }
+            },
+
+            cancelAdminMode: function() {
+                this.closeModals();
+                document.getElementById('input-admin-pass').value = '';
+            },
+
+            // =========================================
+            // UI E RENDERIZAÇÃO
+            // =========================================
+            setFilter: function(filter) {
+                this.currentFilter = filter;
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                event.target.classList.add('active');
+                this.renderList();
+            },
+
+            renderList: function() {
+                const listEl = document.getElementById('item-list');
+                listEl.innerHTML = '';
+
+                let filtered = this.db.requests.filter(req => {
+                    if (this.currentMode !== 'admin' && req.type !== this.currentMode) return false;
+                    if (this.currentFilter !== 'all' && req.status.toString() !== this.currentFilter) return false;
+                    return true;
+                });
+
+                filtered.forEach(req => {
+                    const statusLabels = { 1: 'Pendente', 2: 'Separado', 3: 'Entregue' };
+                    const li = document.createElement('li');
+                    li.className = 'item';
+                    li.dataset.id = req.id;
+                    
+                    li.innerHTML = `
+                        <div class="item-avatar">${req.name.charAt(0).toUpperCase()}</div>
+                        <div class="item-info">
+                            <span class="item-title">${req.name}</span>
+                            <span class="item-subtitle">${new Date(req.timestamp).toLocaleTimeString()} - ${req.type.toUpperCase()}</span>
+                        </div>
+                        <div class="item-status status-${req.status}">${statusLabels[req.status]}</div>
+                    `;
+                    listEl.appendChild(li);
+                });
+            },
+
+            openNewRequestModal: function() {
+                if (this.currentMode === 'admin') {
+                    alert('Faça solicitações nas abas de Estoque ou Água.');
+                    return;
+                }
+                document.getElementById('modal-request').classList.add('active');
+                document.getElementById('input-item-name').focus();
+            },
+
+            closeModals: function() {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            },
+
+            saveRequest: function() {
+                const input = document.getElementById('input-item-name');
+                if (!input.value.trim()) return;
+
+                const newReq = {
+                    id: Date.now().toString(),
+                    name: input.value,
+                    type: this.currentMode,
+                    status: 1, // 1: Pendente
+                    timestamp: Date.now()
+                };
+
+                this.db.requests.unshift(newReq);
+                this.saveLocalDb();
+                this.lockInteraction(newReq.id); // Protege contra Efeito Fantasma
+                
+                input.value = '';
+                this.closeModals();
+                this.renderList();
+                this.triggerSync();
+            },
+
+            // =========================================
+            // 4. INTERAÇÕES POR TOQUE (GESTOS)
+            // =========================================
+            setupTouchGestures: function() {
+                const listEl = document.getElementById('item-list');
+                let startX = 0, startY = 0;
+                let currentItem = null;
+                let pressTimer = null;
+                let lastTap = 0;
+
+                listEl.addEventListener('touchstart', (e) => {
+                    const item = e.target.closest('.item');
+                    if (!item) return;
+
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    currentItem = item;
+
+                    // Long Press (600ms)
+                    pressTimer = setTimeout(() => {
+                        this.handleLongPress(item.dataset.id);
+                        currentItem = null; // Cancela resto dos eventos
+                    }, 600);
+                }, { passive: true });
+
+                listEl.addEventListener('touchmove', (e) => {
+                    if (!currentItem) return;
+                    const diffY = e.touches[0].clientY - startY;
+                    const diffX = e.touches[0].clientX - startX;
+
+                    // Se rolar a tela, cancela gestos
+                    if (Math.abs(diffY) > 15) {
+                        clearTimeout(pressTimer);
+                        currentItem = null;
+                    } else if (Math.abs(diffX) > 10) {
+                        clearTimeout(pressTimer); // Cancel long press if swiping
+                    }
+                }, { passive: true });
+
+                listEl.addEventListener('touchend', (e) => {
+                    clearTimeout(pressTimer);
+                    if (!currentItem) return;
+
+                    const endX = e.changedTouches[0].clientX;
+                    const diffX = endX - startX;
+
+                    // Swipe
+                    if (diffX > 80) {
+                        this.handleSwipe(currentItem.dataset.id, 'right');
+                    } else if (diffX < -80) {
+                        this.handleSwipe(currentItem.dataset.id, 'left');
+                    } else {
+                        // Double Tap (< 350ms)
+                        const currentTime = new Date().getTime();
+                        const tapLength = currentTime - lastTap;
+                        if (tapLength < 350 && tapLength > 0) {
+                            this.handleDoubleTap(currentItem.dataset.id);
+                        }
+                        lastTap = currentTime;
+                    }
+                    currentItem = null;
+                });
+            },
+
+            handleSwipe: function(id, direction) {
+                if (this.currentMode !== 'admin') return; // Apenas admin avança/recua status
+                const req = this.db.requests.find(r => r.id === id);
+                if (!req) return;
+
+                if (direction === 'right' && req.status < 3) req.status++;
+                if (direction === 'left' && req.status > 1) req.status--;
+                
+                this.lockInteraction(id);
+                this.saveLocalDb();
+                this.renderList();
+                this.triggerSync();
+            },
+
+            handleDoubleTap: function(id) {
+                if (this.currentMode !== 'admin') return;
+                this.db.requests = this.db.requests.filter(r => r.id !== id);
+                this.saveLocalDb();
+                this.renderList();
+                this.triggerSync();
+            },
+
+            handleLongPress: function(id) {
+                const req = this.db.requests.find(r => r.id === id);
+                if(req) alert(`Detalhes do Item:\nNome: ${req.name}\nTipo: ${req.type}\nStatus: ${req.status}`);
+            },
+
+            // =========================================
+            // 5. SINCRONIZAÇÃO E ARMAZENAMENTO
+            // =========================================
+            loadLocalDb: function() {
+                const stored = localStorage.getItem('estoqueDb');
+                if (stored) {
+                    this.db = JSON.parse(stored);
+                }
+            },
+
+            saveLocalDb: function() {
+                localStorage.setItem('estoqueDb', JSON.stringify(this.db));
+            },
+
+            lockInteraction: function(id) {
+                this.recentInteractions.add(id);
+                setTimeout(() => this.recentInteractions.delete(id), 15000);
+            },
+
+            startSyncEngine: function() {
+                // GET Periódico (Simulado) a cada 5 segundos
+                setInterval(() => this.pullFromCloudMock(), 5000);
+            },
+
+            triggerSync: function() {
+                // Trava de Segurança na Nuvem (Cloud Lock)
+                if (!this.db.config.dadosBaixados) {
+                    console.warn("Trava de Segurança: POST abortado pois nunca houve GET inicial.");
+                    return;
+                }
+                
+                // Exemplo real seria: fetch(url, { method: 'POST', mode: 'no-cors', body: ... })
+                console.log("POST Assíncrono disparado para a Nuvem.");
+            },
+
+            pullFromCloudMock: function() {
+                // Mock: Simula dados chegando do Google Sheets
+                // Em cenário real seria: fetch(url).then(res=>res.json()).then(data=>...)
+                
+                // Simula que puxou dados e destrava proteção
+                if (!this.db.config.dadosBaixados) {
+                    this.db.config.dadosBaixados = true;
+                    this.saveLocalDb();
+                }
+
+                // Simulação de resolução de "Efeito Fantasma"
+                /*
+                const serverData = ...
+                serverData.requests.forEach(serverReq => {
+                    if (this.recentInteractions.has(serverReq.id)) return; // Ignora se alterado há < 15s
+                    
+                    const localReq = this.db.requests.find(r => r.id === serverReq.id);
+                    if (localReq) {
+                        // Verifica Hierarquia de Status
+                        if (this.statusWeights[localReq.status] < this.statusWeights[serverReq.status]) {
+                            localReq.status = serverReq.status; // Atualiza apenas se servidor for mais avançado
+                        }
+                    } else {
+                        this.db.requests.push(serverReq); // Item novo
+                    }
+                });
+                */
+            }
+        };
+
+        // Inicia o App
+        window.onload = () => app.init();
+
+    </script>
+</body>
+</html>
