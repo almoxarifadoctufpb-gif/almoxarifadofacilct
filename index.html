@@ -7,6 +7,7 @@
     <title>Almox Fácil CT</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
     <style>
         * {
             margin: 0;
@@ -36,7 +37,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Splash Screen */
+        /* Splash Screen com Logo */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -53,24 +54,25 @@
             transition: opacity 0.5s;
         }
 
-        #splash-screen .logo {
-            width: 100px;
-            height: 100px;
-            background: rgba(255,255,255,0.15);
+        #splash-screen img {
+            width: 120px;
+            height: 120px;
             border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: bold;
             margin-bottom: 20px;
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: white;
+            padding: 5px;
+            object-fit: contain;
         }
 
         #splash-screen span {
             font-size: 24px;
             font-weight: 300;
             letter-spacing: 2px;
+            background: rgba(255,255,255,0.15);
+            padding: 10px 30px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
         }
 
         /* Container Principal */
@@ -83,11 +85,11 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* Header */
+        /* Header com Logo */
         .header {
             background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
             color: white;
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -96,30 +98,45 @@
             box-shadow: 0 4px 15px rgba(10,75,140,0.3);
         }
 
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: white;
+            padding: 3px;
+            object-fit: contain;
+        }
+
         .header-title h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 4px;
         }
 
         .header-title p {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.9;
         }
 
         .header-icons {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
 
         .header-icons button {
             background: rgba(255,255,255,0.15);
             border: none;
             color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -136,7 +153,7 @@
             background: var(--branco);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
+            padding: 8px 0;
             border-top: 1px solid var(--cinza-borda);
             border-top-left-radius: 25px;
             border-top-right-radius: 25px;
@@ -150,11 +167,11 @@
             align-items: center;
             gap: 4px;
             color: var(--texto-secundario);
-            font-size: 12px;
+            font-size: 11px;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 5px 15px;
+            padding: 5px 12px;
             border-radius: 12px;
         }
 
@@ -164,7 +181,7 @@
         }
 
         .nav-item span {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         /* Conteúdo Principal */
@@ -237,6 +254,105 @@
             background: var(--azul-institucional);
             color: white;
             border: none;
+        }
+
+        /* Tela de Login com Logo */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: var(--branco);
+            width: 90%;
+            max-width: 380px;
+            padding: 30px 25px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-box img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 3px solid white;
+            object-fit: contain;
+            background: white;
+        }
+
+        .login-box h2 {
+            color: var(--azul-institucional);
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .login-box p {
+            color: var(--texto-secundario);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .login-box .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .login-box .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--texto-secundario);
+            margin-bottom: 5px;
+        }
+
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .login-box .form-group input:focus {
+            border-color: var(--azul-institucional);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            background: var(--azul-institucional);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-box button:hover {
+            background: var(--azul-escuro);
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--texto-secundario);
         }
 
         /* Listas */
@@ -371,6 +487,17 @@
             color: white;
             font-weight: 600;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: white;
+            padding: 3px;
         }
 
         .modal-body {
@@ -443,71 +570,6 @@
             color: white;
         }
 
-        /* Login Screen */
-        #login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .login-box {
-            background: var(--branco);
-            width: 90%;
-            max-width: 400px;
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .login-box h2 {
-            color: var(--azul-institucional);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .login-box .logo {
-            text-align: center;
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        /* Água Fácil CT */
-        .water-stats {
-            background: linear-gradient(135deg, var(--azul-claro), white);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .water-progress {
-            height: 10px;
-            background: var(--cinza-borda);
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-
-        .water-progress-bar {
-            height: 100%;
-            background: var(--azul-institucional);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        /* Responsividade */
-        @media (max-width: 400px) {
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Loading */
         .loading {
             display: inline-block;
@@ -522,54 +584,86 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Responsividade */
+        @media (max-width: 400px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-logo img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .header-title h1 {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Splash Screen com Logo -->
     <div id="splash-screen">
-        <div class="logo">📦</div>
+        <img src="icon.png" alt="Almox Fácil CT" id="splash-logo">
         <span>Almox Fácil CT</span>
     </div>
 
+    <!-- Tela de Login com Logo -->
     <div id="login-screen">
         <div class="login-box">
-            <div class="logo">📦</div>
+            <img src="icon.png" alt="Logo" id="login-logo">
             <h2>Almox Fácil CT</h2>
+            <p>Centro de Tecnologia - UFPB</p>
+            
             <div class="form-group">
                 <label>E-mail institucional</label>
-                <input type="email" id="login-email" placeholder="usuario@ct.ufpb.br">
+                <input type="email" id="login-email" placeholder="usuario@ct.ufpb.br" value="admin@ufpb.br">
             </div>
+            
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" id="login-password" placeholder="******">
+                <input type="password" id="login-password" placeholder="******" value="123456">
             </div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="app.login()">Entrar</button>
-            <p style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--texto-secundario);">
-                Use admin@ufpb.br / 123456 para admin<br>
-                usuario@ufpb.br / 123456 para usuário comum
-            </p>
+            
+            <button onclick="app.login()">Entrar</button>
+            
+            <div class="login-footer">
+                <p>Use admin@ufpb.br / 123456 para admin<br>usuario@ufpb.br / 123456 para usuário</p>
+            </div>
         </div>
     </div>
 
+    <!-- App Container -->
     <div class="app-container" id="app-container" style="display: none;">
+        <!-- Header com Logo -->
         <div class="header">
-            <div class="header-title">
-                <h1>Almox Fácil CT</h1>
-                <p id="user-greeting">Carregando...</p>
+            <div class="header-logo">
+                <img src="icon.png" alt="Logo" id="header-logo">
+                <div class="header-title">
+                    <h1>Almox Fácil CT</h1>
+                    <p id="user-greeting">Carregando...</p>
+                </div>
             </div>
             <div class="header-icons">
                 <button onclick="app.logout()">🚪</button>
             </div>
         </div>
 
+        <!-- Conteúdo Principal -->
         <div class="main-content" id="main-content"></div>
 
+        <!-- Navegação Inferior -->
         <nav class="bottom-nav" id="bottom-nav"></nav>
     </div>
 
-    <!-- Modal de Entrada de Materiais -->
+    <!-- Modal de Entrada -->
     <div class="modal-overlay" id="modal-entrada">
         <div class="modal">
-            <div class="modal-header">Registrar Entrada</div>
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                Registrar Entrada
+            </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Produto</label>
@@ -581,11 +675,11 @@
                 </div>
                 <div class="form-group">
                     <label>Fornecedor</label>
-                    <input type="text" id="entrada-fornecedor">
+                    <input type="text" id="entrada-fornecedor" placeholder="Ex: Papelaria Central">
                 </div>
                 <div class="form-group">
                     <label>Nº Nota Fiscal</label>
-                    <input type="text" id="entrada-nf">
+                    <input type="text" id="entrada-nf" placeholder="Ex: 123456">
                 </div>
                 <div class="form-group">
                     <label>Data</label>
@@ -599,10 +693,13 @@
         </div>
     </div>
 
-    <!-- Modal de Saída de Materiais -->
+    <!-- Modal de Saída -->
     <div class="modal-overlay" id="modal-saida">
         <div class="modal">
-            <div class="modal-header">Registrar Saída</div>
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                Registrar Saída
+            </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Produto</label>
@@ -614,11 +711,11 @@
                 </div>
                 <div class="form-group">
                     <label>Setor Solicitante</label>
-                    <input type="text" id="saida-setor">
+                    <input type="text" id="saida-setor" placeholder="Ex: Secretaria">
                 </div>
                 <div class="form-group">
                     <label>Responsável</label>
-                    <input type="text" id="saida-responsavel">
+                    <input type="text" id="saida-responsavel" placeholder="Ex: João Silva">
                 </div>
                 <div class="form-group">
                     <label>Data</label>
@@ -632,10 +729,13 @@
         </div>
     </div>
 
-    <!-- Modal de Solicitação de Água -->
+    <!-- Modal de Água -->
     <div class="modal-overlay" id="modal-agua">
         <div class="modal">
-            <div class="modal-header">Solicitar Água</div>
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                Solicitar Água
+            </div>
             <div class="modal-body">
                 <p>Estoque atual: <strong id="agua-estoque-atual">0</strong> garrafões</p>
                 <div class="form-group">
@@ -646,7 +746,7 @@
                     <label>Setor</label>
                     <input type="text" id="agua-setor">
                 </div>
-                <p id="agua-previsao"></p>
+                <p id="agua-previsao" style="background: var(--azul-claro); padding: 10px; border-radius: 10px;"></p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="app.closeModal('modal-agua')">Cancelar</button>
@@ -658,7 +758,10 @@
     <!-- Modal de Relatórios -->
     <div class="modal-overlay" id="modal-relatorios">
         <div class="modal">
-            <div class="modal-header">Relatórios</div>
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                Relatórios
+            </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Tipo de relatório</label>
@@ -710,6 +813,13 @@
                 this.hideSplash();
                 this.setupEventListeners();
                 this.checkLoginState();
+                this.preloadLogo();
+            },
+
+            preloadLogo: function() {
+                // Pré-carrega a logo para evitar flickering
+                const img = new Image();
+                img.src = 'icon.png';
             },
 
             hideSplash: function() {
@@ -718,7 +828,7 @@
                     setTimeout(() => {
                         document.getElementById('splash-screen').style.display = 'none';
                     }, 500);
-                }, 1500);
+                }, 2000);
             },
 
             loadDatabase: function() {
@@ -731,7 +841,6 @@
             },
 
             initializeDefaultData: function() {
-                // Usuários de exemplo
                 this.db.users = [
                     {
                         id: 1,
@@ -764,14 +873,12 @@
                     }
                 ];
 
-                // Produtos de exemplo
                 this.db.products = [
                     { id: 1, name: 'Papel A4 (Resma)', category: 'Material de Expediente', stock: 50, minStock: 10, location: 'Prateleira A1' },
                     { id: 2, name: 'Caneta Azul', category: 'Material de Expediente', stock: 100, minStock: 20, location: 'Prateleira A2' },
                     { id: 3, name: 'Detergente Líquido', category: 'Material de Limpeza', stock: 5, minStock: 10, location: 'Prateleira B1' },
                     { id: 4, name: 'Álcool 70%', category: 'Higiene', stock: 8, minStock: 15, location: 'Prateleira B2' },
-                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3' },
-                    { id: 6, name: 'Papel Higiênico (pacote)', category: 'Higiene', stock: 20, minStock: 10, location: 'Prateleira C1' }
+                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3' }
                 ];
 
                 this.saveDatabase();
@@ -786,8 +893,6 @@
                 if (savedUser) {
                     this.currentUser = JSON.parse(savedUser);
                     this.showApp();
-                } else {
-                    document.getElementById('login-screen').style.display = 'flex';
                 }
             },
 
@@ -834,22 +939,11 @@
             renderDashboard: function() {
                 const content = document.getElementById('main-content');
                 const isAdmin = this.currentUser.role === 'admin';
-                const isGestor = this.currentUser.role === 'gestor_terceirizado';
 
-                // Calcular estatísticas
                 const totalItems = this.db.products.length;
                 const lowStock = this.db.products.filter(p => p.stock > 0 && p.stock <= p.minStock).length;
                 const zeroStock = this.db.products.filter(p => p.stock === 0).length;
                 const pendingRequests = this.db.waterRequests.filter(r => r.status === 'pending').length;
-
-                // Calcular consumo mensal (simulado)
-                const monthlyConsumption = this.db.movements.filter(m => {
-                    const date = new Date(m.date);
-                    const now = new Date();
-                    return m.type === 'saida' && 
-                           date.getMonth() === now.getMonth() &&
-                           date.getFullYear() === now.getFullYear();
-                }).reduce((acc, m) => acc + m.qty, 0);
 
                 let html = `
                     <div class="dashboard-cards">
@@ -866,15 +960,14 @@
                             <div class="label">Estoque Zerado</div>
                         </div>
                         <div class="stat-card">
-                            <div class="value">${monthlyConsumption}</div>
-                            <div class="label">Consumo Mensal</div>
+                            <div class="value">${pendingRequests}</div>
+                            <div class="label">Solicitações</div>
                         </div>
                     </div>
+
+                    <div class="quick-actions">
                 `;
 
-                // Ações rápidas baseadas no perfil
-                html += '<div class="quick-actions">';
-                
                 if (isAdmin) {
                     html += `
                         <button class="action-btn primary" onclick="app.openModal('modal-entrada')">
@@ -887,88 +980,14 @@
                 }
 
                 html += `
-                    <button class="action-btn" onclick="app.renderEstoque()">
-                        <span>📋</span> Estoque
-                    </button>
-                    <button class="action-btn" onclick="app.renderAgua()">
-                        <span>💧</span> Água Fácil
-                    </button>
+                        <button class="action-btn" onclick="app.renderEstoque()">
+                            <span>📋</span> Estoque
+                        </button>
+                        <button class="action-btn" onclick="app.renderAgua()">
+                            <span>💧</span> Água Fácil
+                        </button>
+                    </div>
                 `;
-
-                if (isGestor) {
-                    html += `
-                        <button class="action-btn" onclick="app.solicitarLimpeza()">
-                            <span>🧹</span> Limpeza
-                        </button>
-                    `;
-                }
-
-                if (isAdmin) {
-                    html += `
-                        <button class="action-btn" onclick="app.openModal('modal-relatorios')">
-                            <span>📊</span> Relatórios
-                        </button>
-                    `;
-                }
-
-                html += '</div>';
-
-                // Últimas movimentações (para admin)
-                if (isAdmin) {
-                    html += `
-                        <div class="list-title">
-                            <h3>Últimas Movimentações</h3>
-                        </div>
-                        <ul class="item-list">
-                    `;
-
-                    const lastMovements = this.db.movements.slice(-5).reverse();
-                    lastMovements.forEach(m => {
-                        const product = this.db.products.find(p => p.id === m.productId);
-                        html += `
-                            <li class="item-card">
-                                <div class="item-icon">${m.type === 'entrada' ? '📥' : '📤'}</div>
-                                <div class="item-info">
-                                    <h4>${product ? product.name : 'Produto'}</h4>
-                                    <div class="category">${m.qty} unidades - ${new Date(m.date).toLocaleDateString()}</div>
-                                </div>
-                            </li>
-                        `;
-                    });
-
-                    html += '</ul>';
-                }
-
-                // Solicitações pendentes de água (visível para todos)
-                const pendingWater = this.db.waterRequests.filter(r => r.status === 'pending');
-                if (pendingWater.length > 0) {
-                    html += `
-                        <div class="list-title">
-                            <h3>Solicitações de Água Pendentes</h3>
-                        </div>
-                        <ul class="item-list">
-                    `;
-
-                    pendingWater.forEach(r => {
-                        html += `
-                            <li class="item-card">
-                                <div class="item-icon">💧</div>
-                                <div class="item-info">
-                                    <h4>${r.qty} garrafão(ões)</h4>
-                                    <div class="category">Setor: ${r.sector} - ${new Date(r.date).toLocaleDateString()}</div>
-                                </div>
-                                ${isAdmin ? `
-                                    <div style="display: flex; gap: 5px;">
-                                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="app.aprovarAgua(${r.id})">✓</button>
-                                        <button class="btn btn-danger" style="padding: 5px 10px;" onclick="app.negarAgua(${r.id})">✗</button>
-                                    </div>
-                                ` : ''}
-                            </li>
-                        `;
-                    });
-
-                    html += '</ul>';
-                }
 
                 content.innerHTML = html;
                 this.renderBottomNav('dashboard');
@@ -1031,15 +1050,13 @@
                 const content = document.getElementById('main-content');
                 const isAdmin = this.currentUser.role === 'admin';
 
-                // Calcular previsão de reposição (simples)
-                const dailyConsumption = 5; // Média de consumo diário
+                const dailyConsumption = 5;
                 const daysUntilEmpty = Math.floor(this.db.waterStock / dailyConsumption);
-
                 const waterRequests = this.db.waterRequests.filter(r => r.status === 'pending');
                 const totalRequested = waterRequests.reduce((acc, r) => acc + r.qty, 0);
 
-                html = `
-                    <div class="water-stats">
+                let html = `
+                    <div class="water-stats" style="background: linear-gradient(135deg, var(--azul-claro), white); border-radius: 20px; padding: 20px; margin-bottom: 20px;">
                         <h3 style="margin-bottom: 15px;">💧 Água Fácil CT</h3>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
@@ -1057,8 +1074,8 @@
                             </div>
                         </div>
 
-                        <div class="water-progress">
-                            <div class="water-progress-bar" style="width: ${Math.min(100, (this.db.waterStock / 50) * 100)}%"></div>
+                        <div class="water-progress" style="height: 10px; background: var(--cinza-borda); border-radius: 5px; margin: 15px 0; overflow: hidden;">
+                            <div style="height: 100%; background: var(--azul-institucional); width: ${Math.min(100, (this.db.waterStock / 50) * 100)}%;"></div>
                         </div>
 
                         <p style="text-align: center; margin: 10px 0;">
@@ -1071,7 +1088,6 @@
                     </div>
                 `;
 
-                // Lista de solicitações
                 if (this.db.waterRequests.length > 0) {
                     html += `
                         <div class="list-title">
@@ -1093,6 +1109,12 @@
                                         Status: ${r.status === 'pending' ? 'Pendente' : (r.status === 'approved' ? 'Aprovado' : 'Negado')}
                                     </div>
                                 </div>
+                                ${isAdmin && r.status === 'pending' ? `
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="app.aprovarAgua(${r.id})">✓</button>
+                                        <button class="btn btn-danger" style="padding: 5px 10px;" onclick="app.negarAgua(${r.id})">✗</button>
+                                    </div>
+                                ` : ''}
                             </li>
                         `;
                     });
@@ -1131,7 +1153,6 @@
             },
 
             openModal: function(modalId) {
-                // Atualizar selects se necessário
                 if (modalId === 'modal-entrada' || modalId === 'modal-saida') {
                     this.updateProductSelects();
                 }
@@ -1149,10 +1170,6 @@
                 document.getElementById(modalId).classList.remove('active');
             },
 
-            closeModals: function() {
-                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-            },
-
             updateProductSelects: function() {
                 const entradaSelect = document.getElementById('entrada-produto');
                 const saidaSelect = document.getElementById('saida-produto');
@@ -1165,7 +1182,6 @@
                     `<option value="${p.id}">${p.name} (Estoque: ${p.stock})</option>`
                 ).join('');
 
-                // Setar data atual
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('entrada-data').value = today;
                 document.getElementById('saida-data').value = today;
@@ -1250,11 +1266,6 @@
                     return;
                 }
 
-                if (qtd > this.db.waterStock && this.currentUser.role !== 'admin') {
-                    alert('Quantidade solicitada excede o estoque disponível!');
-                    return;
-                }
-
                 this.db.waterRequests.push({
                     id: Date.now(),
                     qtd,
@@ -1263,11 +1274,6 @@
                     userId: this.currentUser.id,
                     status: 'pending'
                 });
-
-                if (this.currentUser.role === 'admin') {
-                    // Admin pode retirar direto
-                    this.db.waterStock -= qtd;
-                }
 
                 this.saveDatabase();
                 this.closeModal('modal-agua');
@@ -1283,7 +1289,7 @@
                         this.db.waterStock -= request.qtd;
                     }
                     this.saveDatabase();
-                    this.renderDashboard();
+                    this.renderAgua();
                 }
             },
 
@@ -1292,14 +1298,8 @@
                 if (request) {
                     request.status = 'rejected';
                     this.saveDatabase();
-                    this.renderDashboard();
+                    this.renderAgua();
                 }
-            },
-
-            solicitarLimpeza: function() {
-                // Simples redirecionamento para filtro de produtos de limpeza
-                this.renderEstoque();
-                this.filterByCategory('Material de Limpeza');
             },
 
             filterProducts: function(search) {
@@ -1324,7 +1324,6 @@
                     }
                 });
 
-                // Atualizar botões ativos
                 document.querySelectorAll('.action-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
@@ -1402,7 +1401,6 @@
             },
 
             setupEventListeners: function() {
-                // Fechar modais clicando fora
                 document.querySelectorAll('.modal-overlay').forEach(modal => {
                     modal.addEventListener('click', function(e) {
                         if (e.target === this) {
@@ -1413,7 +1411,6 @@
             }
         };
 
-        // Inicializar app
         window.onload = () => app.init();
     </script>
 </body>
