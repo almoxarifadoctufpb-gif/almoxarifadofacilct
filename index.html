@@ -55,19 +55,19 @@
         }
 
         #splash-screen img {
-            width: 130px;
-            height: 130px;
+            width: 150px;
+            height: 150px;
             border-radius: 30px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             background: white;
-            padding: 8px;
+            padding: 10px;
             object-fit: contain;
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255,255,255,0.3);
         }
 
         #splash-screen span {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 300;
             letter-spacing: 2px;
             background: rgba(255,255,255,0.15);
@@ -106,8 +106,8 @@
         }
 
         .header-logo img {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 12px;
             background: white;
             padding: 5px;
@@ -146,7 +146,7 @@
             cursor: pointer;
         }
 
-        /* Tela de Login com Logo */
+        /* Tela de Login com Logo MAIOR */
         #login-screen {
             position: fixed;
             top: 0;
@@ -163,8 +163,8 @@
         .login-box {
             background: var(--branco);
             width: 90%;
-            max-width: 380px;
-            padding: 30px 25px;
+            max-width: 400px;
+            padding: 35px 25px;
             border-radius: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             text-align: center;
@@ -176,11 +176,11 @@
         }
 
         .login-box .logo-container img {
-            width: 120px;
-            height: 120px;
-            border-radius: 25px;
+            width: 150px;  /* AUMENTADO */
+            height: 150px; /* AUMENTADO */
+            border-radius: 30px;
             background: white;
-            padding: 8px;
+            padding: 10px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             border: 4px solid var(--azul-institucional);
             object-fit: contain;
@@ -190,13 +190,13 @@
         .login-box h2 {
             color: var(--azul-institucional);
             margin-bottom: 5px;
-            font-size: 24px;
+            font-size: 26px;
         }
 
         .login-box p {
             color: var(--texto-secundario);
             margin-bottom: 25px;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .login-box .form-group {
@@ -250,7 +250,7 @@
             color: var(--texto-secundario);
         }
 
-        /* Menu de Navegação */
+        /* Menu de Navegação com ícone personalizado */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -279,6 +279,7 @@
             cursor: pointer;
             padding: 5px 12px;
             border-radius: 12px;
+            transition: background 0.2s;
         }
 
         .nav-item.active {
@@ -288,6 +289,19 @@
 
         .nav-item span {
             font-size: 18px;
+        }
+
+        /* Ícone personalizado da casinha */
+        .nav-item .home-icon {
+            width: 22px;
+            height: 22px;
+            filter: brightness(0) saturate(100%) invert(40%) sepia(0%) saturate(0%) hue-rotate(0deg);
+            transition: filter 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active .home-icon {
+            filter: brightness(0) saturate(100%) invert(18%) sepia(70%) saturate(2000%) hue-rotate(190deg) brightness(90%);
         }
 
         /* Conteúdo Principal */
@@ -600,8 +614,8 @@
             }
             
             .header-logo img {
-                width: 40px;
-                height: 40px;
+                width: 45px;
+                height: 45px;
             }
             
             .header-title h1 {
@@ -609,8 +623,8 @@
             }
             
             .login-box .logo-container img {
-                width: 100px;
-                height: 100px;
+                width: 130px;
+                height: 130px;
             }
         }
     </style>
@@ -622,7 +636,7 @@
         <span>Almox Fácil CT</span>
     </div>
 
-    <!-- Tela de Login - CORRIGIDA com logo obrigatória -->
+    <!-- Tela de Login - Logo MAIOR -->
     <div id="login-screen">
         <div class="login-box">
             <div class="logo-container">
@@ -672,11 +686,11 @@
         <!-- Conteúdo Principal -->
         <div class="main-content" id="main-content"></div>
 
-        <!-- Navegação Inferior -->
+        <!-- Navegação Inferior com ícone personalizado -->
         <nav class="bottom-nav" id="bottom-nav"></nav>
     </div>
 
-    <!-- Modal de Entrada -->
+    <!-- Modal de Entrada com Valor Unitário -->
     <div class="modal-overlay" id="modal-entrada">
         <div class="modal">
             <div class="modal-header">
@@ -693,6 +707,10 @@
                     <input type="number" id="entrada-qtd" min="1" value="1">
                 </div>
                 <div class="form-group">
+                    <label>Valor Unitário (R$)</label>
+                    <input type="number" id="entrada-valor" min="0.01" step="0.01" value="0.00">
+                </div>
+                <div class="form-group">
                     <label>Fornecedor</label>
                     <input type="text" id="entrada-fornecedor" placeholder="Ex: Papelaria Central">
                 </div>
@@ -703,6 +721,10 @@
                 <div class="form-group">
                     <label>Data</label>
                     <input type="date" id="entrada-data">
+                </div>
+                <div class="form-group" style="background: var(--azul-claro); padding: 10px; border-radius: 10px;">
+                    <label>Saldo Total da Entrada:</label>
+                    <p id="entrada-saldo" style="font-size: 18px; font-weight: bold; color: var(--azul-institucional);">R$ 0,00</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -832,19 +854,17 @@
                 this.hideSplash();
                 this.setupEventListeners();
                 this.checkLoginState();
-                this.forceLogoLoad(); // Força o carregamento da logo
+                this.forceLogoLoad();
             },
 
-            // Força o carregamento da logo em todas as telas
             forceLogoLoad: function() {
-                // Recarregar todas as logos com timestamp para evitar cache
                 const logos = ['splash-logo', 'login-logo', 'header-logo'];
                 const timestamp = '?t=' + new Date().getTime();
                 
                 logos.forEach(id => {
                     const img = document.getElementById(id);
                     if (img) {
-                        const originalSrc = img.src.split('?')[0]; // Remove timestamp antigo
+                        const originalSrc = img.src.split('?')[0];
                         img.src = originalSrc + timestamp;
                     }
                 });
@@ -902,11 +922,11 @@
                 ];
 
                 this.db.products = [
-                    { id: 1, name: 'Papel A4 (Resma)', category: 'Material de Expediente', stock: 50, minStock: 10, location: 'Prateleira A1' },
-                    { id: 2, name: 'Caneta Azul', category: 'Material de Expediente', stock: 100, minStock: 20, location: 'Prateleira A2' },
-                    { id: 3, name: 'Detergente Líquido', category: 'Material de Limpeza', stock: 5, minStock: 10, location: 'Prateleira B1' },
-                    { id: 4, name: 'Álcool 70%', category: 'Higiene', stock: 8, minStock: 15, location: 'Prateleira B2' },
-                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3' }
+                    { id: 1, name: 'Papel A4 (Resma)', category: 'Material de Expediente', stock: 50, minStock: 10, location: 'Prateleira A1', unitValue: 22.50 },
+                    { id: 2, name: 'Caneta Azul', category: 'Material de Expediente', stock: 100, minStock: 20, location: 'Prateleira A2', unitValue: 1.75 },
+                    { id: 3, name: 'Detergente Líquido', category: 'Material de Limpeza', stock: 5, minStock: 10, location: 'Prateleira B1', unitValue: 3.20 },
+                    { id: 4, name: 'Álcool 70%', category: 'Higiene', stock: 8, minStock: 15, location: 'Prateleira B2', unitValue: 6.90 },
+                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3', unitValue: 4.50 }
                 ];
 
                 this.saveDatabase();
@@ -944,7 +964,7 @@
                 this.currentUser = null;
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
-                this.forceLogoLoad(); // Recarrega a logo na tela de login
+                this.forceLogoLoad();
             },
 
             showApp: function() {
@@ -954,7 +974,7 @@
                     `Olá, ${this.currentUser.name.split(' ')[0]} (${this.getRoleName(this.currentUser.role)})`;
                 
                 this.renderDashboard();
-                this.forceLogoLoad(); // Garante que a logo do header apareça
+                this.forceLogoLoad();
             },
 
             getRoleName: function(role) {
@@ -1047,6 +1067,7 @@
                 this.db.products.forEach(p => {
                     const status = p.stock === 0 ? 'zero' : (p.stock <= p.minStock ? 'low' : 'normal');
                     const statusText = p.stock === 0 ? 'Estoque Zerado' : (p.stock <= p.minStock ? 'Estoque Baixo' : 'Estoque Normal');
+                    const totalValue = (p.unitValue || 0) * p.stock;
 
                     html += `
                         <li class="item-card" data-category="${p.category}">
@@ -1060,6 +1081,10 @@
                                 </div>
                                 <div style="font-size: 12px; color: var(--texto-secundario); margin-top: 5px;">
                                     Local: ${p.location}
+                                </div>
+                                <div style="font-size: 12px; color: var(--azul-institucional); margin-top: 5px; font-weight: 600;">
+                                    R$ ${(p.unitValue || 0).toFixed(2).replace('.', ',')} un | 
+                                    Total: R$ ${totalValue.toFixed(2).replace('.', ',')}
                                 </div>
                             </div>
                             ${isAdmin ? `
@@ -1162,8 +1187,9 @@
 
                 nav.innerHTML = `
                     <button class="nav-item ${active === 'dashboard' ? 'active' : ''}" onclick="app.renderDashboard()">
-                        <span>🏠</span>
-                        <span>Início</span>
+                        <img src="home-icon.png" alt="Início" class="home-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none;">🏠</span>
+                        <span style="font-size: 11px; margin-top: 2px;">Início</span>
                     </button>
                     <button class="nav-item ${active === 'estoque' ? 'active' : ''}" onclick="app.renderEstoque()">
                         <span>📦</span>
@@ -1205,7 +1231,7 @@
                 const saidaSelect = document.getElementById('saida-produto');
 
                 entradaSelect.innerHTML = this.db.products.map(p => 
-                    `<option value="${p.id}">${p.name} (Estoque: ${p.stock})</option>`
+                    `<option value="${p.id}" data-valor="${p.unitValue || 0}">${p.name} (Estoque: ${p.stock})</option>`
                 ).join('');
 
                 saidaSelect.innerHTML = this.db.products.filter(p => p.stock > 0).map(p => 
@@ -1215,11 +1241,40 @@
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('entrada-data').value = today;
                 document.getElementById('saida-data').value = today;
+                
+                // Adicionar listeners para calcular saldo
+                const qtdInput = document.getElementById('entrada-qtd');
+                const valorInput = document.getElementById('entrada-valor');
+                
+                if (qtdInput && valorInput) {
+                    qtdInput.addEventListener('input', () => this.calcularSaldoEntrada());
+                    valorInput.addEventListener('input', () => this.calcularSaldoEntrada());
+                    
+                    // Preencher valor unitário quando mudar o produto
+                    document.getElementById('entrada-produto').addEventListener('change', (e) => {
+                        const selectedOption = e.target.options[e.target.selectedIndex];
+                        const valor = selectedOption.dataset.valor || 0;
+                        document.getElementById('entrada-valor').value = valor;
+                        this.calcularSaldoEntrada();
+                    });
+                    
+                    // Trigger inicial
+                    setTimeout(() => this.calcularSaldoEntrada(), 100);
+                }
+            },
+
+            calcularSaldoEntrada: function() {
+                const qtd = parseFloat(document.getElementById('entrada-qtd').value) || 0;
+                const valor = parseFloat(document.getElementById('entrada-valor').value) || 0;
+                const saldo = qtd * valor;
+                
+                document.getElementById('entrada-saldo').innerHTML = `R$ ${saldo.toFixed(2).replace('.', ',')}`;
             },
 
             registrarEntrada: function() {
                 const productId = parseInt(document.getElementById('entrada-produto').value);
                 const qtd = parseInt(document.getElementById('entrada-qtd').value);
+                const valorUnitario = parseFloat(document.getElementById('entrada-valor').value) || 0;
                 const fornecedor = document.getElementById('entrada-fornecedor').value;
                 const nf = document.getElementById('entrada-nf').value;
                 const data = document.getElementById('entrada-data').value;
@@ -1230,6 +1285,11 @@
                 }
 
                 const product = this.db.products.find(p => p.id === productId);
+                
+                if (valorUnitario > 0) {
+                    product.unitValue = valorUnitario;
+                }
+                
                 product.stock += qtd;
 
                 this.db.movements.push({
@@ -1237,6 +1297,8 @@
                     type: 'entrada',
                     productId,
                     qtd,
+                    unitValue: valorUnitario,
+                    totalValue: qtd * valorUnitario,
                     supplier: fornecedor,
                     nf,
                     date: data,
