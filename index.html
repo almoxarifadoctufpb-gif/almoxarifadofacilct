@@ -3,923 +3,1417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" id="theme-color-meta" content="#174A96">
-    <title>Almox CT UFPB</title>
-    <link rel="manifest" id="manifest-link" href="#">
+    <meta name="theme-color" content="#0A4B8C">
+    <title>Almox Fácil CT</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
     <style>
-        /* =========================================
-           PALETA ALMOX CT UFPB
-        ========================================= */
-        :root {
-            --azul-900: #0F2A5A;
-            --azul-800: #174A96;
-            --azul-700: #1E5BB8;
-            --azul-600: #2F73D9;
-            --azul-500: #4A86E8;
-            --azul-400: #6FA3FF;
-            --azul-300: #9FC2FF;
-            --azul-200: #DCE9FF;
-            --azul-100: #EEF4FF;
-            --branco: #FFFFFF;
-            --danger: #E53935;
-            --warning: #FFB020;
-            --success: #43A047;
-            --text-main: #0F2A5A;
-            --text-muted: #4A5568;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        :root {
+            --azul-institucional: #0A4B8C;
+            --azul-escuro: #083A6E;
+            --azul-claro: #E6F0FA;
+            --branco: #FFFFFF;
+            --cinza-claro: #F5F7FA;
+            --cinza-borda: #E1E5EA;
+            --texto-principal: #2C3E50;
+            --texto-secundario: #7F8C8D;
+            --verde: #27AE60;
+            --amarelo: #F39C12;
+            --vermelho: #E74C3C;
+        }
 
         body {
-            background-color: var(--azul-100);
-            color: var(--text-main);
-            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-            overflow-x: hidden;
+            background-color: var(--cinza-claro);
+            color: var(--texto-principal);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        input, select, textarea { user-select: text; -webkit-user-select: text; }
-
-        /* Tema base usa as cores institucionais */
-        .app-container { width: 100%; max-width: 100%; height: 100vh; display: flex; flex-direction: column; }
-
+        /* Splash Screen */
         #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--azul-800), var(--azul-700), var(--azul-600));
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
             color: white;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 24px; font-weight: bold; z-index: 9999;
-            transition: opacity 0.5s ease-out;
+            transition: opacity 0.5s;
         }
-        #splash-screen img { width: 120px; height: 120px; margin-bottom: 20px; background: transparent; }
-        #splash-screen span { background: rgba(255,255,255,0.2); padding: 10px 30px; border-radius: 50px; }
 
-        /* =========================================
-           HEADER E PAINÉIS
-        ========================================= */
+        #splash-screen .logo {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        #splash-screen span {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        /* Container Principal */
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--branco);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Header */
         .header {
-            background: linear-gradient(135deg, var(--azul-800), var(--azul-700));
-            color: white; padding: 15px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: background 0.3s;
-            z-index: 10;
-        }
-        .header select {
-            background: rgba(255,255,255,0.15); color: white; border: none;
-            font-size: 18px; font-weight: bold; padding: 8px 12px; border-radius: 30px;
-            outline: none; appearance: none; backdrop-filter: blur(5px);
-        }
-        .header select option { color: var(--azul-900); background: white; }
-        .header-actions { display: flex; gap: 12px; }
-        .header-actions button {
-            background: rgba(255,255,255,0.2); border: none; color: white;
-            width: 44px; height: 44px; border-radius: 50%;
-            font-size: 24px; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px); transition: 0.2s;
-        }
-        .header-actions button:hover { background: var(--azul-400); }
-
-        #water-stock-panel {
-            background: var(--branco); padding: 12px 20px; text-align: center;
-            font-weight: bold; color: var(--text-main); border-bottom: 2px solid var(--azul-200);
-            display: none; align-items: center; justify-content: center; gap: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .stock-count {
-            font-size: 20px; color: var(--azul-700); padding: 4px 16px;
-            background: var(--azul-200); border-radius: 40px;
-        }
-        .btn-edit-stock {
-            background: var(--azul-200); border: none; padding: 6px 14px;
-            border-radius: 30px; font-size: 14px; color: var(--azul-800);
-            font-weight: bold; display: none; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 15px rgba(10,75,140,0.3);
         }
 
-        .chip-container {
-            display: flex; overflow-x: auto; white-space: nowrap; padding: 15px;
-            gap: 12px; background: var(--branco); border-bottom: 1px solid var(--azul-200);
-        }
-        .chip-container::-webkit-scrollbar { display: none; }
-        .chip {
-            padding: 10px 22px; background: var(--azul-200); border-radius: 40px;
-            font-size: 14px; color: var(--azul-800); border: 1px solid transparent;
-            transition: 0.2s; font-weight: 500;
-        }
-        .chip.active {
-            background: var(--azul-700); color: white; border-color: var(--azul-700);
-            box-shadow: 0 4px 8px rgba(23,74,150,0.2);
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .list-container { flex: 1; overflow-y: auto; padding: 15px; }
-        .list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .item {
-            display: flex; background: var(--branco); padding: 16px;
-            border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            align-items: center; transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid var(--azul-200);
+        .header-title p {
+            font-size: 12px;
+            opacity: 0.9;
         }
-        .item:active { transform: scale(0.99); box-shadow: 0 6px 16px rgba(0,0,0,0.05); }
-        .item-avatar {
-            width: 52px; height: 52px; border-radius: 18px;
-            background: linear-gradient(145deg, var(--azul-600), var(--azul-500));
-            color: white; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 22px; margin-right: 16px; flex-shrink: 0;
-            box-shadow: 0 6px 12px rgba(47,115,217,0.3);
-        }
-        .item-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .item-title { font-size: 16px; font-weight: 700; color: var(--azul-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-        .item-status {
-            font-size: 12px; font-weight: bold; padding: 5px 12px; border-radius: 40px;
-            margin-left: 10px; white-space: nowrap; background: var(--azul-200);
-            color: var(--azul-800);
-        }
-        .status-1 { background: #FFF3E0; color: #E65100; } 
-        .status-2 { background: #E3F2FD; color: #0D47A1; } 
-        .status-3 { background: #E8F5E9; color: #1B5E20; } 
 
-        /* =========================================
-           MODAIS
-        ========================================= */
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-icons button {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+
+        /* Menu de Navegação */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            max-width: 500px;
+            width: 100%;
+            background: var(--branco);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--cinza-borda);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--texto-secundario);
+            font-size: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--azul-institucional);
+            background: var(--azul-claro);
+        }
+
+        .nav-item span {
+            font-size: 20px;
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        /* Cards do Dashboard */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--branco);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid var(--cinza-borda);
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--azul-institucional);
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--texto-secundario);
+        }
+
+        .stat-card.warning .value { color: var(--amarelo); }
+        .stat-card.danger .value { color: var(--vermelho); }
+
+        /* Ações Rápidas */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0 20px;
+            margin-bottom: 10px;
+        }
+
+        .quick-actions::-webkit-scrollbar {
+            display: none;
+        }
+
+        .action-btn {
+            background: var(--branco);
+            border: 1px solid var(--cinza-borda);
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--texto-principal);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            cursor: pointer;
+        }
+
+        .action-btn.primary {
+            background: var(--azul-institucional);
+            color: white;
+            border: none;
+        }
+
+        /* Listas */
+        .list-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 15px;
+        }
+
+        .list-title h3 {
+            font-size: 18px;
+            color: var(--texto-principal);
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item-card {
+            background: var(--branco);
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            border: 1px solid var(--cinza-borda);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--azul-claro);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--azul-institucional);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .item-info .category {
+            font-size: 12px;
+            color: var(--texto-secundario);
+            margin-bottom: 5px;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stock-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stock-badge.normal {
+            background: #E8F5E9;
+            color: var(--verde);
+        }
+
+        .stock-badge.low {
+            background: #FFF3E0;
+            color: var(--amarelo);
+        }
+
+        .stock-badge.zero {
+            background: #FFEBEE;
+            color: var(--vermelho);
+        }
+
+        .stock-qty {
+            font-weight: 600;
+            color: var(--texto-principal);
+        }
+
+        /* Modais */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15,42,90,0.5); backdrop-filter: blur(4px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
-        .modal-overlay.active { display: flex; }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
         .modal {
-            background: var(--branco); width: 95%; max-width: 500px;
-            border-radius: 32px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease-out; max-height: 90vh;
-            display: flex; flex-direction: column;
+            background: var(--branco);
+            width: 90%;
+            max-width: 450px;
+            border-radius: 25px;
+            overflow: hidden;
+            animation: slideUp 0.3s;
         }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
         .modal-header {
-            padding: 20px 20px 10px; font-size: 20px; font-weight: 700;
-            background: var(--branco); color: var(--azul-900);
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 3px solid var(--azul-600);
+            padding: 20px;
+            background: var(--azul-institucional);
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
         }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; background: var(--azul-100); }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
         .modal-footer {
-            padding: 15px 20px; display: flex; justify-content: flex-end; gap: 12px;
-            background: var(--branco); border-top: 2px solid var(--azul-200);
+            padding: 15px 20px;
+            border-top: 1px solid var(--cinza-borda);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
-        button {
-            border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600;
-            font-size: 15px; cursor: pointer; transition: 0.2s;
+        /* Formulários */
+        .form-group {
+            margin-bottom: 15px;
         }
-        .btn-cancel { background: var(--azul-200); color: var(--azul-800); }
-        .btn-action {
-            background: linear-gradient(145deg, var(--azul-700), var(--azul-600));
-            color: white; box-shadow: 0 6px 14px rgba(30,91,184,0.4);
-        }
-        .btn-action:hover { background: linear-gradient(145deg, var(--azul-600), var(--azul-500)); }
 
-        .form-group { margin-bottom: 20px; }
         .form-group label {
-            display: block; font-size: 13px; font-weight: 600;
-            color: var(--azul-800); margin-bottom: 6px; letter-spacing: 0.3px;
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--texto-secundario);
+            margin-bottom: 5px;
         }
-        .form-group input, .form-group select {
-            width: 100%; padding: 14px 18px; font-size: 16px;
-            border: 2px solid var(--azul-200); border-radius: 30px;
-            background: var(--branco); transition: 0.2s; outline: none;
-        }
-        .form-group input:focus { border-color: var(--azul-500); box-shadow: 0 0 0 3px var(--azul-200); }
 
-        .admin-input { text-align: center; font-size: 28px !important; letter-spacing: 12px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
 
-        /* Itens do catálogo no modal */
-        .catalog-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 0; border-bottom: 1px solid var(--azul-200);
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--azul-institucional);
         }
-        .catalog-info {
-            flex: 1; font-size: 16px; color: var(--azul-900);
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .catalog-info small { color: var(--azul-600); font-size: 12px; }
-        .catalog-controls { display: flex; align-items: center; gap: 15px; }
-        .qty-btn {
-            background: var(--azul-200); color: var(--azul-800);
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 22px; font-weight: bold; padding: 0;
-        }
-        .qty-display { font-size: 18px; font-weight: bold; min-width: 30px; text-align: center; color: var(--azul-800); }
 
-        /* Painel de configurações */
-        .settings-item {
-            background: var(--branco); border-radius: 20px; padding: 16px;
-            margin-bottom: 15px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            border: 1px solid var(--azul-200);
+        /* Botões */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .settings-item span { font-weight: 600; color: var(--azul-900); }
-        .settings-actions { display: flex; gap: 10px; }
-        .settings-actions button {
-            padding: 8px 16px; border-radius: 30px; background: var(--azul-200);
-            color: var(--azul-800); font-size: 13px;
+
+        .btn-primary {
+            background: var(--azul-institucional);
+            color: white;
         }
-        .item-outofstock { opacity: 0.6; background: #ffeeee; }
-        .stock-badge {
-            font-size: 11px; padding: 3px 10px; border-radius: 30px;
-            background: var(--azul-200); color: var(--azul-700); margin-left: 10px;
+
+        .btn-secondary {
+            background: var(--cinza-claro);
+            color: var(--texto-principal);
         }
-        .stock-badge.esgotado { background: #FFCDD2; color: #C62828; }
+
+        .btn-danger {
+            background: var(--vermelho);
+            color: white;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .login-box {
+            background: var(--branco);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-box h2 {
+            color: var(--azul-institucional);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-box .logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* Água Fácil CT */
+        .water-stats {
+            background: linear-gradient(135deg, var(--azul-claro), white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .water-progress {
+            height: 10px;
+            background: var(--cinza-borda);
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .water-progress-bar {
+            height: 100%;
+            background: var(--azul-institucional);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Responsividade */
+        @media (max-width: 400px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--cinza-claro);
+            border-top-color: var(--azul-institucional);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body oncontextmenu="return false;" class="theme-estoque">
-
+<body>
     <div id="splash-screen">
-        <img src="icon.png" alt="logo" onerror="this.style.display='none'">
-        <span>Almox CT UFPB</span>
+        <div class="logo">📦</div>
+        <span>Almox Fácil CT</span>
     </div>
 
-    <div class="app-container">
-        <header class="header" id="main-header">
-            <select id="mode-select" onchange="app.changeMode(this.value)">
-                <option value="estoque">Material de Expediente</option>
-                <option value="agua">Água Mineral</option>
-                <option value="admin">Gestão (Admin)</option>
-            </select>
-            <div class="header-actions">
-                <button id="btn-add" onclick="app.openFlow()">+</button>
-                <button id="btn-settings" onclick="app.openSettings()">⚙️</button>
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="logo">📦</div>
+            <h2>Almox Fácil CT</h2>
+            <div class="form-group">
+                <label>E-mail institucional</label>
+                <input type="email" id="login-email" placeholder="usuario@ct.ufpb.br">
             </div>
-        </header>
-
-        <div id="water-stock-panel">
-            Estoque Atual: <span class="stock-count" id="lbl-water-stock">0</span> garrafões
-            <button class="btn-edit-stock" id="btn-edit-stock" onclick="app.promptEditWater()">✏️ Editar</button>
-        </div>
-
-        <div class="chip-container" id="chip-container">
-            <div class="chip active" onclick="app.setFilter('all')">Todos os Pedidos</div>
-            <div class="chip" onclick="app.setFilter('1')">Pendentes</div>
-            <div class="chip" onclick="app.setFilter('2')">Separados</div>
-            <div class="chip" onclick="app.setFilter('3')">Entregues</div>
-        </div>
-
-        <div class="list-container">
-            <ul class="list" id="item-list"></ul>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="login-password" placeholder="******">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="app.login()">Entrar</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--texto-secundario);">
+                Use admin@ufpb.br / 123456 para admin<br>
+                usuario@ufpb.br / 123456 para usuário comum
+            </p>
         </div>
     </div>
 
-    <!-- Modal de catálogo (expediente) -->
-    <div class="modal-overlay" id="modal-catalog">
-        <div class="modal">
-            <div class="modal-header">Selecione os Materiais</div>
-            <div class="modal-body" id="catalog-list"></div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.closeModals()">Cancelar</button>
-                <button class="btn-action" onclick="app.goToCheckout()">Avançar</button>
+    <div class="app-container" id="app-container" style="display: none;">
+        <div class="header">
+            <div class="header-title">
+                <h1>Almox Fácil CT</h1>
+                <p id="user-greeting">Carregando...</p>
+            </div>
+            <div class="header-icons">
+                <button onclick="app.logout()">🚪</button>
             </div>
         </div>
+
+        <div class="main-content" id="main-content"></div>
+
+        <nav class="bottom-nav" id="bottom-nav"></nav>
     </div>
 
-    <!-- Modal de checkout -->
-    <div class="modal-overlay" id="modal-checkout">
+    <!-- Modal de Entrada de Materiais -->
+    <div class="modal-overlay" id="modal-entrada">
         <div class="modal">
-            <div class="modal-header">Finalizar Solicitação</div>
+            <div class="modal-header">Registrar Entrada</div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Seu Nome Completo</label>
-                    <input type="text" id="input-name" placeholder="Ex: João da Silva">
+                    <label>Produto</label>
+                    <select id="entrada-produto"></select>
                 </div>
                 <div class="form-group">
-                    <label>Telefone / WhatsApp</label>
-                    <input type="tel" id="input-phone" placeholder="(00) 00000-0000">
+                    <label>Quantidade</label>
+                    <input type="number" id="entrada-qtd" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Fornecedor</label>
+                    <input type="text" id="entrada-fornecedor">
+                </div>
+                <div class="form-group">
+                    <label>Nº Nota Fiscal</label>
+                    <input type="text" id="entrada-nf">
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="entrada-data">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-entrada')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.registrarEntrada()">Registrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Saída de Materiais -->
+    <div class="modal-overlay" id="modal-saida">
+        <div class="modal">
+            <div class="modal-header">Registrar Saída</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Produto</label>
+                    <select id="saida-produto"></select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="saida-qtd" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Setor Solicitante</label>
+                    <input type="text" id="saida-setor">
+                </div>
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <input type="text" id="saida-responsavel">
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="saida-data">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-saida')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.registrarSaida()">Registrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Solicitação de Água -->
+    <div class="modal-overlay" id="modal-agua">
+        <div class="modal">
+            <div class="modal-header">Solicitar Água</div>
+            <div class="modal-body">
+                <p>Estoque atual: <strong id="agua-estoque-atual">0</strong> garrafões</p>
+                <div class="form-group">
+                    <label>Quantidade solicitada</label>
+                    <input type="number" id="agua-qtd" min="1" value="1">
                 </div>
                 <div class="form-group">
                     <label>Setor</label>
-                    <input type="text" id="input-sector" placeholder="Ex: Recursos Humanos">
+                    <input type="text" id="agua-setor">
                 </div>
-                <div class="form-group" id="group-water-date" style="display: none;">
-                    <label>Data de Validade do Garrafão a ser devolvido</label>
-                    <input type="date" id="input-validity">
-                </div>
+                <p id="agua-previsao"></p>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.closeModals()">Cancelar</button>
-                <button class="btn-action" onclick="app.submitRequest()">Confirmar Pedido</button>
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-agua')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.solicitarAgua()">Solicitar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de admin (senha) -->
-    <div class="modal-overlay" id="modal-admin">
+    <!-- Modal de Relatórios -->
+    <div class="modal-overlay" id="modal-relatorios">
         <div class="modal">
-            <div class="modal-header" style="border-color: var(--azul-900);">Acesso Restrito</div>
+            <div class="modal-header">Relatórios</div>
             <div class="modal-body">
-                <p style="text-align:center; color: var(--text-muted);">Digite a senha (1999)</p>
-                <input type="password" id="input-admin-pass" class="admin-input" 
-                       inputmode="numeric" pattern="[0-9]*" 
-                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); app.checkAdminPassword(this)">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.cancelAdminMode()">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de detalhes do pedido -->
-    <div class="modal-overlay" id="modal-details">
-        <div class="modal">
-            <div class="modal-header">
-                Detalhes do Pedido
-                <span id="detail-status" class="item-status"></span>
-            </div>
-            <div class="modal-body" id="detail-content"></div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.closeModals()">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Configurações (engrenagem) -->
-    <div class="modal-overlay" id="modal-settings">
-        <div class="modal">
-            <div class="modal-header">⚙️ Configurações</div>
-            <div class="modal-body" style="padding: 15px;">
-                <div style="margin-bottom: 20px;">
-                    <button onclick="app.manageAdmins()" style="width:100%; text-align:left; background:var(--branco); border:1px solid var(--azul-200); border-radius:50px; padding:15px 20px; margin-bottom:10px;">👥 Gerenciar Administradores</button>
-                    <button onclick="app.manageUsers()" style="width:100%; text-align:left; background:var(--branco); border:1px solid var(--azul-200); border-radius:50px; padding:15px 20px; margin-bottom:10px;">👤 Gerenciar Usuários</button>
-                    <button onclick="app.manageItems()" style="width:100%; text-align:left; background:var(--branco); border:1px solid var(--azul-200); border-radius:50px; padding:15px 20px; margin-bottom:10px;">📦 Gerenciar Itens do Estoque</button>
-                    <button onclick="app.clearCacheAndReload()" style="width:100%; text-align:left; background:var(--branco); border:1px solid var(--azul-200); border-radius:50px; padding:15px 20px; margin-bottom:10px;">🗑️ Forçar atualização (limpar cache)</button>
+                <div class="form-group">
+                    <label>Tipo de relatório</label>
+                    <select id="relatorio-tipo">
+                        <option value="entradas">Entradas</option>
+                        <option value="saidas">Saídas</option>
+                        <option value="consumo-setor">Consumo por Setor</option>
+                        <option value="mais-utilizados">Itens mais utilizados</option>
+                    </select>
                 </div>
+                <div class="form-group">
+                    <label>Período</label>
+                    <select id="relatorio-periodo">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="365">Último ano</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="app.gerarRelatorio()">Gerar Relatório</button>
+                <div id="relatorio-resultado" style="margin-top: 20px;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.closeModals()">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de gerenciamento de itens (dinâmico) -->
-    <div class="modal-overlay" id="modal-item-manager">
-        <div class="modal">
-            <div class="modal-header" id="item-manager-title">Gerenciar Itens</div>
-            <div class="modal-body" id="item-manager-body"></div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="app.closeModal('modal-item-manager')">Voltar</button>
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-relatorios')">Fechar</button>
             </div>
         </div>
     </div>
 
     <script>
         const app = {
+            currentUser: null,
             db: {
-                requests: [],
-                waterStock: 50,
-                catalog: [  // Agora cada item tem nome e status
-                    { name: "Caneta Esferográfica Azul", inStock: true },
-                    { name: "Caneta Esferográfica Preta", inStock: true },
-                    { name: "Papel A4 (Resma)", inStock: true },
-                    { name: "Grampeador", inStock: true },
-                    { name: "Caixa de Grampos", inStock: true },
-                    { name: "Clipes de Papel (Caixa)", inStock: true },
-                    { name: "Caderno Universitário", inStock: true },
-                    { name: "Fita Adesiva", inStock: true }
-                ],
-                admins: [   // Exemplo inicial
-                    { name: "Admin Master", role: "Gestor", password: "1999" }
-                ],
-                config: { dadosBaixados: false }
+                users: [],
+                products: [],
+                movements: [],
+                waterStock: 30,
+                waterRequests: [],
+                categories: [
+                    'Material de Expediente',
+                    'Material de Limpeza',
+                    'Higiene',
+                    'Informática',
+                    'Manutenção'
+                ]
             },
-            
-            currentMode: 'estoque', 
-            currentFilter: 'all',
-            cart: {},
-            recentInteractions: new Set(),
 
             init: function() {
-                this.handleSplashScreen();
-                this.loadLocalDb();
-                this.loadSavedUserInfo();
-                this.renderList();
-                this.setupTouchGestures();
-                this.updateWaterPanel();
-                this.createManifest();  // Cria o manifest dinamicamente
+                this.loadDatabase();
+                this.hideSplash();
+                this.setupEventListeners();
+                this.checkLoginState();
             },
 
-            handleSplashScreen: function() {
-                const splash = document.getElementById('splash-screen');
-                if (!sessionStorage.getItem('splashShown')) {
+            hideSplash: function() {
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.opacity = '0';
                     setTimeout(() => {
-                        splash.style.opacity = '0';
-                        setTimeout(() => splash.remove(), 500);
-                        sessionStorage.setItem('splashShown', 'true');
-                    }, 1500);
+                        document.getElementById('splash-screen').style.display = 'none';
+                    }, 500);
+                }, 1500);
+            },
+
+            loadDatabase: function() {
+                const saved = localStorage.getItem('almoxFacilDB');
+                if (saved) {
+                    this.db = JSON.parse(saved);
                 } else {
-                    splash.remove();
+                    this.initializeDefaultData();
                 }
             },
 
-            // Manifest dinâmico
-            createManifest: function() {
-                const manifest = {
-                    name: "Almox CT UFPB",
-                    short_name: "Almox",
-                    description: "Gestão de estoque do almoxarifado",
-                    start_url: window.location.href,
-                    display: "standalone",
-                    background_color: "#174A96",
-                    theme_color: "#174A96",
-                    icons: [
-                        {
-                            src: "icon.png",
-                            sizes: "512x512",
-                            type: "image/png",
-                            purpose: "any maskable"
-                        }
-                    ]
-                };
-                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                document.getElementById('manifest-link').href = url;
-            },
-
-            // Limpar cache e recarregar
-            clearCacheAndReload: function() {
-                if (confirm("Isso apagará todos os dados locais e recarregará o app. Continuar?")) {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.reload();
-                }
-            },
-
-            // Gerenciamento de Administradores (simples)
-            manageAdmins: function() {
-                let html = '<h3 style="margin-bottom:15px;">Administradores</h3>';
-                this.db.admins.forEach((admin, index) => {
-                    html += `<div class="settings-item">
-                        <div><strong>${admin.name}</strong><br><small>${admin.role}</small></div>
-                        <div class="settings-actions">
-                            <button onclick="app.editAdmin(${index})">✏️</button>
-                            <button onclick="app.deleteAdmin(${index})">🗑️</button>
-                        </div>
-                    </div>`;
-                });
-                html += `<button class="btn-action" style="width:100%;" onclick="app.addAdmin()">+ Adicionar Admin</button>`;
-                this.showCustomModal('Administradores', html);
-            },
-
-            addAdmin: function() {
-                const name = prompt("Nome completo:");
-                if (!name) return;
-                const role = prompt("Cargo:");
-                const pwd = prompt("Senha numérica (ex: 1999):");
-                if (pwd) {
-                    this.db.admins.push({ name, role, password: pwd });
-                    this.saveLocalDb();
-                    this.manageAdmins(); // recarrega
-                }
-            },
-            editAdmin: function(idx) {
-                const admin = this.db.admins[idx];
-                const newName = prompt("Nome:", admin.name);
-                if (newName) admin.name = newName;
-                const newRole = prompt("Cargo:", admin.role);
-                if (newRole) admin.role = newRole;
-                const newPwd = prompt("Nova senha (deixe vazio para manter):");
-                if (newPwd) admin.password = newPwd;
-                this.saveLocalDb();
-                this.manageAdmins();
-            },
-            deleteAdmin: function(idx) {
-                if (confirm("Remover administrador?")) {
-                    this.db.admins.splice(idx, 1);
-                    this.saveLocalDb();
-                    this.manageAdmins();
-                }
-            },
-
-            // Gerenciar Usuários (baseado em pedidos)
-            manageUsers: function() {
-                const usersMap = new Map();
-                this.db.requests.forEach(req => {
-                    const key = req.userName + req.phone + req.sector; // chave composta
-                    if (!usersMap.has(key)) {
-                        usersMap.set(key, { name: req.userName, phone: req.phone, sector: req.sector, lastOrder: req.timestamp });
+            initializeDefaultData: function() {
+                // Usuários de exemplo
+                this.db.users = [
+                    {
+                        id: 1,
+                        name: 'Admin Principal',
+                        email: 'admin@ufpb.br',
+                        password: '123456',
+                        siape: '1234567',
+                        sector: 'Almoxarifado',
+                        role: 'admin',
+                        location: 'Bloco A - Sala 101'
+                    },
+                    {
+                        id: 2,
+                        name: 'João Servidor',
+                        email: 'usuario@ufpb.br',
+                        password: '123456',
+                        siape: '7654321',
+                        sector: 'Departamento de Computação',
+                        role: 'user',
+                        location: 'Bloco B - Sala 205'
+                    },
+                    {
+                        id: 3,
+                        name: 'Maria Limpeza',
+                        email: 'terceirizado@ufpb.br',
+                        password: '123456',
+                        sector: 'Equipe de Limpeza',
+                        role: 'gestor_terceirizado',
+                        location: 'Bloco C'
                     }
-                });
-                let html = '<h3 style="margin-bottom:15px;">Usuários que já solicitaram</h3>';
-                if (usersMap.size === 0) html += '<p>Nenhum usuário encontrado.</p>';
-                usersMap.forEach(user => {
-                    html += `<div class="settings-item">
-                        <div><strong>${user.name}</strong><br>${user.sector} - ${user.phone}</div>
-                        <div><small>${new Date(user.lastOrder).toLocaleDateString()}</small></div>
-                    </div>`;
-                });
-                this.showCustomModal('Usuários', html);
+                ];
+
+                // Produtos de exemplo
+                this.db.products = [
+                    { id: 1, name: 'Papel A4 (Resma)', category: 'Material de Expediente', stock: 50, minStock: 10, location: 'Prateleira A1' },
+                    { id: 2, name: 'Caneta Azul', category: 'Material de Expediente', stock: 100, minStock: 20, location: 'Prateleira A2' },
+                    { id: 3, name: 'Detergente Líquido', category: 'Material de Limpeza', stock: 5, minStock: 10, location: 'Prateleira B1' },
+                    { id: 4, name: 'Álcool 70%', category: 'Higiene', stock: 8, minStock: 15, location: 'Prateleira B2' },
+                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3' },
+                    { id: 6, name: 'Papel Higiênico (pacote)', category: 'Higiene', stock: 20, minStock: 10, location: 'Prateleira C1' }
+                ];
+
+                this.saveDatabase();
             },
 
-            // Gerenciar Itens do Estoque (catalog)
-            manageItems: function() {
-                let html = '<h3 style="margin-bottom:15px;">Itens do Estoque</h3>';
-                this.db.catalog.forEach((item, index) => {
-                    const statusClass = item.inStock ? '' : 'item-outofstock';
-                    const badge = item.inStock ? '<span class="stock-badge">Em estoque</span>' : '<span class="stock-badge esgotado">Esgotado</span>';
-                    html += `<div class="settings-item ${statusClass}">
-                        <div><strong>${item.name}</strong> ${badge}</div>
-                        <div class="settings-actions">
-                            <button onclick="app.toggleItemStock(${index})">📦 ${item.inStock ? 'Esgotar' : 'Repor'}</button>
-                            <button onclick="app.editItem(${index})">✏️</button>
-                            <button onclick="app.deleteItem(${index})">🗑️</button>
-                        </div>
-                    </div>`;
-                });
-                html += `<button class="btn-action" style="width:100%; margin-top:10px;" onclick="app.addItem()">+ Adicionar Item</button>`;
-                this.showCustomModal('Gerenciar Itens', html);
+            saveDatabase: function() {
+                localStorage.setItem('almoxFacilDB', JSON.stringify(this.db));
             },
 
-            toggleItemStock: function(index) {
-                this.db.catalog[index].inStock = !this.db.catalog[index].inStock;
-                this.saveLocalDb();
-                this.manageItems(); // atualiza a lista
-            },
-            editItem: function(index) {
-                const newName = prompt("Editar nome do item:", this.db.catalog[index].name);
-                if (newName) {
-                    this.db.catalog[index].name = newName;
-                    this.saveLocalDb();
-                    this.manageItems();
-                }
-            },
-            deleteItem: function(index) {
-                if (confirm("Remover este item do catálogo?")) {
-                    this.db.catalog.splice(index, 1);
-                    this.saveLocalDb();
-                    this.manageItems();
-                }
-            },
-            addItem: function() {
-                const name = prompt("Nome do novo item:");
-                if (name) {
-                    this.db.catalog.push({ name, inStock: true });
-                    this.saveLocalDb();
-                    this.manageItems();
+            checkLoginState: function() {
+                const savedUser = sessionStorage.getItem('currentUser');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.showApp();
+                } else {
+                    document.getElementById('login-screen').style.display = 'flex';
                 }
             },
 
-            // Utilitário para mostrar modais customizados simples
-            showCustomModal: function(title, bodyHtml) {
-                // Reutiliza modal-item-manager ou cria um novo
-                const modal = document.getElementById('modal-item-manager');
-                document.getElementById('item-manager-title').innerText = title;
-                document.getElementById('item-manager-body').innerHTML = bodyHtml;
-                modal.classList.add('active');
-            },
-            closeModal: function(id) {
-                document.getElementById(id).classList.remove('active');
-            },
+            login: function() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
 
-            openSettings: function() {
-                document.getElementById('modal-settings').classList.add('active');
-            },
+                const user = this.db.users.find(u => u.email === email && u.password === password);
 
-            changeMode: function(mode) {
-                if (mode === 'admin') {
-                    document.getElementById('mode-select').value = this.currentMode;
-                    document.getElementById('modal-admin').classList.add('active');
-                    setTimeout(() => document.getElementById('input-admin-pass').focus(), 100);
-                    return;
+                if (user) {
+                    this.currentUser = user;
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    this.showApp();
+                } else {
+                    alert('E-mail ou senha inválidos!');
                 }
+            },
+
+            logout: function() {
+                sessionStorage.removeItem('currentUser');
+                this.currentUser = null;
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app-container').style.display = 'none';
+            },
+
+            showApp: function() {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                document.getElementById('user-greeting').textContent = 
+                    `Olá, ${this.currentUser.name.split(' ')[0]} (${this.getRoleName(this.currentUser.role)})`;
                 
-                this.currentMode = mode;
-                document.body.className = `theme-${mode}`;
-                const themeColors = { 'estoque': '#174A96', 'agua': '#00BCD4', 'admin': '#424242' };
-                document.getElementById('theme-color-meta').content = themeColors[mode] || '#174A96';
-                
-                document.getElementById('btn-add').style.display = (mode === 'admin') ? 'none' : 'block';
-                document.getElementById('water-stock-panel').style.display = (mode === 'agua' || mode === 'admin') ? 'flex' : 'none';
-                document.getElementById('btn-edit-stock').style.display = (mode === 'admin') ? 'block' : 'none';
-                
-                this.renderList();
+                this.renderDashboard();
             },
 
-            checkAdminPassword: function(input) {
-                if (input.value === '1999') {
-                    input.blur(); input.value = ''; this.closeModals();
-                    this.currentMode = 'admin';
-                    document.getElementById('mode-select').value = 'admin';
-                    document.body.className = `theme-admin`;
-                    document.getElementById('theme-color-meta').content = '#424242';
-                    
-                    document.getElementById('btn-add').style.display = 'none';
-                    document.getElementById('water-stock-panel').style.display = 'flex';
-                    document.getElementById('btn-edit-stock').style.display = 'block';
-                    
-                    this.renderList();
-                }
-            },
-
-            cancelAdminMode: function() {
-                this.closeModals();
-                document.getElementById('input-admin-pass').value = '';
-            },
-
-            openFlow: function() {
-                if (this.currentMode === 'estoque') {
-                    this.cart = {};
-                    this.renderCatalog();
-                    document.getElementById('modal-catalog').classList.add('active');
-                } else if (this.currentMode === 'agua') {
-                    document.getElementById('group-water-date').style.display = 'block';
-                    document.getElementById('modal-checkout').classList.add('active');
-                }
-            },
-
-            renderCatalog: function() {
-                const container = document.getElementById('catalog-list');
-                container.innerHTML = '';
-                this.db.catalog.forEach(item => {
-                    const itemId = item.name.replace(/\s+/g, '');
-                    const inStock = item.inStock;
-                    const disabledClass = inStock ? '' : 'item-outofstock';
-                    const disabledAttr = inStock ? '' : 'disabled style="opacity:0.5; pointer-events:none;"';
-                    const stockText = inStock ? '' : ' (Esgotado)';
-                    
-                    const div = document.createElement('div');
-                    div.className = `catalog-item ${disabledClass}`;
-                    div.innerHTML = `
-                        <div class="catalog-info">
-                            ${item.name}${stockText}
-                            ${!inStock ? '<small>Indisponível</small>' : ''}
-                        </div>
-                        <div class="catalog-controls" ${disabledAttr}>
-                            <button class="qty-btn" onclick="app.updateCart('${item.name}', -1)" ${!inStock ? 'disabled' : ''}>-</button>
-                            <div class="qty-display" id="qty-${itemId}">0</div>
-                            <button class="qty-btn" onclick="app.updateCart('${item.name}', 1)" ${!inStock ? 'disabled' : ''}>+</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            },
-
-            updateCart: function(item, change) {
-                if (!this.cart[item]) this.cart[item] = 0;
-                this.cart[item] += change;
-                if (this.cart[item] < 0) this.cart[item] = 0;
-                
-                const itemId = item.replace(/\s+/g, '');
-                const display = document.getElementById(`qty-${itemId}`);
-                if (display) display.innerText = this.cart[item];
-            },
-
-            goToCheckout: function() {
-                const totalItems = Object.values(this.cart).reduce((a, b) => a + b, 0);
-                if (totalItems === 0) {
-                    alert('Selecione pelo menos 1 item para avançar.');
-                    return;
-                }
-                document.getElementById('modal-catalog').classList.remove('active');
-                document.getElementById('group-water-date').style.display = 'none';
-                document.getElementById('modal-checkout').classList.add('active');
-            },
-
-            submitRequest: function() {
-                const name = document.getElementById('input-name').value.trim();
-                const phone = document.getElementById('input-phone').value.trim();
-                const sector = document.getElementById('input-sector').value.trim();
-                
-                if (!name || !phone || !sector) {
-                    alert("Preencha Nome, Telefone e Setor."); return;
-                }
-
-                let items = [];
-                let jugValidity = null;
-
-                if (this.currentMode === 'estoque') {
-                    for (const [itemName, qty] of Object.entries(this.cart)) {
-                        if (qty > 0) items.push({ name: itemName, qty: qty });
-                    }
-                } else if (this.currentMode === 'agua') {
-                    jugValidity = document.getElementById('input-validity').value;
-                    if (!jugValidity) { alert("Informe a validade do garrafão."); return; }
-                    items.push({ name: "Garrafão de Água Mineral (20L)", qty: 1 });
-                }
-
-                localStorage.setItem('userInfo', JSON.stringify({ name, phone, sector }));
-
-                const newReq = {
-                    id: Date.now().toString(),
-                    type: this.currentMode,
-                    userName: name,
-                    phone: phone,
-                    sector: sector,
-                    items: items,
-                    jugValidity: jugValidity,
-                    status: 1, 
-                    timestamp: Date.now()
+            getRoleName: function(role) {
+                const roles = {
+                    'admin': 'Administrador',
+                    'user': 'Usuário',
+                    'gestor_terceirizado': 'Gestor Terceirizado'
                 };
-
-                this.db.requests.unshift(newReq);
-                this.saveLocalDb();
-                this.lockInteraction(newReq.id);
-                
-                this.closeModals();
-                this.renderList();
-                
-                document.getElementById('input-validity').value = '';
+                return roles[role] || role;
             },
 
-            setFilter: function(filter) {
-                this.currentFilter = filter;
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                event.target.classList.add('active');
-                this.renderList();
-            },
+            renderDashboard: function() {
+                const content = document.getElementById('main-content');
+                const isAdmin = this.currentUser.role === 'admin';
+                const isGestor = this.currentUser.role === 'gestor_terceirizado';
 
-            renderList: function() {
-                const listEl = document.getElementById('item-list');
-                listEl.innerHTML = '';
+                // Calcular estatísticas
+                const totalItems = this.db.products.length;
+                const lowStock = this.db.products.filter(p => p.stock > 0 && p.stock <= p.minStock).length;
+                const zeroStock = this.db.products.filter(p => p.stock === 0).length;
+                const pendingRequests = this.db.waterRequests.filter(r => r.status === 'pending').length;
 
-                let filtered = this.db.requests.filter(req => {
-                    if (this.currentMode !== 'admin' && req.type !== this.currentMode) return false;
-                    if (this.currentFilter !== 'all' && req.status.toString() !== this.currentFilter) return false;
-                    return true;
-                });
+                // Calcular consumo mensal (simulado)
+                const monthlyConsumption = this.db.movements.filter(m => {
+                    const date = new Date(m.date);
+                    const now = new Date();
+                    return m.type === 'saida' && 
+                           date.getMonth() === now.getMonth() &&
+                           date.getFullYear() === now.getFullYear();
+                }).reduce((acc, m) => acc + m.qty, 0);
 
-                filtered.forEach(req => {
-                    const statusLabels = { 1: 'Pendente', 2: 'Separado', 3: 'Entregue' };
-                    const typeLabel = req.type === 'estoque' ? '📦 Materiais' : '💧 Água';
-                    
-                    const itemsSummary = req.items.length === 1 && req.type === 'agua' 
-                        ? '1x Garrafão' 
-                        : `${req.items.length} tipo(s) de item`;
-
-                    const li = document.createElement('li');
-                    li.className = 'item';
-                    li.dataset.id = req.id;
-                    
-                    li.innerHTML = `
-                        <div class="item-avatar">${req.userName.charAt(0).toUpperCase()}</div>
-                        <div class="item-info">
-                            <span class="item-title">${req.userName} - ${req.sector}</span>
-                            <span class="item-subtitle">${typeLabel} | ${itemsSummary}</span>
+                let html = `
+                    <div class="dashboard-cards">
+                        <div class="stat-card">
+                            <div class="value">${totalItems}</div>
+                            <div class="label">Total de Itens</div>
                         </div>
-                        <div class="item-status status-${req.status}">${statusLabels[req.status]}</div>
-                    `;
-                    listEl.appendChild(li);
-                });
-            },
-
-            openDetailsModal: function(id) {
-                const req = this.db.requests.find(r => r.id === id);
-                if (!req) return;
-
-                const statusLabels = { 1: 'Pendente', 2: 'Separado', 3: 'Entregue' };
-                const badge = document.getElementById('detail-status');
-                badge.className = `item-status status-${req.status}`;
-                badge.innerText = statusLabels[req.status];
-
-                let itemsHtml = req.items.map(i => `<li>${i.qty}x - ${i.name}</li>`).join('');
-                
-                let waterInfo = '';
-                if (req.type === 'agua') {
-                    const dateParts = req.jugValidity.split('-');
-                    const formatData = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : req.jugValidity;
-                    waterInfo = `<div class="detail-row"><span>Validade Garrafão:</span> ${formatData}</div>`;
-                }
-
-                const content = `
-                    <div class="detail-row"><span>Solicitante:</span> ${req.userName}</div>
-                    <div class="detail-row"><span>Setor:</span> ${req.sector}</div>
-                    <div class="detail-row"><span>Telefone:</span> ${req.phone}</div>
-                    <div class="detail-row"><span>Data do Pedido:</span> ${new Date(req.timestamp).toLocaleString()}</div>
-                    ${waterInfo}
-                    <div class="detail-row" style="margin-top:15px;"><span>Itens Solicitados:</span></div>
-                    <ul class="detail-items">${itemsHtml}</ul>
+                        <div class="stat-card warning">
+                            <div class="value">${lowStock}</div>
+                            <div class="label">Estoque Baixo</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="value">${zeroStock}</div>
+                            <div class="label">Estoque Zerado</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">${monthlyConsumption}</div>
+                            <div class="label">Consumo Mensal</div>
+                        </div>
+                    </div>
                 `;
 
-                document.getElementById('detail-content').innerHTML = content;
-                document.getElementById('modal-details').classList.add('active');
+                // Ações rápidas baseadas no perfil
+                html += '<div class="quick-actions">';
+                
+                if (isAdmin) {
+                    html += `
+                        <button class="action-btn primary" onclick="app.openModal('modal-entrada')">
+                            <span>📥</span> Entrada
+                        </button>
+                        <button class="action-btn" onclick="app.openModal('modal-saida')">
+                            <span>📤</span> Saída
+                        </button>
+                    `;
+                }
+
+                html += `
+                    <button class="action-btn" onclick="app.renderEstoque()">
+                        <span>📋</span> Estoque
+                    </button>
+                    <button class="action-btn" onclick="app.renderAgua()">
+                        <span>💧</span> Água Fácil
+                    </button>
+                `;
+
+                if (isGestor) {
+                    html += `
+                        <button class="action-btn" onclick="app.solicitarLimpeza()">
+                            <span>🧹</span> Limpeza
+                        </button>
+                    `;
+                }
+
+                if (isAdmin) {
+                    html += `
+                        <button class="action-btn" onclick="app.openModal('modal-relatorios')">
+                            <span>📊</span> Relatórios
+                        </button>
+                    `;
+                }
+
+                html += '</div>';
+
+                // Últimas movimentações (para admin)
+                if (isAdmin) {
+                    html += `
+                        <div class="list-title">
+                            <h3>Últimas Movimentações</h3>
+                        </div>
+                        <ul class="item-list">
+                    `;
+
+                    const lastMovements = this.db.movements.slice(-5).reverse();
+                    lastMovements.forEach(m => {
+                        const product = this.db.products.find(p => p.id === m.productId);
+                        html += `
+                            <li class="item-card">
+                                <div class="item-icon">${m.type === 'entrada' ? '📥' : '📤'}</div>
+                                <div class="item-info">
+                                    <h4>${product ? product.name : 'Produto'}</h4>
+                                    <div class="category">${m.qty} unidades - ${new Date(m.date).toLocaleDateString()}</div>
+                                </div>
+                            </li>
+                        `;
+                    });
+
+                    html += '</ul>';
+                }
+
+                // Solicitações pendentes de água (visível para todos)
+                const pendingWater = this.db.waterRequests.filter(r => r.status === 'pending');
+                if (pendingWater.length > 0) {
+                    html += `
+                        <div class="list-title">
+                            <h3>Solicitações de Água Pendentes</h3>
+                        </div>
+                        <ul class="item-list">
+                    `;
+
+                    pendingWater.forEach(r => {
+                        html += `
+                            <li class="item-card">
+                                <div class="item-icon">💧</div>
+                                <div class="item-info">
+                                    <h4>${r.qty} garrafão(ões)</h4>
+                                    <div class="category">Setor: ${r.sector} - ${new Date(r.date).toLocaleDateString()}</div>
+                                </div>
+                                ${isAdmin ? `
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="app.aprovarAgua(${r.id})">✓</button>
+                                        <button class="btn btn-danger" style="padding: 5px 10px;" onclick="app.negarAgua(${r.id})">✗</button>
+                                    </div>
+                                ` : ''}
+                            </li>
+                        `;
+                    });
+
+                    html += '</ul>';
+                }
+
+                content.innerHTML = html;
+                this.renderBottomNav('dashboard');
             },
 
-            updateWaterPanel: function() {
-                document.getElementById('lbl-water-stock').innerText = this.db.waterStock;
+            renderEstoque: function() {
+                const content = document.getElementById('main-content');
+                const isAdmin = this.currentUser.role === 'admin';
+
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" placeholder="🔍 Buscar item..." 
+                               style="width:100%; padding:15px; border:1px solid var(--cinza-borda); border-radius:15px;"
+                               onkeyup="app.filterProducts(this.value)">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto;">
+                        <button class="action-btn active" onclick="app.filterByCategory('all')">Todos</button>
+                        ${this.db.categories.map(cat => 
+                            `<button class="action-btn" onclick="app.filterByCategory('${cat}')">${cat}</button>`
+                        ).join('')}
+                    </div>
+
+                    <ul class="item-list" id="product-list">
+                `;
+
+                this.db.products.forEach(p => {
+                    const status = p.stock === 0 ? 'zero' : (p.stock <= p.minStock ? 'low' : 'normal');
+                    const statusText = p.stock === 0 ? 'Estoque Zerado' : (p.stock <= p.minStock ? 'Estoque Baixo' : 'Estoque Normal');
+
+                    html += `
+                        <li class="item-card" data-category="${p.category}">
+                            <div class="item-icon">📦</div>
+                            <div class="item-info">
+                                <h4>${p.name}</h4>
+                                <div class="category">${p.category}</div>
+                                <div class="stock-info">
+                                    <span class="stock-qty">${p.stock} unidades</span>
+                                    <span class="stock-badge ${status}">${statusText}</span>
+                                </div>
+                                <div style="font-size: 12px; color: var(--texto-secundario); margin-top: 5px;">
+                                    Local: ${p.location}
+                                </div>
+                            </div>
+                            ${isAdmin ? `
+                                <div>
+                                    <button onclick="app.editarProduto(${p.id})" style="background:none; border:none; font-size:20px;">✏️</button>
+                                </div>
+                            ` : ''}
+                        </li>
+                    `;
+                });
+
+                html += '</ul>';
+                content.innerHTML = html;
+                this.renderBottomNav('estoque');
             },
 
-            promptEditWater: function() {
-                const current = this.db.waterStock;
-                const novoValor = prompt("Digite a quantidade atualizada de garrafões em estoque:", current);
-                if (novoValor !== null && !isNaN(novoValor) && novoValor.trim() !== "") {
-                    this.db.waterStock = parseInt(novoValor);
-                    this.saveLocalDb();
-                    this.updateWaterPanel();
+            renderAgua: function() {
+                const content = document.getElementById('main-content');
+                const isAdmin = this.currentUser.role === 'admin';
+
+                // Calcular previsão de reposição (simples)
+                const dailyConsumption = 5; // Média de consumo diário
+                const daysUntilEmpty = Math.floor(this.db.waterStock / dailyConsumption);
+
+                const waterRequests = this.db.waterRequests.filter(r => r.status === 'pending');
+                const totalRequested = waterRequests.reduce((acc, r) => acc + r.qty, 0);
+
+                html = `
+                    <div class="water-stats">
+                        <h3 style="margin-bottom: 15px;">💧 Água Fácil CT</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div style="background: white; padding: 15px; border-radius: 15px;">
+                                <div style="font-size: 28px; font-weight: bold; color: var(--azul-institucional);">
+                                    ${this.db.waterStock}
+                                </div>
+                                <div style="font-size: 13px; color: var(--texto-secundario);">Garrafões em estoque</div>
+                            </div>
+                            <div style="background: white; padding: 15px; border-radius: 15px;">
+                                <div style="font-size: 28px; font-weight: bold; color: var(--azul-institucional);">
+                                    ${totalRequested}
+                                </div>
+                                <div style="font-size: 13px; color: var(--texto-secundario);">Solicitações pendentes</div>
+                            </div>
+                        </div>
+
+                        <div class="water-progress">
+                            <div class="water-progress-bar" style="width: ${Math.min(100, (this.db.waterStock / 50) * 100)}%"></div>
+                        </div>
+
+                        <p style="text-align: center; margin: 10px 0;">
+                            Previsão de reposição: <strong>${daysUntilEmpty > 0 ? daysUntilEmpty + ' dias' : 'Urgente!'}</strong>
+                        </p>
+
+                        <button class="btn btn-primary" style="width:100%;" onclick="app.openModal('modal-agua')">
+                            Solicitar Água
+                        </button>
+                    </div>
+                `;
+
+                // Lista de solicitações
+                if (this.db.waterRequests.length > 0) {
+                    html += `
+                        <div class="list-title">
+                            <h3>Histórico de Solicitações</h3>
+                        </div>
+                        <ul class="item-list">
+                    `;
+
+                    this.db.waterRequests.slice(-10).reverse().forEach(r => {
+                        const statusColor = r.status === 'approved' ? 'var(--verde)' : 
+                                          (r.status === 'rejected' ? 'var(--vermelho)' : 'var(--amarelo)');
+                        html += `
+                            <li class="item-card">
+                                <div class="item-icon">💧</div>
+                                <div class="item-info">
+                                    <h4>${r.qty} garrafão(ões)</h4>
+                                    <div class="category">Setor: ${r.sector}</div>
+                                    <div style="color: ${statusColor}; font-size: 12px; font-weight: 600;">
+                                        Status: ${r.status === 'pending' ? 'Pendente' : (r.status === 'approved' ? 'Aprovado' : 'Negado')}
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    });
+
+                    html += '</ul>';
+                }
+
+                content.innerHTML = html;
+                this.renderBottomNav('agua');
+            },
+
+            renderBottomNav: function(active) {
+                const nav = document.getElementById('bottom-nav');
+                const isAdmin = this.currentUser.role === 'admin';
+
+                nav.innerHTML = `
+                    <button class="nav-item ${active === 'dashboard' ? 'active' : ''}" onclick="app.renderDashboard()">
+                        <span>🏠</span>
+                        <span>Início</span>
+                    </button>
+                    <button class="nav-item ${active === 'estoque' ? 'active' : ''}" onclick="app.renderEstoque()">
+                        <span>📦</span>
+                        <span>Estoque</span>
+                    </button>
+                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderAgua()">
+                        <span>💧</span>
+                        <span>Água</span>
+                    </button>
+                    ${isAdmin ? `
+                        <button class="nav-item ${active === 'relatorios' ? 'active' : ''}" onclick="app.openModal('modal-relatorios')">
+                            <span>📊</span>
+                            <span>Relatórios</span>
+                        </button>
+                    ` : ''}
+                `;
+            },
+
+            openModal: function(modalId) {
+                // Atualizar selects se necessário
+                if (modalId === 'modal-entrada' || modalId === 'modal-saida') {
+                    this.updateProductSelects();
+                }
+                if (modalId === 'modal-agua') {
+                    document.getElementById('agua-estoque-atual').textContent = this.db.waterStock;
+                    document.getElementById('agua-setor').value = this.currentUser.sector;
+                    const days = Math.floor(this.db.waterStock / 5);
+                    document.getElementById('agua-previsao').textContent = 
+                        `Previsão de reposição: ${days > 0 ? days + ' dias' : 'Urgente!'}`;
+                }
+                document.getElementById(modalId).classList.add('active');
+            },
+
+            closeModal: function(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            },
+
+            closeModals: function() {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            },
+
+            updateProductSelects: function() {
+                const entradaSelect = document.getElementById('entrada-produto');
+                const saidaSelect = document.getElementById('saida-produto');
+
+                entradaSelect.innerHTML = this.db.products.map(p => 
+                    `<option value="${p.id}">${p.name} (Estoque: ${p.stock})</option>`
+                ).join('');
+
+                saidaSelect.innerHTML = this.db.products.filter(p => p.stock > 0).map(p => 
+                    `<option value="${p.id}">${p.name} (Estoque: ${p.stock})</option>`
+                ).join('');
+
+                // Setar data atual
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('entrada-data').value = today;
+                document.getElementById('saida-data').value = today;
+            },
+
+            registrarEntrada: function() {
+                const productId = parseInt(document.getElementById('entrada-produto').value);
+                const qtd = parseInt(document.getElementById('entrada-qtd').value);
+                const fornecedor = document.getElementById('entrada-fornecedor').value;
+                const nf = document.getElementById('entrada-nf').value;
+                const data = document.getElementById('entrada-data').value;
+
+                if (!productId || !qtd || !fornecedor || !nf) {
+                    alert('Preencha todos os campos!');
+                    return;
+                }
+
+                const product = this.db.products.find(p => p.id === productId);
+                product.stock += qtd;
+
+                this.db.movements.push({
+                    id: Date.now(),
+                    type: 'entrada',
+                    productId,
+                    qtd,
+                    supplier: fornecedor,
+                    nf,
+                    date: data,
+                    userId: this.currentUser.id
+                });
+
+                this.saveDatabase();
+                this.closeModal('modal-entrada');
+                this.renderDashboard();
+                alert('Entrada registrada com sucesso!');
+            },
+
+            registrarSaida: function() {
+                const productId = parseInt(document.getElementById('saida-produto').value);
+                const qtd = parseInt(document.getElementById('saida-qtd').value);
+                const setor = document.getElementById('saida-setor').value;
+                const responsavel = document.getElementById('saida-responsavel').value;
+                const data = document.getElementById('saida-data').value;
+
+                if (!productId || !qtd || !setor || !responsavel) {
+                    alert('Preencha todos os campos!');
+                    return;
+                }
+
+                const product = this.db.products.find(p => p.id === productId);
+                
+                if (product.stock < qtd) {
+                    alert('Estoque insuficiente!');
+                    return;
+                }
+
+                product.stock -= qtd;
+
+                this.db.movements.push({
+                    id: Date.now(),
+                    type: 'saida',
+                    productId,
+                    qtd,
+                    sector: setor,
+                    responsible: responsavel,
+                    date: data,
+                    userId: this.currentUser.id
+                });
+
+                this.saveDatabase();
+                this.closeModal('modal-saida');
+                this.renderDashboard();
+                alert('Saída registrada com sucesso!');
+            },
+
+            solicitarAgua: function() {
+                const qtd = parseInt(document.getElementById('agua-qtd').value);
+                const setor = document.getElementById('agua-setor').value;
+
+                if (!qtd || !setor) {
+                    alert('Preencha todos os campos!');
+                    return;
+                }
+
+                if (qtd > this.db.waterStock && this.currentUser.role !== 'admin') {
+                    alert('Quantidade solicitada excede o estoque disponível!');
+                    return;
+                }
+
+                this.db.waterRequests.push({
+                    id: Date.now(),
+                    qtd,
+                    sector: setor,
+                    date: new Date().toISOString(),
+                    userId: this.currentUser.id,
+                    status: 'pending'
+                });
+
+                if (this.currentUser.role === 'admin') {
+                    // Admin pode retirar direto
+                    this.db.waterStock -= qtd;
+                }
+
+                this.saveDatabase();
+                this.closeModal('modal-agua');
+                this.renderAgua();
+                alert('Solicitação enviada com sucesso!');
+            },
+
+            aprovarAgua: function(requestId) {
+                const request = this.db.waterRequests.find(r => r.id === requestId);
+                if (request && request.status === 'pending') {
+                    request.status = 'approved';
+                    if (this.db.waterStock >= request.qtd) {
+                        this.db.waterStock -= request.qtd;
+                    }
+                    this.saveDatabase();
+                    this.renderDashboard();
                 }
             },
 
-            setupTouchGestures: function() {
-                const listEl = document.getElementById('item-list');
-                let startX = 0, startY = 0;
-                let currentItem = null;
-                let pressTimer = null;
-                let lastTap = 0;
+            negarAgua: function(requestId) {
+                const request = this.db.waterRequests.find(r => r.id === requestId);
+                if (request) {
+                    request.status = 'rejected';
+                    this.saveDatabase();
+                    this.renderDashboard();
+                }
+            },
 
-                listEl.addEventListener('touchstart', (e) => {
-                    const item = e.target.closest('.item');
-                    if (!item) return;
+            solicitarLimpeza: function() {
+                // Simples redirecionamento para filtro de produtos de limpeza
+                this.renderEstoque();
+                this.filterByCategory('Material de Limpeza');
+            },
 
-                    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-                    currentItem = item;
-
-                    pressTimer = setTimeout(() => {
-                        this.openDetailsModal(item.dataset.id);
-                        currentItem = null; 
-                    }, 600);
-                }, { passive: true });
-
-                listEl.addEventListener('touchmove', (e) => {
-                    if (!currentItem) return;
-                    const diffY = Math.abs(e.touches[0].clientY - startY);
-                    const diffX = Math.abs(e.touches[0].clientX - startX);
-
-                    if (diffY > 15 || diffX > 10) { clearTimeout(pressTimer); }
-                }, { passive: true });
-
-                listEl.addEventListener('touchend', (e) => {
-                    clearTimeout(pressTimer);
-                    if (!currentItem) return;
-
-                    const endX = e.changedTouches[0].clientX;
-                    const diffX = endX - startX;
-
-                    if (diffX > 80) { this.handleSwipe(currentItem.dataset.id, 'right'); } 
-                    else if (diffX < -80) { this.handleSwipe(currentItem.dataset.id, 'left'); } 
-                    else {
-                        const currentTime = new Date().getTime();
-                        const tapLength = currentTime - lastTap;
-                        if (tapLength < 350 && tapLength > 0) { this.handleDoubleTap(currentItem.dataset.id); }
-                        lastTap = currentTime;
+            filterProducts: function(search) {
+                const products = document.querySelectorAll('.item-card');
+                products.forEach(p => {
+                    const name = p.querySelector('h4').textContent.toLowerCase();
+                    if (name.includes(search.toLowerCase())) {
+                        p.style.display = 'flex';
+                    } else {
+                        p.style.display = 'none';
                     }
-                    currentItem = null;
                 });
             },
 
-            handleSwipe: function(id, direction) {
-                if (this.currentMode !== 'admin') return; 
-                const req = this.db.requests.find(r => r.id === id);
-                if (!req) return;
-
-                if (direction === 'right' && req.status < 3) req.status++;
-                if (direction === 'left' && req.status > 1) req.status--;
-                
-                this.lockInteraction(id);
-                this.saveLocalDb();
-                this.renderList();
-            },
-
-            handleDoubleTap: function(id) {
-                if (this.currentMode !== 'admin') return;
-                if(confirm("Deseja realmente excluir este pedido?")) {
-                    this.db.requests = this.db.requests.filter(r => r.id !== id);
-                    this.saveLocalDb();
-                    this.renderList();
-                }
-            },
-
-            closeModals: function() { 
-                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); 
-            },
-
-            loadLocalDb: function() {
-                const stored = localStorage.getItem('estoqueGeralDb');
-                if (stored) { 
-                    const parsed = JSON.parse(stored);
-                    // Converter catalog antigo (array de strings) para objetos se necessário
-                    if (parsed.catalog && typeof parsed.catalog[0] === 'string') {
-                        parsed.catalog = parsed.catalog.map(name => ({ name, inStock: true }));
+            filterByCategory: function(category) {
+                const products = document.querySelectorAll('.item-card');
+                products.forEach(p => {
+                    if (category === 'all' || p.dataset.category === category) {
+                        p.style.display = 'flex';
+                    } else {
+                        p.style.display = 'none';
                     }
-                    this.db = parsed; 
+                });
+
+                // Atualizar botões ativos
+                document.querySelectorAll('.action-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+            },
+
+            editarProduto: function(productId) {
+                const product = this.db.products.find(p => p.id === productId);
+                const newStock = prompt(`Estoque atual: ${product.stock}\nDigite o novo estoque:`, product.stock);
+                if (newStock !== null) {
+                    product.stock = parseInt(newStock);
+                    this.saveDatabase();
+                    this.renderEstoque();
                 }
-                if (!this.db.waterStock) this.db.waterStock = 0;
-                if (!this.db.admins) this.db.admins = [{ name: "Admin Master", role: "Gestor", password: "1999" }];
-                if (!this.db.catalog) this.db.catalog = [];
             },
 
-            saveLocalDb: function() { 
-                localStorage.setItem('estoqueGeralDb', JSON.stringify(this.db)); 
-            },
+            gerarRelatorio: function() {
+                const tipo = document.getElementById('relatorio-tipo').value;
+                const dias = parseInt(document.getElementById('relatorio-periodo').value);
+                
+                const dataLimite = new Date();
+                dataLimite.setDate(dataLimite.getDate() - dias);
 
-            loadSavedUserInfo: function() {
-                const info = JSON.parse(localStorage.getItem('userInfo'));
-                if (info) {
-                    document.getElementById('input-name').value = info.name || '';
-                    document.getElementById('input-phone').value = info.phone || '';
-                    document.getElementById('input-sector').value = info.sector || '';
+                let movimentacoes = this.db.movements.filter(m => new Date(m.date) >= dataLimite);
+                
+                if (tipo === 'entradas') {
+                    movimentacoes = movimentacoes.filter(m => m.type === 'entrada');
+                } else if (tipo === 'saidas') {
+                    movimentacoes = movimentacoes.filter(m => m.type === 'saida');
                 }
+
+                let html = '<h4>Resultado:</h4><ul style="list-style:none; margin-top:10px;">';
+
+                if (tipo === 'consumo-setor') {
+                    const consumoPorSetor = {};
+                    movimentacoes.filter(m => m.type === 'saida').forEach(m => {
+                        consumoPorSetor[m.sector] = (consumoPorSetor[m.sector] || 0) + m.qtd;
+                    });
+                    
+                    Object.entries(consumoPorSetor)
+                        .sort((a, b) => b[1] - a[1])
+                        .forEach(([setor, total]) => {
+                            html += `<li style="margin-bottom:10px;">${setor}: ${total} itens</li>`;
+                        });
+                } else if (tipo === 'mais-utilizados') {
+                    const usoItens = {};
+                    movimentacoes.filter(m => m.type === 'saida').forEach(m => {
+                        usoItens[m.productId] = (usoItens[m.productId] || 0) + m.qtd;
+                    });
+                    
+                    const topItens = Object.entries(usoItens)
+                        .map(([productId, total]) => {
+                            const product = this.db.products.find(p => p.id === parseInt(productId));
+                            return { name: product?.name || 'Desconhecido', total };
+                        })
+                        .sort((a, b) => b.total - a.total)
+                        .slice(0, 5);
+
+                    topItens.forEach(item => {
+                        html += `<li style="margin-bottom:10px;">${item.name}: ${item.total} unidades</li>`;
+                    });
+                } else {
+                    movimentacoes.slice(0, 10).forEach(m => {
+                        const product = this.db.products.find(p => p.id === m.productId);
+                        html += `<li style="margin-bottom:10px;">${m.type === 'entrada' ? '📥' : '📤'} ${product?.name} - ${m.qtd} un (${new Date(m.date).toLocaleDateString()})</li>`;
+                    });
+                }
+
+                if (movimentacoes.length === 0) {
+                    html += '<li>Nenhuma movimentação no período</li>';
+                }
+
+                html += '</ul>';
+                document.getElementById('relatorio-resultado').innerHTML = html;
             },
 
-            lockInteraction: function(id) {
-                this.recentInteractions.add(id);
-                setTimeout(() => this.recentInteractions.delete(id), 15000);
+            setupEventListeners: function() {
+                // Fechar modais clicando fora
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            this.classList.remove('active');
+                        }
+                    });
+                });
             }
         };
 
+        // Inicializar app
         window.onload = () => app.init();
     </script>
 </body>
