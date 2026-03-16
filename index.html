@@ -33,6 +33,9 @@
             --vermelho: #E74C3C;
             --sombra-suave: 0 10px 30px rgba(0,0,0,0.05);
             --sombra-media: 0 4px 12px rgba(0,0,0,0.08);
+            --info: #3498db;
+            --warning: #f39c12;
+            --urgent: #e74c3c;
         }
 
         body {
@@ -180,6 +183,52 @@
         .main-content {
             padding: 24px 20px;
             padding-bottom: 90px;
+        }
+
+        /* Avisos / Alertas */
+        .announcements-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .announcement-banner {
+            padding: 16px 20px;
+            border-radius: 16px;
+            border-left: 6px solid;
+            box-shadow: var(--sombra-media);
+            background: white;
+        }
+        .announcement-banner.priority-info {
+            border-left-color: var(--info);
+            background: #EBF5FF;
+        }
+        .announcement-banner.priority-warning {
+            border-left-color: var(--warning);
+            background: #FEF5E7;
+        }
+        .announcement-banner.priority-urgent {
+            border-left-color: var(--urgent);
+            background: #FDEDEC;
+        }
+        .announcement-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .announcement-message {
+            font-size: 0.9rem;
+            color: var(--texto-principal);
+        }
+        .priority-tag {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.05);
         }
 
         /* Catálogo em Grid */
@@ -880,6 +929,46 @@
         </div>
     </div>
 
+    <!-- MODAL DE AVISO (NOVO/EDITAR) -->
+    <div class="modal-overlay" id="modal-aviso">
+        <div class="modal">
+            <div class="modal-header" id="modal-aviso-title">📢 Novo Aviso</div>
+            <div class="modal-body">
+                <form id="form-aviso" onsubmit="event.preventDefault(); app.salvarAviso();">
+                    <input type="hidden" id="aviso-id" value="">
+                    <div class="form-group">
+                        <label>Título *</label>
+                        <input type="text" id="aviso-titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensagem *</label>
+                        <textarea id="aviso-mensagem" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de início (opcional)</label>
+                        <input type="date" id="aviso-inicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de término (opcional)</label>
+                        <input type="date" id="aviso-termino">
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridade *</label>
+                        <select id="aviso-prioridade" required>
+                            <option value="info">📘 Informativo</option>
+                            <option value="warning">⚠️ Atenção</option>
+                            <option value="urgent">🚨 Urgente</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-aviso')">Cancelar</button>
+                <button class="btn-primary" onclick="app.salvarAviso()">Salvar Aviso</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Finalização (Checkout) -->
     <div class="modal-overlay" id="modal-checkout">
         <div class="modal">
@@ -965,7 +1054,8 @@
                     'Materiais de escritório',
                     'Higiene',
                     'Manutenção'
-                ]
+                ],
+                announcements: [] // NOVA COLEÇÃO DE AVISOS
             },
             cart: [],
 
@@ -1013,6 +1103,7 @@
                     if (!Array.isArray(this.db.requests)) this.db.requests = [];
                     if (!Array.isArray(this.db.users)) this.db.users = [];
                     if (!Array.isArray(this.db.movements)) this.db.movements = [];
+                    if (!Array.isArray(this.db.announcements)) this.db.announcements = []; // NOVO: garante array
                     
                     this.db.products.forEach(p => {
                         if (!p.description) p.description = 'Sem descrição';
@@ -1049,6 +1140,7 @@
                 ];
                 this.db.requests = [];
                 this.db.movements = [];
+                this.db.announcements = []; // NOVO: inicia vazio
                 this.saveDatabase();
             },
 
@@ -1088,10 +1180,179 @@
                 }
             },
 
-            // ---------- CATÁLOGO ----------
-            renderCatalog: function() {
+            // ---------- FUNÇÕES DE AVISOS (ANNOUNCEMENTS) ----------
+            getActiveAnnouncements: function() {
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                return this.db.announcements.filter(a => {
+                    // Se tiver data de início e for maior que hoje, não mostra
+                    if (a.startDate && a.startDate > today) return false;
+                    // Se tiver data de término e for menor que hoje, não mostra
+                    if (a.endDate && a.endDate < today) return false;
+                    return true;
+                }).sort((a, b) => {
+                    // Ordenar por prioridade: urgente > warning > info
+                    const priorityWeight = { urgent: 3, warning: 2, info: 1 };
+                    return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
+                });
+            },
+
+            renderActiveAnnouncements: function() {
+                const active = this.getActiveAnnouncements();
+                if (active.length === 0) return '';
+                let html = '<div class="announcements-container">';
+                active.forEach(a => {
+                    let priorityClass = 'priority-info';
+                    let priorityLabel = 'Informativo';
+                    if (a.priority === 'warning') { priorityClass = 'priority-warning'; priorityLabel = 'Atenção'; }
+                    else if (a.priority === 'urgent') { priorityClass = 'priority-urgent'; priorityLabel = 'Urgente'; }
+                    
+                    html += `
+                        <div class="announcement-banner ${priorityClass}">
+                            <div class="announcement-title">
+                                <span>${a.title}</span>
+                                <span class="priority-tag">${priorityLabel}</span>
+                            </div>
+                            <div class="announcement-message">${a.message}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                return html;
+            },
+
+            renderAnnouncementsList: function() {
+                if (!this.isAdmin) return;
                 const content = document.getElementById('main-content');
                 let html = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3>📢 Avisos do Almoxarifado</h3>
+                        <button class="action-btn primary" onclick="app.abrirNovoAviso()">➕ Novo Aviso</button>
+                    </div>
+                    <button class="btn-secondary" onclick="app.renderAdminPanel()" style="margin-bottom:20px;">← Voltar ao Painel</button>
+                `;
+
+                if (this.db.announcements.length === 0) {
+                    html += '<p>Nenhum aviso cadastrado.</p>';
+                } else {
+                    html += '<ul class="item-list">';
+                    this.db.announcements.slice().reverse().forEach(a => {
+                        let priorityClass = 'priority-info';
+                        let priorityLabel = 'Informativo';
+                        if (a.priority === 'warning') { priorityClass = 'priority-warning'; priorityLabel = 'Atenção'; }
+                        else if (a.priority === 'urgent') { priorityClass = 'priority-urgent'; priorityLabel = 'Urgente'; }
+
+                        const periodo = (a.startDate || a.endDate) 
+                            ? `Vigência: ${a.startDate || '?'} até ${a.endDate || '?'}` 
+                            : 'Vigência: sempre ativo';
+
+                        html += `
+                            <li class="item-card" style="flex-direction:column; align-items:stretch;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <div>
+                                        <h4>${a.title}</h4>
+                                        <span class="priority-tag" style="background:${priorityClass=== 'priority-info' ? '#3498db20' : (priorityClass==='priority-warning'?'#f39c1220':'#e74c3c20')}">${priorityLabel}</span>
+                                    </div>
+                                    <div>
+                                        <button onclick="app.editarAviso(${a.id})" style="background:none; border:none; font-size:20px;">✏️</button>
+                                        <button onclick="app.excluirAviso(${a.id})" style="background:none; border:none; font-size:20px;">🗑️</button>
+                                    </div>
+                                </div>
+                                <p>${a.message}</p>
+                                <p style="font-size:0.8rem; color:var(--texto-secundario);">${periodo}</p>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                }
+                content.innerHTML = html;
+                this.renderBottomNav('admin');
+            },
+
+            abrirNovoAviso: function() {
+                document.getElementById('aviso-id').value = '';
+                document.getElementById('aviso-titulo').value = '';
+                document.getElementById('aviso-mensagem').value = '';
+                document.getElementById('aviso-inicio').value = '';
+                document.getElementById('aviso-termino').value = '';
+                document.getElementById('aviso-prioridade').value = 'info';
+                document.getElementById('modal-aviso-title').innerText = '📢 Novo Aviso';
+                this.openModal('modal-aviso');
+            },
+
+            editarAviso: function(id) {
+                const aviso = this.db.announcements.find(a => a.id === id);
+                if (!aviso) return;
+                document.getElementById('aviso-id').value = aviso.id;
+                document.getElementById('aviso-titulo').value = aviso.title;
+                document.getElementById('aviso-mensagem').value = aviso.message;
+                document.getElementById('aviso-inicio').value = aviso.startDate || '';
+                document.getElementById('aviso-termino').value = aviso.endDate || '';
+                document.getElementById('aviso-prioridade').value = aviso.priority || 'info';
+                document.getElementById('modal-aviso-title').innerText = '✏️ Editar Aviso';
+                this.openModal('modal-aviso');
+            },
+
+            salvarAviso: function() {
+                const id = document.getElementById('aviso-id').value;
+                const titulo = document.getElementById('aviso-titulo').value.trim();
+                const mensagem = document.getElementById('aviso-mensagem').value.trim();
+                const inicio = document.getElementById('aviso-inicio').value || null;
+                const termino = document.getElementById('aviso-termino').value || null;
+                const prioridade = document.getElementById('aviso-prioridade').value;
+
+                if (!titulo || !mensagem) {
+                    alert('Preencha título e mensagem');
+                    return;
+                }
+
+                // Validação de datas: se ambas preenchidas, início deve ser <= término
+                if (inicio && termino && inicio > termino) {
+                    alert('A data de início não pode ser maior que a data de término.');
+                    return;
+                }
+
+                const aviso = {
+                    id: id ? parseInt(id) : Date.now(),
+                    title: titulo,
+                    message: mensagem,
+                    startDate: inicio,
+                    endDate: termino,
+                    priority: prioridade
+                };
+
+                if (id) {
+                    const index = this.db.announcements.findIndex(a => a.id === parseInt(id));
+                    if (index !== -1) this.db.announcements[index] = aviso;
+                } else {
+                    this.db.announcements.push(aviso);
+                }
+
+                this.saveDatabase();
+                this.closeModal('modal-aviso');
+                // Se estiver na lista de avisos, atualiza
+                if (document.getElementById('main-content').innerHTML.includes('Avisos do Almoxarifado')) {
+                    this.renderAnnouncementsList();
+                } else {
+                    this.renderAdminPanel(); // fallback
+                }
+                // Se estiver no catálogo, atualiza os avisos visíveis (mas o catálogo será recarregado em outra ação)
+                // Para não perder contexto, apenas avisamos que foi salvo.
+                alert('Aviso salvo com sucesso!');
+            },
+
+            excluirAviso: function(id) {
+                if (confirm('Excluir este aviso?')) {
+                    this.db.announcements = this.db.announcements.filter(a => a.id !== id);
+                    this.saveDatabase();
+                    this.renderAnnouncementsList();
+                }
+            },
+
+            // ---------- CATÁLOGO (MODIFICADO PARA INCLUIR AVISOS) ----------
+            renderCatalog: function() {
+                const content = document.getElementById('main-content');
+                let html = this.renderActiveAnnouncements(); // NOVO: exibe avisos no topo
+                html += `
                     <div style="margin-bottom:20px;">
                         <input type="text" placeholder="🔍 Buscar material..." style="width:100%; padding:16px; border:1px solid var(--cinza-borda); border-radius:20px; font-size:1rem;" onkeyup="app.filterCatalog(event)">
                     </div>
@@ -1151,7 +1412,7 @@
                 if (event && event.target) event.target.classList.add('active');
             },
 
-            // ---------- CARRINHO ----------
+            // ---------- CARRINHO (INALTERADO) ----------
             addToCart: function(productId) {
                 const product = this.db.products.find(p => p.id === productId);
                 if (!product || product.stock <= 0) return;
@@ -1479,7 +1740,7 @@
                 `;
             },
 
-            // ---------- ADMIN ----------
+            // ---------- ADMIN (MODIFICADO PARA INCLUIR BOTÃO DE AVISOS) ----------
             openAdminLogin: function() {
                 document.getElementById('admin-email').value = 'admin@ufpb.br';
                 document.getElementById('admin-password').value = '123456';
@@ -1574,6 +1835,7 @@
                         <button class="action-btn" onclick="app.abrirListaTodosPedidos()">📋 Todos os Pedidos</button>
                         <button class="action-btn" onclick="app.openModal('modal-entrada')">📥 Entrada</button>
                         <button class="action-btn" onclick="app.openModal('modal-saida')">📤 Saída</button>
+                        <button class="action-btn" onclick="app.renderAnnouncementsList()">📢 Avisos</button> <!-- NOVO BOTÃO -->
                     </div>
                     <h3>Produtos</h3>
                     <ul class="item-list" id="admin-product-list">
@@ -1603,7 +1865,7 @@
                 this.renderBottomNav('admin');
             },
 
-            // ---------- CRUD PRODUTOS ----------
+            // ---------- CRUD PRODUTOS (INALTERADO) ----------
             abrirNovoProduto: function() {
                 // Limpa formulário
                 document.getElementById('produto-id').value = '';
