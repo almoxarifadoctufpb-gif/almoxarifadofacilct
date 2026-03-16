@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0A4B8C">
-    <title>Almox Fácil CT</title>
+    <title>Almox Fácil CT - Catálogo</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -37,7 +37,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Splash Screen com Logo */
+        /* Splash Screen */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -86,7 +86,7 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* Header com Logo */
+        /* Header */
         .header {
             background: linear-gradient(135deg, var(--azul-institucional), var(--azul-escuro));
             color: white;
@@ -126,11 +126,6 @@
             opacity: 0.9;
         }
 
-        .header-icons {
-            display: flex;
-            gap: 10px;
-        }
-
         .header-icons button {
             background: rgba(255,255,255,0.15);
             border: none;
@@ -146,7 +141,7 @@
             cursor: pointer;
         }
 
-        /* Tela de Login com Logo MAIOR */
+        /* Tela de Login */
         #login-screen {
             position: fixed;
             top: 0;
@@ -170,21 +165,15 @@
             text-align: center;
         }
 
-        .login-box .logo-container {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
         .login-box .logo-container img {
-            width: 150px;  /* AUMENTADO */
-            height: 150px; /* AUMENTADO */
+            width: 150px;
+            height: 150px;
             border-radius: 30px;
             background: white;
             padding: 10px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             border: 4px solid var(--azul-institucional);
             object-fit: contain;
-            display: inline-block;
         }
 
         .login-box h2 {
@@ -204,14 +193,6 @@
             margin-bottom: 15px;
         }
 
-        .login-box .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--texto-secundario);
-            margin-bottom: 5px;
-        }
-
         .login-box .form-group input {
             width: 100%;
             padding: 14px 15px;
@@ -219,11 +200,6 @@
             border-radius: 15px;
             font-size: 15px;
             outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .login-box .form-group input:focus {
-            border-color: var(--azul-institucional);
         }
 
         .login-box button {
@@ -237,11 +213,6 @@
             font-weight: 600;
             margin-top: 10px;
             cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .login-box button:hover {
-            background: var(--azul-escuro);
         }
 
         .login-footer {
@@ -250,7 +221,7 @@
             color: var(--texto-secundario);
         }
 
-        /* Menu de Navegação com ícone personalizado */
+        /* Navegação Inferior */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -279,7 +250,6 @@
             cursor: pointer;
             padding: 5px 12px;
             border-radius: 12px;
-            transition: background 0.2s;
         }
 
         .nav-item.active {
@@ -291,23 +261,130 @@
             font-size: 18px;
         }
 
-        /* Ícone personalizado da casinha */
-        .nav-item .home-icon {
-            width: 22px;
-            height: 22px;
-            filter: brightness(0) saturate(100%) invert(40%) sepia(0%) saturate(0%) hue-rotate(0deg);
-            transition: filter 0.2s;
-            margin-bottom: 2px;
-        }
-
-        .nav-item.active .home-icon {
-            filter: brightness(0) saturate(100%) invert(18%) sepia(70%) saturate(2000%) hue-rotate(190deg) brightness(90%);
-        }
-
         /* Conteúdo Principal */
         .main-content {
             padding: 20px;
             padding-bottom: 80px;
+        }
+
+        /* Catálogo em Grid */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .product-card {
+            background: var(--branco);
+            border: 1px solid var(--cinza-borda);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .product-image {
+            height: 120px;
+            background: var(--azul-claro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--azul-institucional);
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-info h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-category {
+            font-size: 11px;
+            color: var(--texto-secundario);
+            margin-bottom: 6px;
+        }
+
+        .product-desc {
+            font-size: 12px;
+            color: var(--texto-principal);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-stock {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .stock-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .stock-badge.normal { background: #E8F5E9; color: var(--verde); }
+        .stock-badge.low { background: #FFF3E0; color: var(--amarelo); }
+        .stock-badge.zero { background: #FFEBEE; color: var(--vermelho); }
+
+        .product-qty {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-solicitar {
+            width: 100%;
+            padding: 10px;
+            background: var(--azul-institucional);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Lista de Solicitações */
+        .request-card {
+            background: var(--branco);
+            border: 1px solid var(--cinza-borda);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .request-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending { background: #FFF3E0; color: var(--amarelo); }
+        .status-approved { background: #E8F5E9; color: var(--verde); }
+        .status-rejected { background: #FFEBEE; color: var(--vermelho); }
+
+        .request-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
 
         /* Cards do Dashboard */
@@ -338,21 +415,15 @@
             color: var(--texto-secundario);
         }
 
-        .stat-card.warning .value { color: var(--amarelo); }
-        .stat-card.danger .value { color: var(--vermelho); }
-
         /* Ações Rápidas */
         .quick-actions {
             display: flex;
             gap: 10px;
             overflow-x: auto;
             padding: 10px 0 20px;
-            margin-bottom: 10px;
         }
 
-        .quick-actions::-webkit-scrollbar {
-            display: none;
-        }
+        .quick-actions::-webkit-scrollbar { display: none; }
 
         .action-btn {
             background: var(--branco);
@@ -364,9 +435,6 @@
             gap: 8px;
             white-space: nowrap;
             font-size: 14px;
-            font-weight: 500;
-            color: var(--texto-principal);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
             cursor: pointer;
         }
 
@@ -374,94 +442,6 @@
             background: var(--azul-institucional);
             color: white;
             border: none;
-        }
-
-        /* Listas */
-        .list-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0 15px;
-        }
-
-        .list-title h3 {
-            font-size: 18px;
-            color: var(--texto-principal);
-        }
-
-        .item-list {
-            list-style: none;
-        }
-
-        .item-card {
-            background: var(--branco);
-            padding: 15px;
-            border-radius: 16px;
-            margin-bottom: 10px;
-            border: 1px solid var(--cinza-borda);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .item-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--azul-claro);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--azul-institucional);
-        }
-
-        .item-info {
-            flex: 1;
-        }
-
-        .item-info h4 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .item-info .category {
-            font-size: 12px;
-            color: var(--texto-secundario);
-            margin-bottom: 5px;
-        }
-
-        .stock-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stock-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .stock-badge.normal {
-            background: #E8F5E9;
-            color: var(--verde);
-        }
-
-        .stock-badge.low {
-            background: #FFF3E0;
-            color: var(--amarelo);
-        }
-
-        .stock-badge.zero {
-            background: #FFEBEE;
-            color: var(--vermelho);
-        }
-
-        .stock-qty {
-            font-weight: 600;
-            color: var(--texto-principal);
         }
 
         /* Modais */
@@ -478,9 +458,7 @@
             z-index: 1000;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: var(--branco);
@@ -492,14 +470,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
@@ -522,145 +494,54 @@
             object-fit: contain;
         }
 
-        .modal-body {
-            padding: 20px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid var(--cinza-borda);
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+        .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid var(--cinza-borda); display: flex; justify-content: flex-end; gap: 10px; }
 
         /* Formulários */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--texto-secundario);
-            margin-bottom: 5px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--texto-secundario); margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--cinza-borda);
             border-radius: 12px;
             font-size: 15px;
             outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: var(--azul-institucional);
         }
 
         /* Botões */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--azul-institucional);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--cinza-claro);
-            color: var(--texto-principal);
-        }
-
-        .btn-danger {
-            background: var(--vermelho);
-            color: white;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--cinza-claro);
-            border-top-color: var(--azul-institucional);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsividade */
-        @media (max-width: 400px) {
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-logo img {
-                width: 45px;
-                height: 45px;
-            }
-            
-            .header-title h1 {
-                font-size: 16px;
-            }
-            
-            .login-box .logo-container img {
-                width: 130px;
-                height: 130px;
-            }
-        }
+        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .btn-primary { background: var(--azul-institucional); color: white; }
+        .btn-secondary { background: var(--cinza-claro); color: var(--texto-principal); }
+        .btn-danger { background: var(--vermelho); color: white; }
+        .btn-success { background: var(--verde); color: white; }
     </style>
 </head>
 <body>
-    <!-- Splash Screen com Logo -->
+    <!-- Splash Screen -->
     <div id="splash-screen">
         <img src="icon.png" alt="Almox Fácil CT" id="splash-logo">
         <span>Almox Fácil CT</span>
     </div>
 
-    <!-- Tela de Login - Logo MAIOR -->
+    <!-- Tela de Login -->
     <div id="login-screen">
         <div class="login-box">
             <div class="logo-container">
-                <img src="icon.png" 
-                     alt="Almox Fácil CT" 
-                     id="login-logo"
+                <img src="icon.png" alt="Almox Fácil CT" id="login-logo"
                      onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230A4B8C%22/><text x=%2250%22 y=%2265%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22white%22>CT</text></svg>';">
             </div>
-            
             <h2>Almox Fácil CT</h2>
             <p>Centro de Tecnologia - UFPB</p>
-            
             <div class="form-group">
                 <label>E-mail institucional</label>
                 <input type="email" id="login-email" placeholder="usuario@ct.ufpb.br" value="admin@ufpb.br">
             </div>
-            
             <div class="form-group">
                 <label>Senha</label>
                 <input type="password" id="login-password" placeholder="******" value="123456">
             </div>
-            
             <button onclick="app.login()">Entrar</button>
-            
             <div class="login-footer">
                 <p>👑 admin@ufpb.br / 123456 • 👤 usuario@ufpb.br / 123456</p>
             </div>
@@ -669,7 +550,7 @@
 
     <!-- App Container -->
     <div class="app-container" id="app-container" style="display: none;">
-        <!-- Header com Logo -->
+        <!-- Header -->
         <div class="header">
             <div class="header-logo">
                 <img src="icon.png" alt="Logo" id="header-logo">
@@ -686,46 +567,126 @@
         <!-- Conteúdo Principal -->
         <div class="main-content" id="main-content"></div>
 
-        <!-- Navegação Inferior com ícone personalizado -->
+        <!-- Navegação Inferior -->
         <nav class="bottom-nav" id="bottom-nav"></nav>
     </div>
 
-    <!-- Modal de Entrada com Valor Unitário -->
-    <div class="modal-overlay" id="modal-entrada">
+    <!-- MODAIS -->
+
+    <!-- Modal de Solicitação de Material -->
+    <div class="modal-overlay" id="modal-solicitar">
         <div class="modal">
             <div class="modal-header">
                 <img src="icon.png" alt="">
-                Registrar Entrada
+                Solicitar Material
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Produto</label>
-                    <select id="entrada-produto"></select>
-                </div>
+                <input type="hidden" id="solicitar-produto-id">
+                <p><strong id="solicitar-produto-nome"></strong></p>
+                <p>Estoque disponível: <span id="solicitar-estoque-disponivel">0</span></p>
                 <div class="form-group">
                     <label>Quantidade</label>
-                    <input type="number" id="entrada-qtd" min="1" value="1">
+                    <input type="number" id="solicitar-qtd" min="1" value="1">
                 </div>
                 <div class="form-group">
-                    <label>Valor Unitário (R$)</label>
-                    <input type="number" id="entrada-valor" min="0.01" step="0.01" value="0.00">
+                    <label>Setor solicitante</label>
+                    <input type="text" id="solicitar-setor" placeholder="Seu setor">
                 </div>
                 <div class="form-group">
-                    <label>Fornecedor</label>
-                    <input type="text" id="entrada-fornecedor" placeholder="Ex: Papelaria Central">
+                    <label>Observação (opcional)</label>
+                    <textarea id="solicitar-obs" rows="2" placeholder="Ex: urgente"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-solicitar')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.enviarSolicitacao()">Solicitar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro/Edição de Produto (Admin) -->
+    <div class="modal-overlay" id="modal-produto">
+        <div class="modal">
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                <span id="modal-produto-titulo">Novo Produto</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="produto-id">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="produto-nome">
                 </div>
                 <div class="form-group">
-                    <label>Nº Nota Fiscal</label>
-                    <input type="text" id="entrada-nf" placeholder="Ex: 123456">
+                    <label>Descrição</label>
+                    <textarea id="produto-descricao" rows="2"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Data</label>
-                    <input type="date" id="entrada-data">
+                    <label>Categoria</label>
+                    <select id="produto-categoria"></select>
                 </div>
-                <div class="form-group" style="background: var(--azul-claro); padding: 10px; border-radius: 10px;">
-                    <label>Saldo Total da Entrada:</label>
-                    <p id="entrada-saldo" style="font-size: 18px; font-weight: bold; color: var(--azul-institucional);">R$ 0,00</p>
+                <div class="form-group">
+                    <label>Unidade de medida</label>
+                    <input type="text" id="produto-unidade" placeholder="ex: unidade, resma, caixa">
                 </div>
+                <div class="form-group">
+                    <label>Estoque atual</label>
+                    <input type="number" id="produto-estoque" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Estoque mínimo</label>
+                    <input type="number" id="produto-min" min="0" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Localização</label>
+                    <input type="text" id="produto-localizacao" placeholder="Ex: Prateleira A1">
+                </div>
+                <div class="form-group">
+                    <label>Valor unitário (R$)</label>
+                    <input type="number" id="produto-valor" step="0.01" min="0" value="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Ícone (emoji)</label>
+                    <input type="text" id="produto-emoji" placeholder="ex: 📄" value="📦">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-produto')">Cancelar</button>
+                <button class="btn btn-primary" onclick="app.salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gerenciar Solicitações (Admin) -->
+    <div class="modal-overlay" id="modal-gerir-solicitacoes">
+        <div class="modal">
+            <div class="modal-header">
+                <img src="icon.png" alt="">
+                Solicitações Pendentes
+            </div>
+            <div class="modal-body" id="lista-solicitacoes-pendentes">
+                <!-- preenchido via js -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeModal('modal-gerir-solicitacoes')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Aprovação/Negação (opcional, podemos usar alert) -->
+
+    <!-- Demais modais já existentes (entrada, saída, relatórios) serão mantidos -->
+    <!-- Modal de Entrada (já existente) -->
+    <div class="modal-overlay" id="modal-entrada"> <!-- conteúdo igual ao original, omitido por brevidade, mas deve permanecer -->
+        <div class="modal">
+            <div class="modal-header">📥 Registrar Entrada</div>
+            <div class="modal-body">
+                <div class="form-group"><label>Produto</label><select id="entrada-produto"></select></div>
+                <div class="form-group"><label>Quantidade</label><input type="number" id="entrada-qtd" min="1" value="1"></div>
+                <div class="form-group"><label>Valor Unitário (R$)</label><input type="number" id="entrada-valor" step="0.01" value="0.00"></div>
+                <div class="form-group"><label>Fornecedor</label><input type="text" id="entrada-fornecedor"></div>
+                <div class="form-group"><label>Nº Nota Fiscal</label><input type="text" id="entrada-nf"></div>
+                <div class="form-group"><label>Data</label><input type="date" id="entrada-data"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="app.closeModal('modal-entrada')">Cancelar</button>
@@ -734,34 +695,16 @@
         </div>
     </div>
 
-    <!-- Modal de Saída -->
+    <!-- Modal de Saída (já existente) -->
     <div class="modal-overlay" id="modal-saida">
         <div class="modal">
-            <div class="modal-header">
-                <img src="icon.png" alt="">
-                Registrar Saída
-            </div>
+            <div class="modal-header">📤 Registrar Saída</div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Produto</label>
-                    <select id="saida-produto"></select>
-                </div>
-                <div class="form-group">
-                    <label>Quantidade</label>
-                    <input type="number" id="saida-qtd" min="1" value="1">
-                </div>
-                <div class="form-group">
-                    <label>Setor Solicitante</label>
-                    <input type="text" id="saida-setor" placeholder="Ex: Secretaria">
-                </div>
-                <div class="form-group">
-                    <label>Responsável</label>
-                    <input type="text" id="saida-responsavel" placeholder="Ex: João Silva">
-                </div>
-                <div class="form-group">
-                    <label>Data</label>
-                    <input type="date" id="saida-data">
-                </div>
+                <div class="form-group"><label>Produto</label><select id="saida-produto"></select></div>
+                <div class="form-group"><label>Quantidade</label><input type="number" id="saida-qtd" min="1" value="1"></div>
+                <div class="form-group"><label>Setor</label><input type="text" id="saida-setor"></div>
+                <div class="form-group"><label>Responsável</label><input type="text" id="saida-responsavel"></div>
+                <div class="form-group"><label>Data</label><input type="date" id="saida-data"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="app.closeModal('modal-saida')">Cancelar</button>
@@ -770,47 +713,17 @@
         </div>
     </div>
 
-    <!-- Modal de Água -->
-    <div class="modal-overlay" id="modal-agua">
-        <div class="modal">
-            <div class="modal-header">
-                <img src="icon.png" alt="">
-                Solicitar Água
-            </div>
-            <div class="modal-body">
-                <p>Estoque atual: <strong id="agua-estoque-atual">0</strong> garrafões</p>
-                <div class="form-group">
-                    <label>Quantidade solicitada</label>
-                    <input type="number" id="agua-qtd" min="1" value="1">
-                </div>
-                <div class="form-group">
-                    <label>Setor</label>
-                    <input type="text" id="agua-setor">
-                </div>
-                <p id="agua-previsao" style="background: var(--azul-claro); padding: 10px; border-radius: 10px;"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="app.closeModal('modal-agua')">Cancelar</button>
-                <button class="btn btn-primary" onclick="app.solicitarAgua()">Solicitar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Relatórios -->
+    <!-- Modal de Relatórios (já existente) -->
     <div class="modal-overlay" id="modal-relatorios">
         <div class="modal">
-            <div class="modal-header">
-                <img src="icon.png" alt="">
-                Relatórios
-            </div>
+            <div class="modal-header">📊 Relatórios</div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Tipo de relatório</label>
+                    <label>Tipo</label>
                     <select id="relatorio-tipo">
                         <option value="entradas">Entradas</option>
                         <option value="saidas">Saídas</option>
-                        <option value="consumo-setor">Consumo por Setor</option>
-                        <option value="mais-utilizados">Itens mais utilizados</option>
+                        <option value="solicitacoes">Solicitações</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -819,11 +732,10 @@
                         <option value="7">Últimos 7 dias</option>
                         <option value="30">Últimos 30 dias</option>
                         <option value="90">Últimos 90 dias</option>
-                        <option value="365">Último ano</option>
                     </select>
                 </div>
-                <button class="btn btn-primary" style="width:100%" onclick="app.gerarRelatorio()">Gerar Relatório</button>
-                <div id="relatorio-resultado" style="margin-top: 20px;"></div>
+                <button class="btn btn-primary" style="width:100%" onclick="app.gerarRelatorio()">Gerar</button>
+                <div id="relatorio-resultado" style="margin-top:20px;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="app.closeModal('modal-relatorios')">Fechar</button>
@@ -837,14 +749,15 @@
             db: {
                 users: [],
                 products: [],
+                requests: [],        // novas solicitações
                 movements: [],
-                waterStock: 30,
-                waterRequests: [],
                 categories: [
-                    'Material de Expediente',
-                    'Material de Limpeza',
-                    'Higiene',
+                    'Papelaria',
                     'Informática',
+                    'Limpeza',
+                    'Água mineral',
+                    'Materiais de escritório',
+                    'Higiene',
                     'Manutenção'
                 ]
             },
@@ -860,7 +773,6 @@
             forceLogoLoad: function() {
                 const logos = ['splash-logo', 'login-logo', 'header-logo'];
                 const timestamp = '?t=' + new Date().getTime();
-                
                 logos.forEach(id => {
                     const img = document.getElementById(id);
                     if (img) {
@@ -883,51 +795,38 @@
                 const saved = localStorage.getItem('almoxFacilDB');
                 if (saved) {
                     this.db = JSON.parse(saved);
+                    // Migração para novos campos
+                    if (this.db.products) {
+                        this.db.products.forEach(p => {
+                            if (!p.description) p.description = 'Sem descrição';
+                            if (!p.unit) p.unit = 'un';
+                            if (!p.imageEmoji) p.imageEmoji = '📦';
+                            if (!p.minStock) p.minStock = 5;
+                        });
+                    }
+                    if (!this.db.requests) this.db.requests = [];
                 } else {
                     this.initializeDefaultData();
                 }
+                this.saveDatabase();
             },
 
             initializeDefaultData: function() {
                 this.db.users = [
-                    {
-                        id: 1,
-                        name: 'Admin Principal',
-                        email: 'admin@ufpb.br',
-                        password: '123456',
-                        siape: '1234567',
-                        sector: 'Almoxarifado',
-                        role: 'admin',
-                        location: 'Bloco A - Sala 101'
-                    },
-                    {
-                        id: 2,
-                        name: 'João Servidor',
-                        email: 'usuario@ufpb.br',
-                        password: '123456',
-                        siape: '7654321',
-                        sector: 'Departamento de Computação',
-                        role: 'user',
-                        location: 'Bloco B - Sala 205'
-                    },
-                    {
-                        id: 3,
-                        name: 'Maria Limpeza',
-                        email: 'terceirizado@ufpb.br',
-                        password: '123456',
-                        sector: 'Equipe de Limpeza',
-                        role: 'gestor_terceirizado',
-                        location: 'Bloco C'
-                    }
+                    { id: 1, name: 'Admin Principal', email: 'admin@ufpb.br', password: '123456', siape: '1234567', sector: 'Almoxarifado', role: 'admin' },
+                    { id: 2, name: 'João Servidor', email: 'usuario@ufpb.br', password: '123456', siape: '7654321', sector: 'DCOMP', role: 'user' }
                 ];
 
                 this.db.products = [
-                    { id: 1, name: 'Papel A4 (Resma)', category: 'Material de Expediente', stock: 50, minStock: 10, location: 'Prateleira A1', unitValue: 22.50 },
-                    { id: 2, name: 'Caneta Azul', category: 'Material de Expediente', stock: 100, minStock: 20, location: 'Prateleira A2', unitValue: 1.75 },
-                    { id: 3, name: 'Detergente Líquido', category: 'Material de Limpeza', stock: 5, minStock: 10, location: 'Prateleira B1', unitValue: 3.20 },
-                    { id: 4, name: 'Álcool 70%', category: 'Higiene', stock: 8, minStock: 15, location: 'Prateleira B2', unitValue: 6.90 },
-                    { id: 5, name: 'Cloro', category: 'Material de Limpeza', stock: 0, minStock: 5, location: 'Prateleira B3', unitValue: 4.50 }
+                    { id: 1, name: 'Papel A4', description: 'Resma com 500 folhas', category: 'Papelaria', unit: 'resma', stock: 50, minStock: 10, location: 'A1', unitValue: 22.50, imageEmoji: '📄' },
+                    { id: 2, name: 'Caneta Azul', description: 'Caneta esferográfica azul', category: 'Papelaria', unit: 'un', stock: 100, minStock: 20, location: 'A2', unitValue: 1.75, imageEmoji: '🖊️' },
+                    { id: 3, name: 'Detergente', description: 'Detergente líquido 500ml', category: 'Limpeza', unit: 'un', stock: 5, minStock: 10, location: 'B1', unitValue: 3.20, imageEmoji: '🧼' },
+                    { id: 4, name: 'Água Mineral', description: 'Garrafão 20L', category: 'Água mineral', unit: 'garrafão', stock: 30, minStock: 5, location: 'C1', unitValue: 12.00, imageEmoji: '💧' },
+                    { id: 5, name: 'Mouse Óptico', description: 'Mouse USB preto', category: 'Informática', unit: 'un', stock: 8, minStock: 3, location: 'D2', unitValue: 25.90, imageEmoji: '🖱️' }
                 ];
+
+                this.db.requests = [];
+                this.db.movements = [];
 
                 this.saveDatabase();
             },
@@ -947,9 +846,7 @@
             login: function() {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-
                 const user = this.db.users.find(u => u.email === email && u.password === password);
-
                 if (user) {
                     this.currentUser = user;
                     sessionStorage.setItem('currentUser', JSON.stringify(user));
@@ -964,7 +861,6 @@
                 this.currentUser = null;
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
-                this.forceLogoLoad();
             },
 
             showApp: function() {
@@ -972,252 +868,317 @@
                 document.getElementById('app-container').style.display = 'block';
                 document.getElementById('user-greeting').textContent = 
                     `Olá, ${this.currentUser.name.split(' ')[0]} (${this.getRoleName(this.currentUser.role)})`;
-                
-                this.renderDashboard();
-                this.forceLogoLoad();
+                this.renderCatalog(); // início com catálogo
+                this.renderBottomNav('catalog');
             },
 
             getRoleName: function(role) {
-                const roles = {
-                    'admin': 'Administrador',
-                    'user': 'Usuário',
-                    'gestor_terceirizado': 'Gestor Terceirizado'
-                };
+                const roles = { 'admin': 'Administrador', 'user': 'Usuário' };
                 return roles[role] || role;
             },
 
-            renderDashboard: function() {
-                const content = document.getElementById('main-content');
+            renderBottomNav: function(active) {
+                const nav = document.getElementById('bottom-nav');
                 const isAdmin = this.currentUser.role === 'admin';
-
-                const totalItems = this.db.products.length;
-                const lowStock = this.db.products.filter(p => p.stock > 0 && p.stock <= p.minStock).length;
-                const zeroStock = this.db.products.filter(p => p.stock === 0).length;
-                const pendingRequests = this.db.waterRequests.filter(r => r.status === 'pending').length;
-
-                let html = `
-                    <div class="dashboard-cards">
-                        <div class="stat-card">
-                            <div class="value">${totalItems}</div>
-                            <div class="label">Total de Itens</div>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="value">${lowStock}</div>
-                            <div class="label">Estoque Baixo</div>
-                        </div>
-                        <div class="stat-card danger">
-                            <div class="value">${zeroStock}</div>
-                            <div class="label">Estoque Zerado</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="value">${pendingRequests}</div>
-                            <div class="label">Solicitações</div>
-                        </div>
-                    </div>
-
-                    <div class="quick-actions">
+                nav.innerHTML = `
+                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span>📋</span><span>Catálogo</span></button>
+                    <button class="nav-item ${active === 'requests' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoes()"><span>📦</span><span>Minhas Solic.</span></button>
+                    ${isAdmin ? `
+                        <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span>⚙️</span><span>Admin</span></button>
+                        <button class="nav-item ${active === 'relatorios' ? 'active' : ''}" onclick="app.openModal('modal-relatorios')"><span>📊</span><span>Relatórios</span></button>
+                    ` : ''}
                 `;
-
-                if (isAdmin) {
-                    html += `
-                        <button class="action-btn primary" onclick="app.openModal('modal-entrada')">
-                            <span>📥</span> Entrada
-                        </button>
-                        <button class="action-btn" onclick="app.openModal('modal-saida')">
-                            <span>📤</span> Saída
-                        </button>
-                    `;
-                }
-
-                html += `
-                        <button class="action-btn" onclick="app.renderEstoque()">
-                            <span>📋</span> Estoque
-                        </button>
-                        <button class="action-btn" onclick="app.renderAgua()">
-                            <span>💧</span> Água Fácil
-                        </button>
-                    </div>
-                `;
-
-                content.innerHTML = html;
-                this.renderBottomNav('dashboard');
             },
 
-            renderEstoque: function() {
+            // ---------- CATÁLOGO ----------
+            renderCatalog: function() {
                 const content = document.getElementById('main-content');
-                const isAdmin = this.currentUser.role === 'admin';
-
                 let html = `
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" placeholder="🔍 Buscar item..." 
-                               style="width:100%; padding:15px; border:1px solid var(--cinza-borda); border-radius:15px;"
-                               onkeyup="app.filterProducts(this.value)">
+                    <div style="margin-bottom:20px;">
+                        <input type="text" placeholder="🔍 Buscar material..." style="width:100%; padding:15px; border:1px solid var(--cinza-borda); border-radius:15px;" onkeyup="app.filterCatalog(event)">
                     </div>
-
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto;">
-                        <button class="action-btn active" onclick="app.filterByCategory('all')">Todos</button>
-                        ${this.db.categories.map(cat => 
-                            `<button class="action-btn" onclick="app.filterByCategory('${cat}')">${cat}</button>`
-                        ).join('')}
+                    <div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:20px;">
+                        <button class="action-btn active" onclick="app.filterCatalogByCategory('all')">Todos</button>
+                        ${this.db.categories.map(cat => `<button class="action-btn" onclick="app.filterCatalogByCategory('${cat}')">${cat}</button>`).join('')}
                     </div>
-
-                    <ul class="item-list" id="product-list">
+                    <div class="catalog-grid" id="catalog-grid">
                 `;
 
                 this.db.products.forEach(p => {
                     const status = p.stock === 0 ? 'zero' : (p.stock <= p.minStock ? 'low' : 'normal');
-                    const statusText = p.stock === 0 ? 'Estoque Zerado' : (p.stock <= p.minStock ? 'Estoque Baixo' : 'Estoque Normal');
-                    const totalValue = (p.unitValue || 0) * p.stock;
-
+                    const statusText = p.stock === 0 ? 'Zerado' : (p.stock <= p.minStock ? 'Baixo' : 'Normal');
                     html += `
-                        <li class="item-card" data-category="${p.category}">
-                            <div class="item-icon">📦</div>
-                            <div class="item-info">
+                        <div class="product-card" data-category="${p.category}" data-name="${p.name.toLowerCase()}">
+                            <div class="product-image">${p.imageEmoji || '📦'}</div>
+                            <div class="product-info">
                                 <h4>${p.name}</h4>
-                                <div class="category">${p.category}</div>
-                                <div class="stock-info">
-                                    <span class="stock-qty">${p.stock} unidades</span>
+                                <div class="product-category">${p.category}</div>
+                                <div class="product-desc">${p.description}</div>
+                                <div class="product-stock">
+                                    <span class="product-qty">${p.stock} ${p.unit}</span>
                                     <span class="stock-badge ${status}">${statusText}</span>
                                 </div>
-                                <div style="font-size: 12px; color: var(--texto-secundario); margin-top: 5px;">
-                                    Local: ${p.location}
-                                </div>
-                                <div style="font-size: 12px; color: var(--azul-institucional); margin-top: 5px; font-weight: 600;">
-                                    R$ ${(p.unitValue || 0).toFixed(2).replace('.', ',')} un | 
-                                    Total: R$ ${totalValue.toFixed(2).replace('.', ',')}
-                                </div>
+                                <button class="btn-solicitar" onclick="app.abrirSolicitacao(${p.id})">Solicitar</button>
                             </div>
-                            ${isAdmin ? `
-                                <div>
-                                    <button onclick="app.editarProduto(${p.id})" style="background:none; border:none; font-size:20px;">✏️</button>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+                content.innerHTML = html;
+                this.renderBottomNav('catalog');
+            },
+
+            filterCatalog: function(e) {
+                const search = e.target.value.toLowerCase();
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const name = card.dataset.name;
+                    card.style.display = name.includes(search) ? 'block' : 'none';
+                });
+            },
+
+            filterCatalogByCategory: function(category) {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            },
+
+            abrirSolicitacao: function(productId) {
+                const product = this.db.products.find(p => p.id === productId);
+                if (!product) return;
+                document.getElementById('solicitar-produto-id').value = productId;
+                document.getElementById('solicitar-produto-nome').innerText = product.name;
+                document.getElementById('solicitar-estoque-disponivel').innerText = product.stock;
+                document.getElementById('solicitar-qtd').value = 1;
+                document.getElementById('solicitar-qtd').max = product.stock;
+                document.getElementById('solicitar-setor').value = this.currentUser.sector || '';
+                document.getElementById('solicitar-obs').value = '';
+                this.openModal('modal-solicitar');
+            },
+
+            enviarSolicitacao: function() {
+                const productId = parseInt(document.getElementById('solicitar-produto-id').value);
+                const qtd = parseInt(document.getElementById('solicitar-qtd').value);
+                const setor = document.getElementById('solicitar-setor').value;
+                const obs = document.getElementById('solicitar-obs').value;
+                const product = this.db.products.find(p => p.id === productId);
+                if (!product) return;
+                if (qtd <= 0) { alert('Quantidade inválida'); return; }
+                if (qtd > product.stock) { alert('Estoque insuficiente'); return; }
+
+                const request = {
+                    id: Date.now(),
+                    productId: productId,
+                    productName: product.name,
+                    userId: this.currentUser.id,
+                    requesterName: this.currentUser.name,
+                    sector: setor,
+                    qty: qtd,
+                    observation: obs,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'pendente' // pendente, aprovado, negado
+                };
+                this.db.requests.push(request);
+                this.saveDatabase();
+                this.closeModal('modal-solicitar');
+                alert('Solicitação enviada com sucesso!');
+                // Se quiser, redireciona para minhas solicitações
+                this.renderMinhasSolicitacoes();
+                this.renderBottomNav('requests');
+            },
+
+            // ---------- MINHAS SOLICITAÇÕES ----------
+            renderMinhasSolicitacoes: function() {
+                const content = document.getElementById('main-content');
+                const userRequests = this.db.requests.filter(r => r.userId === this.currentUser.id).sort((a,b) => b.id - a.id);
+                let html = '<h3>Minhas Solicitações</h3>';
+                if (userRequests.length === 0) {
+                    html += '<p style="text-align:center; color:var(--texto-secundario);">Nenhuma solicitação ainda.</p>';
+                } else {
+                    userRequests.forEach(r => {
+                        const statusClass = r.status === 'pendente' ? 'status-pending' : (r.status === 'aprovado' ? 'status-approved' : 'status-rejected');
+                        const statusText = r.status === 'pendente' ? 'Pendente' : (r.status === 'aprovado' ? 'Aprovado' : 'Negado');
+                        html += `
+                            <div class="request-card">
+                                <div class="request-header">
+                                    <strong>${r.productName}</strong>
+                                    <span class="request-status ${statusClass}">${statusText}</span>
                                 </div>
-                            ` : ''}
+                                <p>Quantidade: ${r.qty} | Setor: ${r.sector}</p>
+                                <p>Data: ${r.date} | Obs: ${r.observation || '-'}</p>
+                            </div>
+                        `;
+                    });
+                }
+                content.innerHTML = html;
+                this.renderBottomNav('requests');
+            },
+
+            // ---------- PAINEL ADMIN ----------
+            renderAdminPanel: function() {
+                const content = document.getElementById('main-content');
+                let html = `
+                    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                        <button class="action-btn primary" onclick="app.abrirNovoProduto()">➕ Novo Produto</button>
+                        <button class="action-btn" onclick="app.abrirGerenciarSolicitacoes()">📋 Solicitações Pendentes</button>
+                        <button class="action-btn" onclick="app.openModal('modal-entrada')">📥 Entrada</button>
+                        <button class="action-btn" onclick="app.openModal('modal-saida')">📤 Saída</button>
+                    </div>
+                    <h3>Produtos</h3>
+                    <ul class="item-list" id="admin-product-list">
+                `;
+
+                this.db.products.forEach(p => {
+                    html += `
+                        <li class="item-card">
+                            <div class="item-icon">${p.imageEmoji || '📦'}</div>
+                            <div class="item-info">
+                                <h4>${p.name}</h4>
+                                <div>Estoque: ${p.stock} ${p.unit} (mín: ${p.minStock})</div>
+                                <div style="font-size:12px;">${p.category} | R$ ${(p.unitValue||0).toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <button onclick="app.editarProduto(${p.id})" style="background:none; border:none; font-size:20px;">✏️</button>
+                                <button onclick="app.excluirProduto(${p.id})" style="background:none; border:none; font-size:20px;">🗑️</button>
+                            </div>
                         </li>
                     `;
                 });
 
                 html += '</ul>';
                 content.innerHTML = html;
-                this.renderBottomNav('estoque');
+                this.renderBottomNav('admin');
             },
 
-            renderAgua: function() {
-                const content = document.getElementById('main-content');
-                const isAdmin = this.currentUser.role === 'admin';
+            abrirNovoProduto: function() {
+                document.getElementById('modal-produto-titulo').innerText = 'Novo Produto';
+                document.getElementById('produto-id').value = '';
+                document.getElementById('produto-nome').value = '';
+                document.getElementById('produto-descricao').value = '';
+                document.getElementById('produto-categoria').innerHTML = this.db.categories.map(c => `<option>${c}</option>`).join('');
+                document.getElementById('produto-unidade').value = 'un';
+                document.getElementById('produto-estoque').value = 0;
+                document.getElementById('produto-min').value = 5;
+                document.getElementById('produto-localizacao').value = '';
+                document.getElementById('produto-valor').value = '0.00';
+                document.getElementById('produto-emoji').value = '📦';
+                this.openModal('modal-produto');
+            },
 
-                const dailyConsumption = 5;
-                const daysUntilEmpty = Math.floor(this.db.waterStock / dailyConsumption);
-                const waterRequests = this.db.waterRequests.filter(r => r.status === 'pending');
-                const totalRequested = waterRequests.reduce((acc, r) => acc + r.qty, 0);
+            editarProduto: function(id) {
+                const p = this.db.products.find(p => p.id === id);
+                if (!p) return;
+                document.getElementById('modal-produto-titulo').innerText = 'Editar Produto';
+                document.getElementById('produto-id').value = p.id;
+                document.getElementById('produto-nome').value = p.name;
+                document.getElementById('produto-descricao').value = p.description || '';
+                document.getElementById('produto-categoria').innerHTML = this.db.categories.map(c => `<option ${c === p.category ? 'selected' : ''}>${c}</option>`).join('');
+                document.getElementById('produto-unidade').value = p.unit || 'un';
+                document.getElementById('produto-estoque').value = p.stock;
+                document.getElementById('produto-min').value = p.minStock;
+                document.getElementById('produto-localizacao').value = p.location || '';
+                document.getElementById('produto-valor').value = p.unitValue || 0;
+                document.getElementById('produto-emoji').value = p.imageEmoji || '📦';
+                this.openModal('modal-produto');
+            },
 
-                let html = `
-                    <div class="water-stats" style="background: linear-gradient(135deg, var(--azul-claro), white); border-radius: 20px; padding: 20px; margin-bottom: 20px;">
-                        <h3 style="margin-bottom: 15px;">💧 Água Fácil CT</h3>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                            <div style="background: white; padding: 15px; border-radius: 15px;">
-                                <div style="font-size: 28px; font-weight: bold; color: var(--azul-institucional);">
-                                    ${this.db.waterStock}
-                                </div>
-                                <div style="font-size: 13px; color: var(--texto-secundario);">Garrafões em estoque</div>
-                            </div>
-                            <div style="background: white; padding: 15px; border-radius: 15px;">
-                                <div style="font-size: 28px; font-weight: bold; color: var(--azul-institucional);">
-                                    ${totalRequested}
-                                </div>
-                                <div style="font-size: 13px; color: var(--texto-secundario);">Solicitações pendentes</div>
-                            </div>
-                        </div>
+            salvarProduto: function() {
+                const id = document.getElementById('produto-id').value;
+                const produto = {
+                    id: id ? parseInt(id) : Date.now(),
+                    name: document.getElementById('produto-nome').value,
+                    description: document.getElementById('produto-descricao').value,
+                    category: document.getElementById('produto-categoria').value,
+                    unit: document.getElementById('produto-unidade').value,
+                    stock: parseInt(document.getElementById('produto-estoque').value) || 0,
+                    minStock: parseInt(document.getElementById('produto-min').value) || 5,
+                    location: document.getElementById('produto-localizacao').value,
+                    unitValue: parseFloat(document.getElementById('produto-valor').value) || 0,
+                    imageEmoji: document.getElementById('produto-emoji').value || '📦'
+                };
+                if (!produto.name) { alert('Nome obrigatório'); return; }
+                if (id) {
+                    // editar
+                    const index = this.db.products.findIndex(p => p.id === parseInt(id));
+                    if (index !== -1) this.db.products[index] = produto;
+                } else {
+                    this.db.products.push(produto);
+                }
+                this.saveDatabase();
+                this.closeModal('modal-produto');
+                this.renderAdminPanel();
+            },
 
-                        <div class="water-progress" style="height: 10px; background: var(--cinza-borda); border-radius: 5px; margin: 15px 0; overflow: hidden;">
-                            <div style="height: 100%; background: var(--azul-institucional); width: ${Math.min(100, (this.db.waterStock / 50) * 100)}%;"></div>
-                        </div>
+            excluirProduto: function(id) {
+                if (confirm('Deseja realmente excluir este produto?')) {
+                    this.db.products = this.db.products.filter(p => p.id !== id);
+                    this.saveDatabase();
+                    this.renderAdminPanel();
+                }
+            },
 
-                        <p style="text-align: center; margin: 10px 0;">
-                            Previsão de reposição: <strong>${daysUntilEmpty > 0 ? daysUntilEmpty + ' dias' : 'Urgente!'}</strong>
-                        </p>
-
-                        <button class="btn btn-primary" style="width:100%;" onclick="app.openModal('modal-agua')">
-                            Solicitar Água
-                        </button>
-                    </div>
-                `;
-
-                if (this.db.waterRequests.length > 0) {
-                    html += `
-                        <div class="list-title">
-                            <h3>Histórico de Solicitações</h3>
-                        </div>
-                        <ul class="item-list">
-                    `;
-
-                    this.db.waterRequests.slice(-10).reverse().forEach(r => {
-                        const statusColor = r.status === 'approved' ? 'var(--verde)' : 
-                                          (r.status === 'rejected' ? 'var(--vermelho)' : 'var(--amarelo)');
+            abrirGerenciarSolicitacoes: function() {
+                const pendentes = this.db.requests.filter(r => r.status === 'pendente');
+                let html = '';
+                if (pendentes.length === 0) {
+                    html = '<p>Nenhuma solicitação pendente.</p>';
+                } else {
+                    pendentes.forEach(r => {
                         html += `
-                            <li class="item-card">
-                                <div class="item-icon">💧</div>
-                                <div class="item-info">
-                                    <h4>${r.qty} garrafão(ões)</h4>
-                                    <div class="category">Setor: ${r.sector}</div>
-                                    <div style="color: ${statusColor}; font-size: 12px; font-weight: 600;">
-                                        Status: ${r.status === 'pending' ? 'Pendente' : (r.status === 'approved' ? 'Aprovado' : 'Negado')}
-                                    </div>
+                            <div class="request-card">
+                                <p><strong>${r.productName}</strong> - ${r.qty} unidades</p>
+                                <p>Solicitante: ${r.requesterName} (${r.sector})</p>
+                                <p>Data: ${r.date}</p>
+                                <div class="request-actions">
+                                    <button class="btn btn-success" onclick="app.aprovarSolicitacao(${r.id})">Aprovar</button>
+                                    <button class="btn btn-danger" onclick="app.negarSolicitacao(${r.id})">Negar</button>
                                 </div>
-                                ${isAdmin && r.status === 'pending' ? `
-                                    <div style="display: flex; gap: 5px;">
-                                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="app.aprovarAgua(${r.id})">✓</button>
-                                        <button class="btn btn-danger" style="padding: 5px 10px;" onclick="app.negarAgua(${r.id})">✗</button>
-                                    </div>
-                                ` : ''}
-                            </li>
+                            </div>
                         `;
                     });
-
-                    html += '</ul>';
                 }
-
-                content.innerHTML = html;
-                this.renderBottomNav('agua');
+                document.getElementById('lista-solicitacoes-pendentes').innerHTML = html;
+                this.openModal('modal-gerir-solicitacoes');
             },
 
-            renderBottomNav: function(active) {
-                const nav = document.getElementById('bottom-nav');
-                const isAdmin = this.currentUser.role === 'admin';
-
-                nav.innerHTML = `
-                    <button class="nav-item ${active === 'dashboard' ? 'active' : ''}" onclick="app.renderDashboard()">
-                        <img src="home-icon.png" alt="Início" class="home-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <span style="display: none;">🏠</span>
-                        <span style="font-size: 11px; margin-top: 2px;">Início</span>
-                    </button>
-                    <button class="nav-item ${active === 'estoque' ? 'active' : ''}" onclick="app.renderEstoque()">
-                        <span>📦</span>
-                        <span>Estoque</span>
-                    </button>
-                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderAgua()">
-                        <span>💧</span>
-                        <span>Água</span>
-                    </button>
-                    ${isAdmin ? `
-                        <button class="nav-item ${active === 'relatorios' ? 'active' : ''}" onclick="app.openModal('modal-relatorios')">
-                            <span>📊</span>
-                            <span>Relatórios</span>
-                        </button>
-                    ` : ''}
-                `;
+            aprovarSolicitacao: function(requestId) {
+                const req = this.db.requests.find(r => r.id === requestId);
+                if (!req) return;
+                const product = this.db.products.find(p => p.id === req.productId);
+                if (!product) return;
+                if (product.stock < req.qty) {
+                    alert('Estoque insuficiente para atender esta solicitação.');
+                    return;
+                }
+                product.stock -= req.qty;
+                req.status = 'aprovado';
+                this.saveDatabase();
+                this.abrirGerenciarSolicitacoes(); // atualiza lista
+                this.renderAdminPanel(); // atualiza estoque
             },
 
+            negarSolicitacao: function(requestId) {
+                const req = this.db.requests.find(r => r.id === requestId);
+                if (req) {
+                    req.status = 'negado';
+                    this.saveDatabase();
+                    this.abrirGerenciarSolicitacoes();
+                }
+            },
+
+            // ---------- MODAIS EXISTENTES (entrada/saída) ajustados ----------
             openModal: function(modalId) {
                 if (modalId === 'modal-entrada' || modalId === 'modal-saida') {
                     this.updateProductSelects();
                 }
-                if (modalId === 'modal-agua') {
-                    document.getElementById('agua-estoque-atual').textContent = this.db.waterStock;
-                    document.getElementById('agua-setor').value = this.currentUser.sector;
-                    const days = Math.floor(this.db.waterStock / 5);
-                    document.getElementById('agua-previsao').textContent = 
-                        `Previsão de reposição: ${days > 0 ? days + ' dias' : 'Urgente!'}`;
+                if (modalId === 'modal-relatorios') {
+                    document.getElementById('relatorio-resultado').innerHTML = '';
                 }
                 document.getElementById(modalId).classList.add('active');
             },
@@ -1229,86 +1190,29 @@
             updateProductSelects: function() {
                 const entradaSelect = document.getElementById('entrada-produto');
                 const saidaSelect = document.getElementById('saida-produto');
-
-                entradaSelect.innerHTML = this.db.products.map(p => 
-                    `<option value="${p.id}" data-valor="${p.unitValue || 0}">${p.name} (Estoque: ${p.stock})</option>`
-                ).join('');
-
-                saidaSelect.innerHTML = this.db.products.filter(p => p.stock > 0).map(p => 
-                    `<option value="${p.id}">${p.name} (Estoque: ${p.stock})</option>`
-                ).join('');
-
+                entradaSelect.innerHTML = this.db.products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                saidaSelect.innerHTML = this.db.products.filter(p => p.stock > 0).map(p => `<option value="${p.id}">${p.name} (${p.stock})</option>`).join('');
                 const today = new Date().toISOString().split('T')[0];
-                document.getElementById('entrada-data').value = today;
-                document.getElementById('saida-data').value = today;
-                
-                // Adicionar listeners para calcular saldo
-                const qtdInput = document.getElementById('entrada-qtd');
-                const valorInput = document.getElementById('entrada-valor');
-                
-                if (qtdInput && valorInput) {
-                    qtdInput.addEventListener('input', () => this.calcularSaldoEntrada());
-                    valorInput.addEventListener('input', () => this.calcularSaldoEntrada());
-                    
-                    // Preencher valor unitário quando mudar o produto
-                    document.getElementById('entrada-produto').addEventListener('change', (e) => {
-                        const selectedOption = e.target.options[e.target.selectedIndex];
-                        const valor = selectedOption.dataset.valor || 0;
-                        document.getElementById('entrada-valor').value = valor;
-                        this.calcularSaldoEntrada();
-                    });
-                    
-                    // Trigger inicial
-                    setTimeout(() => this.calcularSaldoEntrada(), 100);
-                }
-            },
-
-            calcularSaldoEntrada: function() {
-                const qtd = parseFloat(document.getElementById('entrada-qtd').value) || 0;
-                const valor = parseFloat(document.getElementById('entrada-valor').value) || 0;
-                const saldo = qtd * valor;
-                
-                document.getElementById('entrada-saldo').innerHTML = `R$ ${saldo.toFixed(2).replace('.', ',')}`;
+                if (document.getElementById('entrada-data')) document.getElementById('entrada-data').value = today;
+                if (document.getElementById('saida-data')) document.getElementById('saida-data').value = today;
             },
 
             registrarEntrada: function() {
                 const productId = parseInt(document.getElementById('entrada-produto').value);
                 const qtd = parseInt(document.getElementById('entrada-qtd').value);
-                const valorUnitario = parseFloat(document.getElementById('entrada-valor').value) || 0;
+                const valor = parseFloat(document.getElementById('entrada-valor').value) || 0;
                 const fornecedor = document.getElementById('entrada-fornecedor').value;
                 const nf = document.getElementById('entrada-nf').value;
                 const data = document.getElementById('entrada-data').value;
-
-                if (!productId || !qtd || !fornecedor || !nf) {
-                    alert('Preencha todos os campos!');
-                    return;
-                }
-
+                if (!productId || !qtd || !fornecedor || !nf) { alert('Preencha todos'); return; }
                 const product = this.db.products.find(p => p.id === productId);
-                
-                if (valorUnitario > 0) {
-                    product.unitValue = valorUnitario;
-                }
-                
+                if (valor > 0) product.unitValue = valor;
                 product.stock += qtd;
-
-                this.db.movements.push({
-                    id: Date.now(),
-                    type: 'entrada',
-                    productId,
-                    qtd,
-                    unitValue: valorUnitario,
-                    totalValue: qtd * valorUnitario,
-                    supplier: fornecedor,
-                    nf,
-                    date: data,
-                    userId: this.currentUser.id
-                });
-
+                this.db.movements.push({ id: Date.now(), type: 'entrada', productId, qtd, valor, fornecedor, nf, data, userId: this.currentUser.id });
                 this.saveDatabase();
                 this.closeModal('modal-entrada');
-                this.renderDashboard();
-                alert('Entrada registrada com sucesso!');
+                alert('Entrada registrada');
+                this.renderAdminPanel();
             },
 
             registrarSaida: function() {
@@ -1317,177 +1221,38 @@
                 const setor = document.getElementById('saida-setor').value;
                 const responsavel = document.getElementById('saida-responsavel').value;
                 const data = document.getElementById('saida-data').value;
-
-                if (!productId || !qtd || !setor || !responsavel) {
-                    alert('Preencha todos os campos!');
-                    return;
-                }
-
+                if (!productId || !qtd || !setor || !responsavel) { alert('Preencha todos'); return; }
                 const product = this.db.products.find(p => p.id === productId);
-                
-                if (product.stock < qtd) {
-                    alert('Estoque insuficiente!');
-                    return;
-                }
-
+                if (product.stock < qtd) { alert('Estoque insuficiente'); return; }
                 product.stock -= qtd;
-
-                this.db.movements.push({
-                    id: Date.now(),
-                    type: 'saida',
-                    productId,
-                    qtd,
-                    sector: setor,
-                    responsible: responsavel,
-                    date: data,
-                    userId: this.currentUser.id
-                });
-
+                this.db.movements.push({ id: Date.now(), type: 'saida', productId, qtd, setor, responsavel, data, userId: this.currentUser.id });
                 this.saveDatabase();
                 this.closeModal('modal-saida');
-                this.renderDashboard();
-                alert('Saída registrada com sucesso!');
-            },
-
-            solicitarAgua: function() {
-                const qtd = parseInt(document.getElementById('agua-qtd').value);
-                const setor = document.getElementById('agua-setor').value;
-
-                if (!qtd || !setor) {
-                    alert('Preencha todos os campos!');
-                    return;
-                }
-
-                this.db.waterRequests.push({
-                    id: Date.now(),
-                    qtd,
-                    sector: setor,
-                    date: new Date().toISOString(),
-                    userId: this.currentUser.id,
-                    status: 'pending'
-                });
-
-                this.saveDatabase();
-                this.closeModal('modal-agua');
-                this.renderAgua();
-                alert('Solicitação enviada com sucesso!');
-            },
-
-            aprovarAgua: function(requestId) {
-                const request = this.db.waterRequests.find(r => r.id === requestId);
-                if (request && request.status === 'pending') {
-                    request.status = 'approved';
-                    if (this.db.waterStock >= request.qtd) {
-                        this.db.waterStock -= request.qtd;
-                    }
-                    this.saveDatabase();
-                    this.renderAgua();
-                }
-            },
-
-            negarAgua: function(requestId) {
-                const request = this.db.waterRequests.find(r => r.id === requestId);
-                if (request) {
-                    request.status = 'rejected';
-                    this.saveDatabase();
-                    this.renderAgua();
-                }
-            },
-
-            filterProducts: function(search) {
-                const products = document.querySelectorAll('.item-card');
-                products.forEach(p => {
-                    const name = p.querySelector('h4').textContent.toLowerCase();
-                    if (name.includes(search.toLowerCase())) {
-                        p.style.display = 'flex';
-                    } else {
-                        p.style.display = 'none';
-                    }
-                });
-            },
-
-            filterByCategory: function(category) {
-                const products = document.querySelectorAll('.item-card');
-                products.forEach(p => {
-                    if (category === 'all' || p.dataset.category === category) {
-                        p.style.display = 'flex';
-                    } else {
-                        p.style.display = 'none';
-                    }
-                });
-
-                document.querySelectorAll('.action-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                event.target.classList.add('active');
-            },
-
-            editarProduto: function(productId) {
-                const product = this.db.products.find(p => p.id === productId);
-                const newStock = prompt(`Estoque atual: ${product.stock}\nDigite o novo estoque:`, product.stock);
-                if (newStock !== null) {
-                    product.stock = parseInt(newStock);
-                    this.saveDatabase();
-                    this.renderEstoque();
-                }
+                alert('Saída registrada');
+                this.renderAdminPanel();
             },
 
             gerarRelatorio: function() {
                 const tipo = document.getElementById('relatorio-tipo').value;
                 const dias = parseInt(document.getElementById('relatorio-periodo').value);
-                
                 const dataLimite = new Date();
                 dataLimite.setDate(dataLimite.getDate() - dias);
-
-                let movimentacoes = this.db.movements.filter(m => new Date(m.date) >= dataLimite);
-                
-                if (tipo === 'entradas') {
-                    movimentacoes = movimentacoes.filter(m => m.type === 'entrada');
-                } else if (tipo === 'saidas') {
-                    movimentacoes = movimentacoes.filter(m => m.type === 'saida');
-                }
-
-                let html = '<h4>Resultado:</h4><ul style="list-style:none; margin-top:10px;">';
-
-                if (tipo === 'consumo-setor') {
-                    const consumoPorSetor = {};
-                    movimentacoes.filter(m => m.type === 'saida').forEach(m => {
-                        consumoPorSetor[m.sector] = (consumoPorSetor[m.sector] || 0) + m.qtd;
-                    });
-                    
-                    Object.entries(consumoPorSetor)
-                        .sort((a, b) => b[1] - a[1])
-                        .forEach(([setor, total]) => {
-                            html += `<li style="margin-bottom:10px;">${setor}: ${total} itens</li>`;
-                        });
-                } else if (tipo === 'mais-utilizados') {
-                    const usoItens = {};
-                    movimentacoes.filter(m => m.type === 'saida').forEach(m => {
-                        usoItens[m.productId] = (usoItens[m.productId] || 0) + m.qtd;
-                    });
-                    
-                    const topItens = Object.entries(usoItens)
-                        .map(([productId, total]) => {
-                            const product = this.db.products.find(p => p.id === parseInt(productId));
-                            return { name: product?.name || 'Desconhecido', total };
-                        })
-                        .sort((a, b) => b.total - a.total)
-                        .slice(0, 5);
-
-                    topItens.forEach(item => {
-                        html += `<li style="margin-bottom:10px;">${item.name}: ${item.total} unidades</li>`;
-                    });
+                let dados;
+                if (tipo === 'solicitacoes') {
+                    dados = this.db.requests.filter(r => new Date(r.date) >= dataLimite);
                 } else {
-                    movimentacoes.slice(0, 10).forEach(m => {
-                        const product = this.db.products.find(p => p.id === m.productId);
-                        html += `<li style="margin-bottom:10px;">${m.type === 'entrada' ? '📥' : '📤'} ${product?.name} - ${m.qtd} un (${new Date(m.date).toLocaleDateString()})</li>`;
-                    });
+                    dados = this.db.movements.filter(m => m.type === tipo && new Date(m.date) >= dataLimite);
                 }
-
-                if (movimentacoes.length === 0) {
-                    html += '<li>Nenhuma movimentação no período</li>';
-                }
-
+                let html = '<h4>Resultado:</h4><ul>';
+                dados.slice(0,20).forEach(item => {
+                    if (tipo === 'solicitacoes') {
+                        html += `<li>${item.productName} - ${item.qty} (${item.status}) - ${item.date}</li>`;
+                    } else {
+                        const prod = this.db.products.find(p => p.id === item.productId);
+                        html += `<li>${prod ? prod.name : ''} - ${item.qtd} - ${item.date}</li>`;
+                    }
+                });
+                if (dados.length === 0) html += '<li>Nenhum registro</li>';
                 html += '</ul>';
                 document.getElementById('relatorio-resultado').innerHTML = html;
             },
@@ -1495,9 +1260,7 @@
             setupEventListeners: function() {
                 document.querySelectorAll('.modal-overlay').forEach(modal => {
                     modal.addEventListener('click', function(e) {
-                        if (e.target === this) {
-                            this.classList.remove('active');
-                        }
+                        if (e.target === this) this.classList.remove('active');
                     });
                 });
             }
