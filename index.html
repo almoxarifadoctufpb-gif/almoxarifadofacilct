@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0A4B8C">
-    <title>Almox Fácil CT - Catálogo com Fotos</title>
+    <title>Água Fácil CT - Almoxarifado</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -746,6 +746,7 @@
         .status-pendente { background: #FFF3E0; color: var(--amarelo); }
         .status-aprovado { background: #E8F5E9; color: var(--verde); }
         .status-negado { background: #FFEBEE; color: var(--vermelho); }
+        .status-entregue { background: #D4EDDA; color: #155724; } /* Novo status */
 
         .tracking-items {
             margin-top: 20px;
@@ -809,6 +810,30 @@
             border: none;
         }
 
+        /* Dashboard cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .dashboard-card {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--sombra-media);
+            text-align: center;
+        }
+        .dashboard-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--azul-institucional);
+        }
+        .dashboard-card .label {
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+        }
+
         /* Responsividade */
         @media (max-width: 400px) {
             .catalog-grid {
@@ -820,8 +845,8 @@
 <body>
     <!-- Splash Screen -->
     <div id="splash-screen">
-        <img src="icon.png" alt="Almox Fácil CT" id="splash-logo">
-        <span>Almox Fácil CT</span>
+        <img src="icon.png" alt="Água Fácil CT" id="splash-logo">
+        <span>Água Fácil CT</span>
     </div>
 
     <!-- App Container -->
@@ -831,8 +856,8 @@
             <div class="header-logo">
                 <img src="icon.png" alt="Logo" id="header-logo">
                 <div class="header-title">
-                    <h1>Almox Fácil CT</h1>
-                    <p id="user-greeting">Catálogo de Materiais</p>
+                    <h1>Água Fácil CT</h1>
+                    <p id="user-greeting">Almoxarifado</p>
                 </div>
             </div>
             <div class="header-icons">
@@ -969,33 +994,52 @@
         </div>
     </div>
 
-    <!-- Modal de Finalização (Checkout) -->
+    <!-- Modal de Finalização (Checkout) - Adaptado para Água Mineral -->
     <div class="modal-overlay" id="modal-checkout">
         <div class="modal">
-            <div class="modal-header">📋 Finalizar Solicitação</div>
+            <div class="modal-header">💧 Solicitar Água Mineral</div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Nome completo</label>
-                    <input type="text" id="checkout-nome" placeholder="Seu nome">
+                <form id="form-agua" onsubmit="event.preventDefault(); app.finalizarPedidoAgua();">
+                    <div class="form-group">
+                        <label>Nome do solicitante *</label>
+                        <input type="text" id="agua-nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Setor / Laboratório *</label>
+                        <input type="text" id="agua-setor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Curso vinculado *</label>
+                        <input type="text" id="agua-curso" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Local de entrega *</label>
+                        <input type="text" id="agua-local" placeholder="Ex: Bloco A, sala 101" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Complemento</label>
+                        <input type="text" id="agua-complemento" placeholder="Ex: Próximo ao elevador">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade de garrafões *</label>
+                        <input type="number" id="agua-quantidade" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de validade do garrafão vazio</label>
+                        <input type="date" id="agua-validade">
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="agua-obs" rows="2"></textarea>
+                    </div>
+                </form>
+                <div style="margin-top: 20px; background: var(--cinza-claro); padding: 15px; border-radius: 16px;">
+                    <strong>Garrafões em estoque:</strong> <span id="estoque-agua-display">0</span>
                 </div>
-                <div class="form-group">
-                    <label>Setor</label>
-                    <input type="text" id="checkout-setor" placeholder="Ex: DCOMP">
-                </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="checkout-email" placeholder="seu@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Observações (opcional)</label>
-                    <textarea id="checkout-obs" rows="2"></textarea>
-                </div>
-                <h4>Resumo do Pedido</h4>
-                <div id="checkout-resumo" style="background: var(--cinza-claro); padding: 15px; border-radius: 16px; margin-top: 10px;"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="app.closeModal('modal-checkout')">Cancelar</button>
-                <button class="btn-primary" onclick="app.finalizarPedido()">Confirmar e Gerar PDF</button>
+                <button class="btn-primary" onclick="app.finalizarPedidoAgua()">Solicitar</button>
             </div>
         </div>
     </div>
@@ -1021,18 +1065,31 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação (após pedido) - exibe código de rastreamento -->
+    <!-- Modal de Confirmação (após pedido de água) -->
     <div class="modal-overlay" id="modal-pedido-realizado">
         <div class="modal">
             <div class="modal-header">✅ Pedido Realizado</div>
             <div class="modal-body" style="text-align: center;">
-                <p style="font-size: 1.2rem; margin-bottom: 20px;">Seu pedido foi registrado com sucesso!</p>
-                <p style="font-weight: 600;">Código de rastreamento:</p>
-                <p id="tracking-code-display" style="font-size: 2rem; font-weight: 700; color: var(--azul-institucional); background: var(--azul-claro); padding: 15px; border-radius: 20px; margin: 20px 0;">ALM-123ABC</p>
-                <p>Guarde este código para acompanhar seu pedido.</p>
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Solicitação de água registrada com sucesso!</p>
+                <p style="font-weight: 600;">Código de confirmação:</p>
+                <p id="tracking-code-display" style="font-size: 2rem; font-weight: 700; color: var(--azul-institucional); background: var(--azul-claro); padding: 15px; border-radius: 20px; margin: 20px 0;">AGUA-123ABC</p>
+                <p>Guarde este código para acompanhar.</p>
             </div>
             <div class="modal-footer" style="justify-content: center;">
                 <button class="btn-primary" onclick="app.closeModal('modal-pedido-realizado')">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes da Solicitação de Água (Admin) -->
+    <div class="modal-overlay" id="modal-detalhes-agua">
+        <div class="modal">
+            <div class="modal-header">📋 Detalhes da Solicitação</div>
+            <div class="modal-body" id="detalhes-agua-body">
+                <!-- preenchido via js -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-detalhes-agua')">Fechar</button>
             </div>
         </div>
     </div>
@@ -1044,7 +1101,8 @@
             db: {
                 users: [],
                 products: [],
-                requests: [],
+                requests: [], // pedidos gerais (materiais)
+                waterRequests: [], // NOVO: pedidos específicos de água
                 movements: [],
                 categories: [
                     'Papelaria',
@@ -1055,7 +1113,7 @@
                     'Higiene',
                     'Manutenção'
                 ],
-                announcements: [] // NOVA COLEÇÃO DE AVISOS
+                announcements: []
             },
             cart: [],
 
@@ -1065,10 +1123,10 @@
                     this.hideSplash();
                     this.setupEventListeners();
                     this.loadCart();
-                    this.renderCatalog();
+                    this.renderCatalog(); // tela inicial
                     this.renderBottomNav('catalog');
                     this.updateCartCount();
-                    this.populateCategorySelect(); // Para o modal de produto
+                    this.populateCategorySelect();
 
                     const savedAdmin = sessionStorage.getItem('adminUser');
                     if (savedAdmin) {
@@ -1076,7 +1134,7 @@
                         this.isAdmin = true;
                         document.getElementById('user-greeting').innerText = `Admin: ${this.currentUser.name}`;
                     } else {
-                        document.getElementById('user-greeting').innerText = 'Catálogo de Materiais';
+                        document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                     }
                 } catch (error) {
                     console.error('Erro na inicialização:', error);
@@ -1098,21 +1156,21 @@
                 const saved = localStorage.getItem('almoxFacilDB');
                 if (saved) {
                     this.db = JSON.parse(saved);
-                    // Migrações seguras
                     if (!Array.isArray(this.db.products)) this.db.products = [];
                     if (!Array.isArray(this.db.requests)) this.db.requests = [];
+                    if (!Array.isArray(this.db.waterRequests)) this.db.waterRequests = []; // NOVO
                     if (!Array.isArray(this.db.users)) this.db.users = [];
                     if (!Array.isArray(this.db.movements)) this.db.movements = [];
-                    if (!Array.isArray(this.db.announcements)) this.db.announcements = []; // NOVO: garante array
+                    if (!Array.isArray(this.db.announcements)) this.db.announcements = [];
                     
                     this.db.products.forEach(p => {
                         if (!p.description) p.description = 'Sem descrição';
                         if (!p.unit) p.unit = 'un';
-                        if (!p.imageEmoji && !p.imageBase64) p.imageEmoji = '📦'; // Fallback
+                        if (!p.imageEmoji && !p.imageBase64) p.imageEmoji = '📦';
                         if (!p.minStock) p.minStock = 5;
                         if (!p.location) p.location = '';
                         if (!p.unitValue) p.unitValue = 0;
-                        if (!p.imageBase64) p.imageBase64 = null; // campo para foto
+                        if (!p.imageBase64) p.imageBase64 = null;
                     });
                 } else {
                     this.initializeDefaultData();
@@ -1125,7 +1183,6 @@
                     { id: 1, name: 'Admin Principal', email: 'admin@ufpb.br', password: '123456', siape: '1234567', sector: 'Almoxarifado', role: 'admin' },
                     { id: 2, name: 'João Servidor', email: 'usuario@ufpb.br', password: '123456', siape: '7654321', sector: 'DCOMP', role: 'user' }
                 ];
-                // Produtos pré-cadastrados (baseado em materiais comuns de almoxarifado)
                 this.db.products = [
                     { id: 1, name: 'Papel A4', description: 'Resma com 500 folhas', category: 'Papelaria', unit: 'resma', stock: 50, minStock: 10, location: 'A1', unitValue: 22.50, imageEmoji: '📄', imageBase64: null },
                     { id: 2, name: 'Caneta Azul', description: 'Caneta esferográfica azul', category: 'Papelaria', unit: 'cx c/ 50', stock: 100, minStock: 20, location: 'A2', unitValue: 1.75, imageEmoji: '🖊️', imageBase64: null },
@@ -1139,8 +1196,9 @@
                     { id: 10, name: 'Teclado USB', description: 'Teclado padrão ABNT2', category: 'Informática', unit: 'un', stock: 5, minStock: 2, location: 'D1', unitValue: 42.00, imageEmoji: '⌨️', imageBase64: null }
                 ];
                 this.db.requests = [];
+                this.db.waterRequests = []; // Inicia vazio
                 this.db.movements = [];
-                this.db.announcements = []; // NOVO: inicia vazio
+                this.db.announcements = [];
                 this.saveDatabase();
             },
 
@@ -1163,7 +1221,6 @@
                 }
             },
 
-            // Preview de imagem
             previewImage: function(event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -1180,17 +1237,14 @@
                 }
             },
 
-            // ---------- FUNÇÕES DE AVISOS (ANNOUNCEMENTS) ----------
+            // ---------- FUNÇÕES DE AVISOS (ANUNCIOS) ----------
             getActiveAnnouncements: function() {
-                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                const today = new Date().toISOString().split('T')[0];
                 return this.db.announcements.filter(a => {
-                    // Se tiver data de início e for maior que hoje, não mostra
                     if (a.startDate && a.startDate > today) return false;
-                    // Se tiver data de término e for menor que hoje, não mostra
                     if (a.endDate && a.endDate < today) return false;
                     return true;
                 }).sort((a, b) => {
-                    // Ordenar por prioridade: urgente > warning > info
                     const priorityWeight = { urgent: 3, warning: 2, info: 1 };
                     return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
                 });
@@ -1305,7 +1359,6 @@
                     return;
                 }
 
-                // Validação de datas: se ambas preenchidas, início deve ser <= término
                 if (inicio && termino && inicio > termino) {
                     alert('A data de início não pode ser maior que a data de término.');
                     return;
@@ -1329,14 +1382,11 @@
 
                 this.saveDatabase();
                 this.closeModal('modal-aviso');
-                // Se estiver na lista de avisos, atualiza
                 if (document.getElementById('main-content').innerHTML.includes('Avisos do Almoxarifado')) {
                     this.renderAnnouncementsList();
                 } else {
-                    this.renderAdminPanel(); // fallback
+                    this.renderAdminPanel();
                 }
-                // Se estiver no catálogo, atualiza os avisos visíveis (mas o catálogo será recarregado em outra ação)
-                // Para não perder contexto, apenas avisamos que foi salvo.
                 alert('Aviso salvo com sucesso!');
             },
 
@@ -1348,10 +1398,10 @@
                 }
             },
 
-            // ---------- CATÁLOGO (MODIFICADO PARA INCLUIR AVISOS) ----------
+            // ---------- CATÁLOGO (com avisos) ----------
             renderCatalog: function() {
                 const content = document.getElementById('main-content');
-                let html = this.renderActiveAnnouncements(); // NOVO: exibe avisos no topo
+                let html = this.renderActiveAnnouncements();
                 html += `
                     <div style="margin-bottom:20px;">
                         <input type="text" placeholder="🔍 Buscar material..." style="width:100%; padding:16px; border:1px solid var(--cinza-borda); border-radius:20px; font-size:1rem;" onkeyup="app.filterCatalog(event)">
@@ -1412,7 +1462,7 @@
                 if (event && event.target) event.target.classList.add('active');
             },
 
-            // ---------- CARRINHO (INALTERADO) ----------
+            // ---------- CARRINHO (para materiais gerais) ----------
             addToCart: function(productId) {
                 const product = this.db.products.find(p => p.id === productId);
                 if (!product || product.stock <= 0) return;
@@ -1438,7 +1488,6 @@
                 }
                 this.updateCartCount();
                 this.saveCart();
-                // Feedback visual rápido
                 if (event && event.target) {
                     const btn = event.target;
                     btn.style.backgroundColor = '#27ae60';
@@ -1558,133 +1607,210 @@
                 }
             },
 
-            // ---------- FINALIZAR PEDIDO ----------
+            // ---------- FINALIZAR PEDIDO (para materiais gerais) ----------
             openCheckoutModal: function() {
                 if (this.cart.length === 0) {
                     alert('Carrinho vazio');
                     return;
                 }
-                const resumoDiv = document.getElementById('checkout-resumo');
-                let resumoHtml = '<ul style="list-style:none;">';
-                this.cart.forEach(item => {
-                    resumoHtml += `<li>${item.name}: ${item.qty} ${item.unit}</li>`;
-                });
-                resumoHtml += '</ul>';
-                resumoDiv.innerHTML = resumoHtml;
-
-                const last = this.db.requests[this.db.requests.length - 1];
-                if (last) {
-                    document.getElementById('checkout-nome').value = last.requesterName || '';
-                    document.getElementById('checkout-setor').value = last.sector || '';
-                    document.getElementById('checkout-email').value = last.email || '';
-                } else {
-                    document.getElementById('checkout-nome').value = '';
-                    document.getElementById('checkout-setor').value = '';
-                    document.getElementById('checkout-email').value = '';
-                }
-                document.getElementById('checkout-obs').value = '';
-
+                // Redireciona para o modal de água? Não, mantém o antigo para compatibilidade.
+                // Mas vamos manter o modal antigo? Para não quebrar, vou manter o fluxo antigo e criar um novo para água.
+                // Na verdade, o modal antigo era usado para materiais gerais. Vamos manter assim.
+                // Para água, criamos um novo fluxo.
+                alert('Para solicitar água mineral, use a opção "Solicitar Água" no menu inferior.');
                 this.closeCart();
-                this.openModal('modal-checkout');
             },
 
-            finalizarPedido: function() {
-                const nome = document.getElementById('checkout-nome').value.trim();
-                const setor = document.getElementById('checkout-setor').value.trim();
-                const email = document.getElementById('checkout-email').value.trim();
-                const obs = document.getElementById('checkout-obs').value.trim();
+            // ---------- NOVO MÓDULO: SOLICITAÇÃO DE ÁGUA MINERAL ----------
+            renderSolicitarAgua: function() {
+                const content = document.getElementById('main-content');
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const estoque = aguaProduct ? aguaProduct.stock : 0;
+                const html = `
+                    ${this.renderActiveAnnouncements()}
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2>💧 Solicitar Água Mineral</h2>
+                        <p style="color: var(--texto-secundario);">Preencha os dados abaixo</p>
+                    </div>
+                    <div style="background: var(--branco); border-radius: 24px; padding: 20px; box-shadow: var(--sombra-media);">
+                        <div style="margin-bottom: 20px; text-align: center; background: var(--azul-claro); padding: 15px; border-radius: 16px;">
+                            <strong>Garrafões em estoque:</strong> <span style="font-size: 1.5rem; font-weight: 700; color: var(--azul-institucional);">${estoque}</span>
+                        </div>
+                        <form id="form-agua-solicitacao" onsubmit="event.preventDefault(); app.enviarSolicitacaoAgua();">
+                            <div class="form-group">
+                                <label>Nome do solicitante *</label>
+                                <input type="text" id="agua-nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Setor / Laboratório *</label>
+                                <input type="text" id="agua-setor" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Curso vinculado *</label>
+                                <input type="text" id="agua-curso" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Local de entrega *</label>
+                                <input type="text" id="agua-local" placeholder="Ex: Bloco A, sala 101" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Complemento</label>
+                                <input type="text" id="agua-complemento" placeholder="Ex: Próximo ao elevador">
+                            </div>
+                            <div class="form-group">
+                                <label>Quantidade de garrafões *</label>
+                                <input type="number" id="agua-quantidade" min="1" max="${estoque}" value="1" required onchange="app.validarQuantidadeAgua(${estoque})">
+                            </div>
+                            <div class="form-group">
+                                <label>Data de validade do garrafão vazio</label>
+                                <input type="date" id="agua-validade">
+                            </div>
+                            <div class="form-group">
+                                <label>Observações</label>
+                                <textarea id="agua-obs" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width:100%;">Solicitar</button>
+                        </form>
+                    </div>
+                `;
+                content.innerHTML = html;
+                this.renderBottomNav('agua');
+            },
 
-                if (!nome || !setor || !email) {
-                    alert('Preencha nome, setor e e-mail');
+            validarQuantidadeAgua: function(estoque) {
+                const qtdInput = document.getElementById('agua-quantidade');
+                let qtd = parseInt(qtdInput.value);
+                if (qtd > estoque) {
+                    alert(`Estoque insuficiente. Disponível: ${estoque} garrafão(ões).`);
+                    qtdInput.value = estoque;
+                } else if (qtd < 1) {
+                    qtdInput.value = 1;
+                }
+            },
+
+            enviarSolicitacaoAgua: function() {
+                const nome = document.getElementById('agua-nome').value.trim();
+                const setor = document.getElementById('agua-setor').value.trim();
+                const curso = document.getElementById('agua-curso').value.trim();
+                const local = document.getElementById('agua-local').value.trim();
+                const complemento = document.getElementById('agua-complemento').value.trim();
+                const quantidade = parseInt(document.getElementById('agua-quantidade').value);
+                const validade = document.getElementById('agua-validade').value;
+                const obs = document.getElementById('agua-obs').value.trim();
+
+                if (!nome || !setor || !curso || !local) {
+                    alert('Preencha todos os campos obrigatórios.');
                     return;
                 }
 
-                const trackingCode = this.generateTrackingCode();
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                if (!aguaProduct) {
+                    alert('Produto Água Mineral não encontrado no cadastro.');
+                    return;
+                }
 
-                const pedido = {
+                if (quantidade > aguaProduct.stock) {
+                    alert(`Estoque insuficiente. Disponível: ${aguaProduct.stock} garrafão(ões).`);
+                    return;
+                }
+
+                // Gerar código de protocolo
+                const codigo = 'AGUA-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+                const solicitacao = {
                     id: Date.now(),
-                    trackingCode: trackingCode,
-                    date: new Date().toISOString().split('T')[0],
-                    requesterName: nome,
-                    sector: setor,
-                    email: email,
-                    observation: obs,
-                    items: this.cart.map(item => ({
-                        productId: item.productId,
-                        productName: item.name,
-                        qty: item.qty,
-                        unit: item.unit
-                    })),
-                    status: 'pendente'
+                    codigo: codigo,
+                    data: new Date().toISOString().split('T')[0],
+                    nome: nome,
+                    setor: setor,
+                    curso: curso,
+                    local: local,
+                    complemento: complemento,
+                    quantidade: quantidade,
+                    validade: validade || null,
+                    observacoes: obs,
+                    status: 'pendente', // pendente, aprovado, entregue, negado
+                    historico: [
+                        { data: new Date().toISOString(), acao: 'Solicitação criada', status: 'pendente' }
+                    ]
                 };
 
-                this.db.requests.push(pedido);
+                this.db.waterRequests.push(solicitacao);
                 this.saveDatabase();
 
-                this.gerarPDF(pedido);
-
-                this.cart = [];
-                this.updateCartCount();
-                this.saveCart();
-
-                this.closeModal('modal-checkout');
-                document.getElementById('tracking-code-display').innerText = trackingCode;
+                // Exibir modal de confirmação
+                document.getElementById('tracking-code-display').innerText = codigo;
                 this.openModal('modal-pedido-realizado');
+
+                // Limpar formulário (opcional)
+                document.getElementById('form-agua-solicitacao').reset();
             },
 
-            generateTrackingCode: function() {
-                const timestamp = Date.now().toString(36).toUpperCase();
-                const random = Math.floor(Math.random() * 1000).toString(36).toUpperCase().padStart(3, '0');
-                return `ALM-${timestamp}-${random}`;
-            },
-
-            gerarPDF: function(pedido) {
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-
-                    doc.setFontSize(20);
-                    doc.setTextColor(10, 75, 140);
-                    doc.text('Almox Fácil CT - Pedido de Materiais', 14, 22);
-
-                    doc.setFontSize(12);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(`Código de rastreamento: ${pedido.trackingCode}`, 14, 30);
-                    doc.text(`Solicitante: ${pedido.requesterName}`, 14, 38);
-                    doc.text(`Setor: ${pedido.sector}`, 14, 46);
-                    doc.text(`E-mail: ${pedido.email}`, 14, 54);
-                    doc.text(`Data: ${pedido.date}`, 14, 62);
-                    if (pedido.observation) {
-                        doc.text(`Obs: ${pedido.observation}`, 14, 70);
-                    }
-
-                    const tableColumn = ["Produto", "Quantidade", "Unidade"];
-                    const tableRows = pedido.items.map(item => [item.productName, item.qty, item.unit]);
-
-                    doc.autoTable({
-                        startY: 80,
-                        head: [tableColumn],
-                        body: tableRows,
-                        theme: 'striped',
-                        headStyles: { fillColor: [10, 75, 140] }
+            // ---------- MINHAS SOLICITAÇÕES DE ÁGUA ----------
+            renderMinhasSolicitacoesAgua: function() {
+                const content = document.getElementById('main-content');
+                // Filtra por nome? Como não temos usuário logado, vamos mostrar todas para teste, mas idealmente filtrar por nome digitado.
+                // Para simplificar, mostraremos as últimas 20 solicitações.
+                const solicitacoes = this.db.waterRequests.slice().reverse();
+                let html = `
+                    <h3 style="margin-bottom:20px;">📦 Minhas Solicitações de Água</h3>
+                    <button class="btn-secondary" onclick="app.renderSolicitarAgua()" style="margin-bottom:20px;">← Nova Solicitação</button>
+                `;
+                if (solicitacoes.length === 0) {
+                    html += '<p style="text-align:center; color:var(--texto-secundario);">Nenhuma solicitação encontrada.</p>';
+                } else {
+                    solicitacoes.forEach(s => {
+                        const statusClass = s.status === 'pendente' ? 'status-pendente' : 
+                                            (s.status === 'aprovado' ? 'status-aprovado' : 
+                                            (s.status === 'entregue' ? 'status-entregue' : 'status-negado'));
+                        const statusText = s.status.charAt(0).toUpperCase() + s.status.slice(1);
+                        html += `
+                            <div class="item-card" style="margin-bottom: 15px; display: block;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <strong>${s.codigo}</strong>
+                                    <span class="tracking-status ${statusClass}">${statusText}</span>
+                                </div>
+                                <p><strong>Data:</strong> ${s.data}</p>
+                                <p><strong>Setor:</strong> ${s.setor} | <strong>Quantidade:</strong> ${s.quantidade}</p>
+                                <p><strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
+                                <button class="action-btn" onclick="app.verDetalhesAgua(${s.id})">Ver detalhes</button>
+                            </div>
+                        `;
                     });
-
-                    const pageCount = doc.internal.getNumberOfPages();
-                    for (let i = 1; i <= pageCount; i++) {
-                        doc.setPage(i);
-                        doc.setFontSize(10);
-                        doc.setTextColor(150);
-                        doc.text(`Gerado em ${new Date().toLocaleString()}`, 14, doc.internal.pageSize.height - 10);
-                    }
-
-                    doc.save(`pedido_${pedido.trackingCode}.pdf`);
-                } catch (error) {
-                    console.error('Erro ao gerar PDF:', error);
-                    alert('Não foi possível gerar o PDF, mas o pedido foi registrado.');
                 }
+                content.innerHTML = html;
+                this.renderBottomNav('minhas-solicitacoes');
             },
 
-            // ---------- RASTREAMENTO ----------
+            verDetalhesAgua: function(id) {
+                const s = this.db.waterRequests.find(r => r.id === id);
+                if (!s) return;
+                const body = document.getElementById('detalhes-agua-body');
+                let historicoHtml = '';
+                if (s.historico && s.historico.length) {
+                    historicoHtml = '<h4>Histórico</h4><ul style="list-style:none; padding:0;">';
+                    s.historico.forEach(h => {
+                        historicoHtml += `<li>${new Date(h.data).toLocaleString()}: ${h.acao}</li>`;
+                    });
+                    historicoHtml += '</ul>';
+                }
+                body.innerHTML = `
+                    <p><strong>Código:</strong> ${s.codigo}</p>
+                    <p><strong>Data:</strong> ${s.data}</p>
+                    <p><strong>Nome:</strong> ${s.nome}</p>
+                    <p><strong>Setor:</strong> ${s.setor}</p>
+                    <p><strong>Curso:</strong> ${s.curso}</p>
+                    <p><strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
+                    <p><strong>Quantidade:</strong> ${s.quantidade}</p>
+                    <p><strong>Validade do garrafão:</strong> ${s.validade || 'Não informada'}</p>
+                    <p><strong>Observações:</strong> ${s.observacoes || '-'}</p>
+                    <p><strong>Status:</strong> <span class="tracking-status status-${s.status}">${s.status}</span></p>
+                    ${historicoHtml}
+                `;
+                this.openModal('modal-detalhes-agua');
+            },
+
+            // ---------- RASTREAMENTO (inclui água) ----------
             renderTrackOrder: function() {
                 const content = document.getElementById('main-content');
                 content.innerHTML = `
@@ -1706,7 +1832,13 @@
                     alert('Digite um código');
                     return;
                 }
-                const pedido = this.db.requests.find(r => r.trackingCode === code);
+                // Procura em pedidos gerais e em água
+                let pedido = this.db.requests.find(r => r.trackingCode === code);
+                let tipo = 'material';
+                if (!pedido) {
+                    pedido = this.db.waterRequests.find(r => r.codigo === code);
+                    tipo = 'agua';
+                }
                 const resultDiv = document.getElementById('tracking-result');
                 if (!pedido) {
                     resultDiv.style.display = 'block';
@@ -1714,130 +1846,109 @@
                     return;
                 }
 
-                const statusClass = pedido.status === 'pendente' ? 'status-pendente' : (pedido.status === 'aprovado' ? 'status-aprovado' : 'status-negado');
-                const statusText = pedido.status === 'pendente' ? 'Pendente' : (pedido.status === 'aprovado' ? 'Aprovado' : 'Negado');
-
-                let itemsHtml = '';
-                pedido.items.forEach(item => {
-                    itemsHtml += `<div class="tracking-item"><span>${item.productName}</span><span>${item.qty} ${item.unit}</span></div>`;
-                });
-
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `
-                    <div class="tracking-header">
-                        <span class="tracking-code">${pedido.trackingCode}</span>
-                        <span class="tracking-status ${statusClass}">${statusText}</span>
-                    </div>
-                    <p><strong>Solicitante:</strong> ${pedido.requesterName}</p>
-                    <p><strong>Setor:</strong> ${pedido.sector}</p>
-                    <p><strong>E-mail:</strong> ${pedido.email}</p>
-                    <p><strong>Data:</strong> ${pedido.date}</p>
-                    ${pedido.observation ? `<p><strong>Obs:</strong> ${pedido.observation}</p>` : ''}
-                    <div class="tracking-items">
-                        <h4>Itens solicitados</h4>
-                        ${itemsHtml}
-                    </div>
-                `;
-            },
-
-            // ---------- ADMIN (MODIFICADO PARA INCLUIR BOTÃO DE AVISOS) ----------
-            openAdminLogin: function() {
-                document.getElementById('admin-email').value = 'admin@ufpb.br';
-                document.getElementById('admin-password').value = '123456';
-                this.openModal('modal-admin-login');
-            },
-
-            adminLogin: function() {
-                const email = document.getElementById('admin-email').value;
-                const password = document.getElementById('admin-password').value;
-                const user = this.db.users.find(u => u.email === email && u.password === password && u.role === 'admin');
-                if (user) {
-                    this.currentUser = user;
-                    this.isAdmin = true;
-                    sessionStorage.setItem('adminUser', JSON.stringify(user));
-                    document.getElementById('user-greeting').innerText = `Admin: ${user.name}`;
-                    this.closeModal('modal-admin-login');
-                    this.renderAdminPanel();
-                    this.renderBottomNav('admin');
-                } else {
-                    alert('Credenciais inválidas');
-                }
-            },
-
-            logoutAdmin: function() {
-                this.currentUser = null;
-                this.isAdmin = false;
-                sessionStorage.removeItem('adminUser');
-                document.getElementById('user-greeting').innerText = 'Catálogo de Materiais';
-                this.renderCatalog();
-                this.renderBottomNav('catalog');
-            },
-
-            // ---------- RENDERIZAÇÃO DAS TELAS ----------
-            renderBottomNav: function(active) {
-                const nav = document.getElementById('bottom-nav');
-                const isAdmin = this.isAdmin;
-                nav.innerHTML = `
-                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span>📋</span><span>Catálogo</span></button>
-                    <button class="nav-item ${active === 'requests' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoes()"><span>📦</span><span>Minhas Solic.</span></button>
-                    <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span>🔍</span><span>Rastrear</span></button>
-                    ${isAdmin ? `
-                        <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span>⚙️</span><span>Admin</span></button>
-                    ` : ''}
-                `;
-                const adminBtn = document.getElementById('admin-login-btn');
-                if (isAdmin) {
-                    adminBtn.innerHTML = '🔓';
-                    adminBtn.onclick = () => app.logoutAdmin();
-                } else {
-                    adminBtn.innerHTML = '🔒';
-                    adminBtn.onclick = () => app.openAdminLogin();
-                }
-            },
-
-            renderMinhasSolicitacoes: function() {
-                const content = document.getElementById('main-content');
-                const requests = this.db.requests.slice(-20).reverse();
-                let html = '<h3 style="margin-bottom:20px;">📦 Solicitações Recentes</h3>';
-                if (requests.length === 0) {
-                    html += '<p style="text-align:center; color:var(--texto-secundario);">Nenhuma solicitação ainda.</p>';
-                } else {
-                    requests.forEach(r => {
-                        const statusClass = r.status === 'pendente' ? 'status-pendente' : (r.status === 'aprovado' ? 'status-aprovado' : 'status-negado');
-                        const statusText = r.status === 'pendente' ? 'Pendente' : (r.status === 'aprovado' ? 'Aprovado' : 'Negado');
-                        html += `
-                            <div class="item-card" style="margin-bottom: 15px; display: block;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                    <strong>${r.requesterName}</strong>
-                                    <span class="tracking-status ${statusClass}">${statusText}</span>
-                                </div>
-                                <p><strong>Código:</strong> ${r.trackingCode}</p>
-                                <p>Setor: ${r.sector} | Itens: ${r.items.length}</p>
-                                <p>Data: ${r.date}</p>
-                            </div>
-                        `;
+                if (tipo === 'material') {
+                    // Exibe pedido de materiais (já existente)
+                    const statusClass = pedido.status === 'pendente' ? 'status-pendente' : (pedido.status === 'aprovado' ? 'status-aprovado' : 'status-negado');
+                    const statusText = pedido.status === 'pendente' ? 'Pendente' : (pedido.status === 'aprovado' ? 'Aprovado' : 'Negado');
+                    let itemsHtml = '';
+                    pedido.items.forEach(item => {
+                        itemsHtml += `<div class="tracking-item"><span>${item.productName}</span><span>${item.qty} ${item.unit}</span></div>`;
                     });
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div class="tracking-header">
+                            <span class="tracking-code">${pedido.trackingCode}</span>
+                            <span class="tracking-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <p><strong>Solicitante:</strong> ${pedido.requesterName}</p>
+                        <p><strong>Setor:</strong> ${pedido.sector}</p>
+                        <p><strong>E-mail:</strong> ${pedido.email}</p>
+                        <p><strong>Data:</strong> ${pedido.date}</p>
+                        ${pedido.observation ? `<p><strong>Obs:</strong> ${pedido.observation}</p>` : ''}
+                        <div class="tracking-items">
+                            <h4>Itens solicitados</h4>
+                            ${itemsHtml}
+                        </div>
+                    `;
+                } else {
+                    // Exibe pedido de água
+                    const statusClass = pedido.status === 'pendente' ? 'status-pendente' : 
+                                        (pedido.status === 'aprovado' ? 'status-aprovado' : 
+                                        (pedido.status === 'entregue' ? 'status-entregue' : 'status-negado'));
+                    const statusText = pedido.status.charAt(0).toUpperCase() + pedido.status.slice(1);
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div class="tracking-header">
+                            <span class="tracking-code">${pedido.codigo}</span>
+                            <span class="tracking-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <p><strong>Solicitante:</strong> ${pedido.nome}</p>
+                        <p><strong>Setor:</strong> ${pedido.setor}</p>
+                        <p><strong>Curso:</strong> ${pedido.curso}</p>
+                        <p><strong>Local:</strong> ${pedido.local} ${pedido.complemento ? '- '+pedido.complemento : ''}</p>
+                        <p><strong>Quantidade:</strong> ${pedido.quantidade} garrafão(ões)</p>
+                        <p><strong>Data:</strong> ${pedido.data}</p>
+                        ${pedido.observacoes ? `<p><strong>Obs:</strong> ${pedido.observacoes}</p>` : ''}
+                        <div class="tracking-items">
+                            <h4>Histórico</h4>
+                            ${pedido.historico ? pedido.historico.map(h => `<div class="tracking-item"><span>${new Date(h.data).toLocaleString()}</span><span>${h.acao}</span></div>`).join('') : ''}
+                        </div>
+                    `;
                 }
-                content.innerHTML = html;
-                this.renderBottomNav('requests');
             },
 
+            // ---------- ADMIN: PAINEL COM DASHBOARD E GERENCIAMENTO DE ÁGUA ----------
             renderAdminPanel: function() {
                 if (!this.isAdmin) {
                     alert('Acesso restrito');
                     return;
                 }
+                // Calcular estatísticas para dashboard
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const estoqueAgua = aguaProduct ? aguaProduct.stock : 0;
+                const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente').length;
+                const atendidas = this.db.waterRequests.filter(r => r.status === 'entregue').length;
+                
+                // Consumo por setor (simplificado: top 3)
+                const setores = {};
+                this.db.waterRequests.forEach(r => {
+                    if (r.status === 'entregue' || r.status === 'aprovado') {
+                        setores[r.setor] = (setores[r.setor] || 0) + r.quantidade;
+                    }
+                });
+                const topSetores = Object.entries(setores).sort((a,b) => b[1] - a[1]).slice(0,3).map(([setor, qtd]) => `${setor}: ${qtd}`).join(', ') || 'Nenhum';
+
                 const content = document.getElementById('main-content');
                 let html = `
                     <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
                         <button class="action-btn primary" onclick="app.abrirNovoProduto()">➕ Novo Produto</button>
-                        <button class="action-btn" onclick="app.abrirGerenciarSolicitacoes()">📋 Solicitações Pendentes</button>
+                        <button class="action-btn" onclick="app.abrirGerenciarSolicitacoesAgua()">💧 Solicitações de Água</button>
+                        <button class="action-btn" onclick="app.renderAnnouncementsList()">📢 Avisos</button>
                         <button class="action-btn" onclick="app.abrirListaTodosPedidos()">📋 Todos os Pedidos</button>
-                        <button class="action-btn" onclick="app.openModal('modal-entrada')">📥 Entrada</button>
-                        <button class="action-btn" onclick="app.openModal('modal-saida')">📤 Saída</button>
-                        <button class="action-btn" onclick="app.renderAnnouncementsList()">📢 Avisos</button> <!-- NOVO BOTÃO -->
                     </div>
-                    <h3>Produtos</h3>
+
+                    <h3>Dashboard - Água Mineral</h3>
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card">
+                            <div class="number">${estoqueAgua}</div>
+                            <div class="label">Garrafões em estoque</div>
+                            ${estoqueAgua <= (aguaProduct?.minStock || 5) ? '<p style="color: var(--vermelho);">⚠️ Estoque baixo!</p>' : ''}
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number">${pendentes}</div>
+                            <div class="label">Solicitações pendentes</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number">${atendidas}</div>
+                            <div class="label">Atendidas</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number" style="font-size:1.2rem;">${topSetores}</div>
+                            <div class="label">Consumo por setor</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Produtos</h3>
                     <ul class="item-list" id="admin-product-list">
                 `;
 
@@ -1865,9 +1976,117 @@
                 this.renderBottomNav('admin');
             },
 
-            // ---------- CRUD PRODUTOS (INALTERADO) ----------
+            abrirGerenciarSolicitacoesAgua: function() {
+                if (!this.isAdmin) return;
+                const content = document.getElementById('main-content');
+                let html = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3>💧 Solicitações de Água</h3>
+                        <button class="btn-secondary" onclick="app.renderAdminPanel()">← Voltar</button>
+                    </div>
+                `;
+                const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente');
+                const outras = this.db.waterRequests.filter(r => r.status !== 'pendente');
+                if (pendentes.length === 0 && outras.length === 0) {
+                    html += '<p>Nenhuma solicitação.</p>';
+                } else {
+                    if (pendentes.length > 0) {
+                        html += '<h4>Pendentes</h4>';
+                        pendentes.forEach(s => {
+                            html += this.renderSolicitacaoAguaCard(s);
+                        });
+                    }
+                    if (outras.length > 0) {
+                        html += '<h4>Histórico</h4>';
+                        outras.forEach(s => {
+                            html += this.renderSolicitacaoAguaCard(s);
+                        });
+                    }
+                }
+                content.innerHTML = html;
+            },
+
+            renderSolicitacaoAguaCard: function(s) {
+                const statusClass = s.status === 'pendente' ? 'status-pendente' : 
+                                    (s.status === 'aprovado' ? 'status-aprovado' : 
+                                    (s.status === 'entregue' ? 'status-entregue' : 'status-negado'));
+                const statusText = s.status.charAt(0).toUpperCase() + s.status.slice(1);
+                let actions = '';
+                if (s.status === 'pendente') {
+                    actions = `
+                        <button class="action-btn primary" onclick="app.aprovarSolicitacaoAgua(${s.id})">✓ Aprovar</button>
+                        <button class="btn-danger" onclick="app.negarSolicitacaoAgua(${s.id})">✗ Negar</button>
+                    `;
+                } else if (s.status === 'aprovado') {
+                    actions = `
+                        <button class="action-btn primary" onclick="app.registrarEntregaAgua(${s.id})">📦 Registrar Entrega</button>
+                    `;
+                }
+                return `
+                    <div class="item-card" style="margin-bottom: 15px; display: block;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong>${s.codigo}</strong>
+                            <span class="tracking-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <p><strong>Data:</strong> ${s.data}</p>
+                        <p><strong>Solicitante:</strong> ${s.nome} (${s.setor})</p>
+                        <p><strong>Curso:</strong> ${s.curso} | <strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
+                        <p><strong>Quantidade:</strong> ${s.quantidade} garrafão(ões)</p>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            ${actions}
+                            <button class="action-btn" onclick="app.verDetalhesAgua(${s.id})">👁️ Detalhes</button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            aprovarSolicitacaoAgua: function(id) {
+                const req = this.db.waterRequests.find(r => r.id === id);
+                if (!req) return;
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                if (!aguaProduct) return;
+                if (aguaProduct.stock < req.quantidade) {
+                    alert('Estoque insuficiente para atender esta solicitação.');
+                    return;
+                }
+                req.status = 'aprovado';
+                req.historico.push({ data: new Date().toISOString(), acao: 'Solicitação aprovada', status: 'aprovado' });
+                // Não baixa estoque ainda, só quando entregar
+                this.saveDatabase();
+                this.abrirGerenciarSolicitacoesAgua();
+                alert('Solicitação aprovada. Aguardando registro de entrega.');
+            },
+
+            negarSolicitacaoAgua: function(id) {
+                if (confirm('Negar esta solicitação?')) {
+                    const req = this.db.waterRequests.find(r => r.id === id);
+                    if (!req) return;
+                    req.status = 'negado';
+                    req.historico.push({ data: new Date().toISOString(), acao: 'Solicitação negada', status: 'negado' });
+                    this.saveDatabase();
+                    this.abrirGerenciarSolicitacoesAgua();
+                }
+            },
+
+            registrarEntregaAgua: function(id) {
+                const req = this.db.waterRequests.find(r => r.id === id);
+                if (!req || req.status !== 'aprovado') return;
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                if (!aguaProduct) return;
+                if (aguaProduct.stock < req.quantidade) {
+                    alert('Estoque insuficiente para realizar a entrega.');
+                    return;
+                }
+                req.status = 'entregue';
+                aguaProduct.stock -= req.quantidade;
+                req.historico.push({ data: new Date().toISOString(), acao: 'Entrega registrada', status: 'entregue' });
+                this.saveDatabase();
+                this.abrirGerenciarSolicitacoesAgua();
+                alert('Entrega registrada. Estoque atualizado.');
+            },
+
+            // ---------- FUNÇÕES ADMIN EXISTENTES (adaptadas) ----------
             abrirNovoProduto: function() {
-                // Limpa formulário
                 document.getElementById('produto-id').value = '';
                 document.getElementById('produto-nome').value = '';
                 document.getElementById('produto-categoria').value = '';
@@ -1898,7 +2117,6 @@
                 document.getElementById('produto-minstock').value = produto.minStock || 5;
                 document.getElementById('produto-localizacao').value = produto.location || '';
                 document.getElementById('produto-valor').value = produto.unitValue || 0;
-                // Preview da imagem existente
                 const preview = document.getElementById('image-preview');
                 if (produto.imageBase64) {
                     preview.style.backgroundImage = `url('${produto.imageBase64}')`;
@@ -1922,7 +2140,6 @@
                     return;
                 }
 
-                // Processa a imagem (se nova)
                 const fileInput = document.getElementById('produto-foto');
                 let imageBase64 = null;
 
@@ -1937,15 +2154,13 @@
                         minStock: parseInt(document.getElementById('produto-minstock').value) || 5,
                         location: document.getElementById('produto-localizacao').value.trim(),
                         unitValue: parseFloat(document.getElementById('produto-valor').value) || 0,
-                        imageEmoji: '📦', // Fallback
+                        imageEmoji: '📦',
                         imageBase64: base64
                     };
 
                     if (id) {
-                        // Editar: manter campos não editados, como imageEmoji antigo se não houver nova imagem
                         const index = this.db.products.findIndex(p => p.id === parseInt(id));
                         if (index !== -1) {
-                            // Se não enviou nova imagem, mantém a antiga
                             if (!base64) {
                                 produto.imageBase64 = this.db.products[index].imageBase64;
                                 produto.imageEmoji = this.db.products[index].imageEmoji;
@@ -1953,14 +2168,13 @@
                             this.db.products[index] = produto;
                         }
                     } else {
-                        // Novo
                         this.db.products.push(produto);
                     }
 
                     this.saveDatabase();
                     this.closeModal('modal-produto');
-                    this.renderAdminPanel(); // Atualiza lista admin
-                    this.renderCatalog(); // Atualiza catálogo
+                    this.renderAdminPanel();
+                    this.renderCatalog();
                 };
 
                 if (fileInput.files.length > 0) {
@@ -1983,15 +2197,10 @@
                 }
             },
 
-            // ---------- OUTRAS FUNÇÕES ADMIN (placeholders melhorados) ----------
-            abrirGerenciarSolicitacoes: function() {
-                alert('Funcionalidade de gerenciar solicitações pendentes será implementada em breve.');
-            },
-
             abrirListaTodosPedidos: function() {
                 if (!this.isAdmin) return;
                 const content = document.getElementById('main-content');
-                let html = '<h3 style="margin-bottom:20px;">📋 Todos os Pedidos</h3>';
+                let html = '<h3 style="margin-bottom:20px;">📋 Todos os Pedidos (Materiais)</h3>';
                 html += '<button class="btn-secondary" onclick="app.renderAdminPanel()" style="margin-bottom:20px;">← Voltar</button>';
                 
                 if (this.db.requests.length === 0) {
@@ -2039,6 +2248,62 @@
                     this.db.requests = this.db.requests.filter(r => r.id !== requestId);
                     this.saveDatabase();
                     this.abrirListaTodosPedidos();
+                }
+            },
+
+            // ---------- LOGIN / LOGOUT ----------
+            openAdminLogin: function() {
+                document.getElementById('admin-email').value = 'admin@ufpb.br';
+                document.getElementById('admin-password').value = '123456';
+                this.openModal('modal-admin-login');
+            },
+
+            adminLogin: function() {
+                const email = document.getElementById('admin-email').value;
+                const password = document.getElementById('admin-password').value;
+                const user = this.db.users.find(u => u.email === email && u.password === password && u.role === 'admin');
+                if (user) {
+                    this.currentUser = user;
+                    this.isAdmin = true;
+                    sessionStorage.setItem('adminUser', JSON.stringify(user));
+                    document.getElementById('user-greeting').innerText = `Admin: ${user.name}`;
+                    this.closeModal('modal-admin-login');
+                    this.renderAdminPanel();
+                    this.renderBottomNav('admin');
+                } else {
+                    alert('Credenciais inválidas');
+                }
+            },
+
+            logoutAdmin: function() {
+                this.currentUser = null;
+                this.isAdmin = false;
+                sessionStorage.removeItem('adminUser');
+                document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
+                this.renderCatalog();
+                this.renderBottomNav('catalog');
+            },
+
+            // ---------- RENDERIZAÇÃO DA NAVEGAÇÃO INFERIOR ----------
+            renderBottomNav: function(active) {
+                const nav = document.getElementById('bottom-nav');
+                const isAdmin = this.isAdmin;
+                nav.innerHTML = `
+                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span>📋</span><span>Catálogo</span></button>
+                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span>💧</span><span>Solicitar Água</span></button>
+                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span>📦</span><span>Minhas Solic.</span></button>
+                    <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span>🔍</span><span>Rastrear</span></button>
+                    ${isAdmin ? `
+                        <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span>⚙️</span><span>Admin</span></button>
+                    ` : ''}
+                `;
+                const adminBtn = document.getElementById('admin-login-btn');
+                if (isAdmin) {
+                    adminBtn.innerHTML = '🔓';
+                    adminBtn.onclick = () => app.logoutAdmin();
+                } else {
+                    adminBtn.innerHTML = '🔒';
+                    adminBtn.onclick = () => app.openAdminLogin();
                 }
             },
 
