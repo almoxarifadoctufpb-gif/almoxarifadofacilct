@@ -154,12 +154,24 @@
             justify-content: center;
             backdrop-filter: blur(5px);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
             position: relative;
+            padding: 0;
         }
 
         .header-icons button:hover {
             background: rgba(255,255,255,0.25);
+        }
+
+        .header-icons button:active {
+            transform: scale(0.95);
+        }
+
+        .header-icons button img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1); /* torna a imagem branca */
         }
 
         .cart-badge {
@@ -633,11 +645,27 @@
             width: 44px;
             height: 44px;
             border-radius: 14px;
-            font-size: 1.4rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            padding: 0;
+        }
+
+        .admin-login-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .admin-login-btn:active {
+            transform: scale(0.95);
+        }
+
+        .admin-login-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
         }
 
         /* Navegação Inferior */
@@ -649,7 +677,7 @@
             background: var(--branco);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 8px 0;
             border-top: 1px solid var(--cinza-borda);
             border-top-left-radius: 28px;
             border-top-right-radius: 28px;
@@ -661,13 +689,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             color: var(--texto-secundario);
             font-size: 0.7rem;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 6px 16px;
+            padding: 6px 12px;
             border-radius: 30px;
             transition: all 0.2s;
         }
@@ -678,8 +706,20 @@
             font-weight: 500;
         }
 
-        .nav-item span:first-child {
-            font-size: 1.4rem;
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .nav-item.active img {
+            opacity: 1;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
         }
 
         /* Estilos para rastreamento */
@@ -834,6 +874,77 @@
             color: var(--texto-secundario);
         }
 
+        /* Estilo para controle de estoque de água */
+        .water-stock-control {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--sombra-media);
+            border-left: 4px solid var(--azul-institucional);
+        }
+        .water-stock-control h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: var(--azul-institucional);
+        }
+        .stock-input-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .stock-input-group input {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border: 1.5px solid var(--cinza-borda);
+            border-radius: 16px;
+            font-size: 1rem;
+        }
+        .stock-input-group button {
+            padding: 12px 20px;
+            background: var(--azul-institucional);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .stock-input-group button:hover {
+            background: var(--azul-escuro);
+        }
+        .stock-history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--cinza-claro);
+            border-radius: 16px;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--cinza-borda);
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .low-stock-warning {
+            color: var(--vermelho);
+            font-weight: 600;
+            margin-top: 10px;
+            padding: 10px;
+            background: #FFEBEE;
+            border-radius: 12px;
+            text-align: center;
+        }
+
         /* Toast de notificação */
         .toast-notification {
             position: fixed;
@@ -887,7 +998,9 @@
                     🛒
                     <span id="cart-count" class="cart-badge" style="display: none;">0</span>
                 </button>
-                <button id="admin-login-btn" class="admin-login-btn" onclick="app.openAdminLogin()">🔒</button>
+                <button id="admin-login-btn" class="admin-login-btn" onclick="app.toggleAdmin()">
+                    <img src="administrador.png" alt="Admin" id="admin-icon-img">
+                </button>
             </div>
         </div>
 
@@ -1016,7 +1129,7 @@
         </div>
     </div>
 
-    <!-- Modal de Finalização (Checkout) - NÃO USADO PARA ÁGUA, APENAS PARA MATERIAIS -->
+    <!-- Modal de Finalização (Checkout) -->
     <div class="modal-overlay" id="modal-checkout">
         <div class="modal">
             <div class="modal-header">📦 Finalizar Pedido</div>
@@ -1068,7 +1181,7 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmação (após pedido de água) - AGORA COM OPÇÕES DE PDF -->
+    <!-- Modal de Confirmação (após pedido) -->
     <div class="modal-overlay" id="modal-pedido-realizado">
         <div class="modal">
             <div class="modal-header">✅ Pedido Realizado</div>
@@ -1122,7 +1235,8 @@
                     'Higiene',
                     'Manutenção'
                 ],
-                announcements: []
+                announcements: [],
+                waterStockMovements: [] // novo: histórico de movimentações de água
             },
             cart: [],
             recentPDF: null, // armazena o último PDF gerado para download
@@ -1146,6 +1260,7 @@
                     } else {
                         document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                     }
+                    this.updateAdminButtonIcon();
                 } catch (error) {
                     console.error('Erro na inicialização:', error);
                     alert('Ocorreu um erro ao carregar o aplicativo. Tente recarregar a página.');
@@ -1172,6 +1287,7 @@
                     if (!Array.isArray(this.db.users)) this.db.users = [];
                     if (!Array.isArray(this.db.movements)) this.db.movements = [];
                     if (!Array.isArray(this.db.announcements)) this.db.announcements = [];
+                    if (!Array.isArray(this.db.waterStockMovements)) this.db.waterStockMovements = [];
                     
                     this.db.products.forEach(p => {
                         if (!p.description) p.description = 'Sem descrição';
@@ -1209,6 +1325,7 @@
                 this.db.waterRequests = [];
                 this.db.movements = [];
                 this.db.announcements = [];
+                this.db.waterStockMovements = [];
                 this.saveDatabase();
             },
 
@@ -1686,11 +1803,14 @@
                 this.openModal('modal-pedido-realizado');
             },
 
-            // ---------- NOVO MÓDULO: SOLICITAÇÃO DE ÁGUA MINERAL (SEM VERIFICAÇÃO DE ESTOQUE) ----------
+            // ---------- NOVO MÓDULO: SOLICITAÇÃO DE ÁGUA MINERAL ----------
             renderSolicitarAgua: function() {
                 const content = document.getElementById('main-content');
                 const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
                 const estoque = aguaProduct ? aguaProduct.stock : 0;
+                const minStock = aguaProduct ? aguaProduct.minStock : 5;
+                const lowStock = estoque <= minStock;
+                const noStock = estoque === 0;
                 const html = `
                     ${this.renderActiveAnnouncements()}
                     <div style="text-align: center; margin-bottom: 20px;">
@@ -1700,7 +1820,8 @@
                     <div style="background: var(--branco); border-radius: 24px; padding: 20px; box-shadow: var(--sombra-media);">
                         <div style="margin-bottom: 20px; text-align: center; background: var(--azul-claro); padding: 15px; border-radius: 16px;">
                             <strong>Garrafões em estoque:</strong> <span style="font-size: 1.5rem; font-weight: 700; color: var(--azul-institucional);">${estoque}</span>
-                            <p style="font-size:0.8rem; color: var(--texto-secundario);">(A solicitação pode ser feita mesmo sem estoque)</p>
+                            ${lowStock ? '<p style="color: var(--vermelho); font-weight:600; margin-top:5px;">⚠️ Estoque baixo!</p>' : ''}
+                            ${noStock ? '<p style="color: var(--vermelho); font-weight:600; margin-top:5px;">❌ Sem estoque disponível no momento</p>' : ''}
                         </div>
                         <form id="form-agua-solicitacao" onsubmit="event.preventDefault(); app.enviarSolicitacaoAgua();">
                             <div class="form-group">
@@ -2067,6 +2188,93 @@
                 }
             },
 
+            // ---------- CONTROLE DE ESTOQUE DE ÁGUA (ADMIN) ----------
+            updateWaterStock: function(operation) {
+                const input = document.getElementById('water-stock-qty');
+                const qty = parseInt(input.value);
+                if (isNaN(qty) || qty <= 0) {
+                    this.showNotification('Digite uma quantidade válida (maior que zero)', 'erro');
+                    return;
+                }
+
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                if (!aguaProduct) {
+                    this.showNotification('Produto de água não encontrado', 'erro');
+                    return;
+                }
+
+                let newStock = aguaProduct.stock;
+                let movimento = '';
+
+                if (operation === 'add') {
+                    newStock += qty;
+                    movimento = `Adicionado ${qty} garrafão(ões)`;
+                } else if (operation === 'remove') {
+                    if (aguaProduct.stock < qty) {
+                        this.showNotification('Estoque insuficiente para remoção', 'erro');
+                        return;
+                    }
+                    newStock -= qty;
+                    movimento = `Removido ${qty} garrafão(ões)`;
+                }
+
+                aguaProduct.stock = newStock;
+                const now = new Date();
+                const movimentoReg = {
+                    data: now.toISOString(),
+                    tipo: operation === 'add' ? 'adição' : 'remoção',
+                    quantidade: qty,
+                    estoqueResultante: newStock,
+                    usuario: this.currentUser ? this.currentUser.name : 'Admin'
+                };
+                this.db.waterStockMovements.push(movimentoReg);
+                this.saveDatabase();
+
+                this.showNotification(`Estoque atualizado: ${newStock} garrafões`, 'sucesso');
+
+                // Re-renderizar o painel admin para atualizar a interface
+                if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
+                    this.renderAdminPanel();
+                } else {
+                    this.renderAdminWaterStock(); // se estiver em uma subpágina, mas por simplicidade, recarregamos o painel
+                }
+            },
+
+            renderAdminWaterStock: function() {
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const estoque = aguaProduct ? aguaProduct.stock : 0;
+                const minStock = aguaProduct ? aguaProduct.minStock : 5;
+                const lowStock = estoque <= minStock;
+                const movimentos = this.db.waterStockMovements.slice().reverse().slice(0, 10); // últimos 10
+
+                let html = `
+                    <div class="water-stock-control">
+                        <h3>💧 Controle de Estoque - Água Mineral</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 1.2rem;">Estoque atual: <strong style="color: var(--azul-institucional);">${estoque}</strong> garrafões</span>
+                            ${lowStock ? '<span class="stock-badge low" style="font-size:0.9rem;">⚠️ Estoque baixo</span>' : ''}
+                        </div>
+                        <div class="stock-input-group">
+                            <input type="number" id="water-stock-qty" min="1" value="1" placeholder="Quantidade">
+                            <button onclick="app.updateWaterStock('add')">➕ Adicionar</button>
+                            <button onclick="app.updateWaterStock('remove')" ${estoque === 0 ? 'disabled' : ''}>➖ Remover</button>
+                        </div>
+                        ${estoque === 0 ? '<div class="low-stock-warning">❌ Sem estoque disponível no momento</div>' : ''}
+                        <div class="stock-history">
+                            <h4 style="margin-bottom: 5px;">Últimas movimentações</h4>
+                            ${movimentos.length === 0 ? '<p>Nenhuma movimentação registrada.</p>' : ''}
+                            ${movimentos.map(m => `
+                                <div class="history-item">
+                                    <span>${new Date(m.data).toLocaleString()}</span>
+                                    <span>${m.tipo}: ${m.quantidade} (estoque: ${m.estoqueResultante})</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                return html;
+            },
+
             // ---------- ADMIN: PAINEL COM DASHBOARD E GERENCIAMENTO DE ÁGUA ----------
             renderAdminPanel: function() {
                 if (!this.isAdmin) {
@@ -2127,6 +2335,8 @@
                             <div class="label">Consumo por setor</div>
                         </div>
                     </div>
+
+                    ${this.renderAdminWaterStock()}
 
                     <h3 style="margin-top: 20px;">Produtos</h3>
                     <ul class="item-list" id="admin-product-list">
@@ -2269,6 +2479,15 @@
                 }
                 req.status = 'entregue';
                 aguaProduct.stock -= req.quantidade;
+                // Registrar movimentação
+                this.db.waterStockMovements.push({
+                    data: new Date().toISOString(),
+                    tipo: 'remoção (entrega)',
+                    quantidade: req.quantidade,
+                    estoqueResultante: aguaProduct.stock,
+                    usuario: this.currentUser ? this.currentUser.name : 'Admin',
+                    solicitacao: req.codigo
+                });
                 req.historico.push({ data: new Date().toISOString(), acao: 'Entrega registrada', status: 'entregue' });
                 this.saveDatabase();
                 this.abrirGerenciarSolicitacoesAgua();
@@ -2461,6 +2680,7 @@
                     this.closeModal('modal-admin-login');
                     this.renderAdminPanel();
                     this.renderBottomNav('admin');
+                    this.updateAdminButtonIcon();
                 } else {
                     alert('Credenciais inválidas');
                 }
@@ -2473,6 +2693,20 @@
                 document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                 this.renderCatalog();
                 this.renderBottomNav('catalog');
+                this.updateAdminButtonIcon();
+            },
+
+            toggleAdmin: function() {
+                if (this.isAdmin) {
+                    this.logoutAdmin();
+                } else {
+                    this.openAdminLogin();
+                }
+            },
+
+            updateAdminButtonIcon: function() {
+                const btn = document.getElementById('admin-login-btn');
+                btn.innerHTML = '<img src="administrador.png" alt="Admin" id="admin-icon-img">';
             },
 
             // ---------- RENDERIZAÇÃO DA NAVEGAÇÃO INFERIOR ----------
@@ -2480,22 +2714,14 @@
                 const nav = document.getElementById('bottom-nav');
                 const isAdmin = this.isAdmin;
                 nav.innerHTML = `
-                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span>📋</span><span>Catálogo</span></button>
-                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span>💧</span><span>Solicitar Água</span></button>
-                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span>📦</span><span>Minhas Solic.</span></button>
-                    <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span>🔍</span><span>Rastrear</span></button>
+                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
+                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="ícone.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
+                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="caixa-de-entrega.png" alt="Minhas Solicitações"></span><span>Minhas Solic.</span></button>
+                    <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
                     ${isAdmin ? `
-                        <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span>⚙️</span><span>Admin</span></button>
+                        <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span><img src="ç.png" alt="Admin"></span><span>Admin</span></button>
                     ` : ''}
                 `;
-                const adminBtn = document.getElementById('admin-login-btn');
-                if (isAdmin) {
-                    adminBtn.innerHTML = '🔓';
-                    adminBtn.onclick = () => app.logoutAdmin();
-                } else {
-                    adminBtn.innerHTML = '🔒';
-                    adminBtn.onclick = () => app.openAdminLogin();
-                }
             },
 
             // ---------- UTILITÁRIOS ----------
