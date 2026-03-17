@@ -1,58 +1,3 @@
-Faremos as melhorias solicitadas de forma incremental, preservando todas as funcionalidades existentes e adicionando novas capacidades. Abaixo estão as principais alterações implementadas:
-
-1. **Solicitação de água sem verificação de estoque**  
-   - Removida a validação de quantidade máxima no front-end.  
-   - A solicitação agora é sempre registrada, mesmo com estoque zero, mantendo status “pendente”.  
-   - O administrador poderá aprovar mesmo sem estoque (a baixa ocorrerá apenas na entrega).
-
-2. **Geração e salvamento de PDF**  
-   - Criada a função `gerarPDFPedidoAgua(solicitacao)` que gera um PDF com todos os dados da solicitação.  
-   - Após finalizar o pedido, o PDF é gerado automaticamente e um modal oferece opções: **Baixar PDF** e **Enviar por E-mail** (simulado).  
-   - O PDF também é armazenado como string base64 na própria solicitação (campo `pdfBase64`) para consulta futura.  
-   - No modal de confirmação, adicionamos botões para download e e-mail.
-
-3. **Feedback visual no carrinho**  
-   - Criado um sistema de notificação temporária (toast) que aparece ao adicionar item, informando “Item adicionado ao carrinho”.  
-   - O contador do carrinho é atualizado instantaneamente.  
-   - O botão do carrinho agora tem um pequeno tooltip com a quantidade (ao passar o mouse).  
-   - Ao clicar no ícone do carrinho, o painel lateral abre automaticamente.
-
-4. **Separação clara dos módulos**  
-   - **Módulo Água**: Tela dedicada com formulário específico (já existente).  
-   - **Módulo Materiais**: Catálogo de produtos + carrinho (já existente).  
-   - Foram mantidos fluxos independentes, com regras de negócio separadas.  
-   - O carrinho só aceita itens do catálogo geral, enquanto a água tem seu próprio processo.
-
-5. **Dashboard aprimorado e controle de aprovação**  
-   - O painel administrativo agora exibe cards com totais de solicitações de água por status (pendente, aprovado, entregue, negado).  
-   - Lista completa de solicitações de água com opções de **Aprovar**, **Negar** e **Registrar Entrega** (esta última só aparece quando aprovado).  
-   - Para materiais, o admin pode aprovar pedidos (com baixa automática no estoque) ou excluir.  
-   - Adicionado um seção “Histórico de Solicitações de Água” no painel, separando pendentes das demais.
-
-6. **Histórico de pedidos do usuário**  
-   - A tela “Minhas Solicitações” agora permite filtrar por **nome do solicitante** (campo de busca).  
-   - Lista todos os pedidos de água que contenham o nome digitado (parcial).  
-   - Exibe status e detalhes.  
-   - Para materiais, o usuário pode consultar pelo código de rastreamento na tela de rastreamento.
-
-7. **Melhorias adicionais**  
-   - Adicionado campo “E-mail do solicitante” no formulário de água (para futuros envios).  
-   - Implementado envio de e-mail simulado (apenas alerta) com o PDF anexado.  
-   - Melhorada a responsividade do painel admin com grid.  
-   - Adicionados comentários explicativos nas principais funções.
-
-Todo o código foi ajustado para garantir que nada existente deixe de funcionar. As novas funções foram inseridas de forma modular e compatível. O sistema continua sendo uma única página HTML, mas agora com maior robustez e usabilidade.
-
-Abaixo está o código completo com todas as alterações incorporadas. As principais modificações estão concentradas nas funções:
-- `enviarSolicitacaoAgua`
-- `gerarPDFPedidoAgua`
-- `showNotification`
-- `addToCart`
-- `renderAdminPanel`
-- `renderMinhasSolicitacoesAgua`
-
-E novos elementos HTML foram adicionados para o toast de notificação e o modal de PDF.
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -2575,4 +2520,3 @@ E novos elementos HTML foram adicionados para o toast de notificação e o modal
     </script>
 </body>
 </html>
-```
