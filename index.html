@@ -11,6 +11,8 @@
     <!-- jsPDF e autoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Chart.js para o gráfico de nível de água -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -1241,6 +1243,7 @@
             },
             cart: [],
             recentPDF: null, // armazena o último PDF gerado para download
+            grafico: null, // instância do Chart
 
             init: function() {
                 try {
@@ -1262,6 +1265,9 @@
                         document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                     }
                     this.updateAdminButtonIcon();
+
+                    // Carrega dados da API e atualiza gráfico (assíncrono)
+                    this.carregarEAtualizar();
                 } catch (error) {
                     console.error('Erro na inicialização:', error);
                     alert('Ocorreu um erro ao carregar o aplicativo. Tente recarregar a página.');
@@ -1382,6 +1388,97 @@
                     };
                     reader.readAsDataURL(file);
                 }
+            },
+
+            // ---------- NOVAS FUNÇÕES DE INTEGRAÇÃO COM API ----------
+            salvarDados: async function(dados) {
+                try {
+                    const response = await fetch("https://script.google.com/macros/s/AKfycbxb1K9PqopwtRqvuPjP1yFiWz1ldQ-eNJSY_kjm0qOy8IVEbhu1-SWSRW4dtxXeR_Qe6g/exec", {
+                        method: "POST",
+                        body: JSON.stringify(dados)
+                    });
+                    console.log("Salvo com sucesso na API");
+                    return await response.json();
+                } catch (error) {
+                    console.error("Erro ao salvar na API:", error);
+                }
+            },
+
+            buscarDados: async function() {
+                try {
+                    const response = await fetch("https://script.google.com/macros/s/AKfycbxb1K9PqopwtRqvuPjP1yFiWz1ldQ-eNJSY_kjm0qOy8IVEbhu1-SWSRW4dtxXeR_Qe6g/exec");
+                    console.log("Dados carregados da API");
+                    return await response.json();
+                } catch (error) {
+                    console.error("Erro ao buscar da API:", error);
+                    return [];
+                }
+            },
+
+            salvarAgua: async function(quantidade, usuario) {
+                return this.salvarDados({
+                    id: Date.now(),
+                    produto: "Água Mineral",
+                    quantidade: quantidade,
+                    usuario: usuario
+                });
+            },
+
+            atualizarGraficoAgua: function(quantidadeAtual) {
+                const canvas = document.getElementById('graficoAgua');
+                if (!canvas) return; // gráfico ainda não foi renderizado na tela
+
+                const ctx = canvas.getContext('2d');
+                if (this.grafico) {
+                    this.grafico.destroy();
+                }
+                this.grafico = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Água Mineral'],
+                        datasets: [{
+                            label: 'Quantidade em Estoque',
+                            data: [quantidadeAtual],
+                            backgroundColor: '#0A4B8C',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Garrafões'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            },
+
+            carregarEAtualizar: async function() {
+                const dados = await this.buscarDados();
+                // Verifica se os dados são um array (caso a API retorne um array de arrays)
+                let totalAgua = 0;
+                if (Array.isArray(dados)) {
+                    // Supondo que cada registro seja um array onde o índice 1 é o produto e índice 2 é a quantidade
+                    totalAgua = dados
+                        .filter(item => item[1] === "Água Mineral")
+                        .reduce((soma, item) => soma + Number(item[2] || 0), 0);
+                } else if (dados && Array.isArray(dados.dados)) {
+                    // Caso a API retorne um objeto com campo "dados"
+                    totalAgua = dados.dados
+                        .filter(item => item[1] === "Água Mineral")
+                        .reduce((soma, item) => soma + Number(item[2] || 0), 0);
+                }
+                // Atualiza o gráfico se ele existir na tela atual
+                this.atualizarGraficoAgua(totalAgua);
             },
 
             // ---------- FUNÇÕES DE AVISOS (ANUNCIOS) ----------
@@ -1806,6 +1903,8 @@
                 };
 
                 this.db.requests.push(pedido);
+                // Salva o pedido na API (opcional)
+                this.salvarDados(pedido);
                 this.saveDatabase();
 
                 // Gerar PDF do pedido
@@ -1831,7 +1930,7 @@
                 const minStock = aguaProduct ? aguaProduct.minStock : 5;
                 const lowStock = estoque <= minStock;
                 const noStock = estoque === 0;
-                const html = `
+                let html = `
                     ${this.renderActiveAnnouncements()}
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h2>💧 Solicitar Água Mineral</h2>
@@ -1884,7 +1983,21 @@
                         </form>
                     </div>
                 `;
+
+                // Container para o gráfico de nível de água
+                html += `
+                    <div style="margin-top: 30px; background: var(--branco); border-radius: 24px; padding: 20px; box-shadow: var(--sombra-media);">
+                        <h4 style="margin-bottom: 15px;">📊 Nível de Estoque (Água Mineral)</h4>
+                        <div style="height: 150px;">
+                            <canvas id="graficoAgua" height="150"></canvas>
+                        </div>
+                    </div>
+                `;
                 content.innerHTML = html;
+                // Atualiza o gráfico com o estoque atual
+                if (aguaProduct) {
+                    this.atualizarGraficoAgua(aguaProduct.stock);
+                }
                 this.renderBottomNav('agua');
             },
 
@@ -1928,6 +2041,12 @@
 
                 this.db.waterRequests.push(solicitacao);
                 this.saveDatabase();
+
+                // Salva na API
+                this.salvarAgua(quantidade, nome).then(() => {
+                    // Atualiza o gráfico após salvar
+                    this.carregarEAtualizar();
+                });
 
                 // Gerar PDF da solicitação
                 this.gerarPDFPedidoAgua(solicitacao);
@@ -2270,6 +2389,13 @@
                     // Recarrega o painel admin se estiver visível
                     if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
                         this.renderAdminPanel();
+                    }
+                }
+                // Se a tela atual for a de solicitação de água, recarrega o gráfico
+                if (document.getElementById('form-agua-solicitacao')) {
+                    const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                    if (aguaProduct) {
+                        this.atualizarGraficoAgua(aguaProduct.stock);
                     }
                 }
             },
