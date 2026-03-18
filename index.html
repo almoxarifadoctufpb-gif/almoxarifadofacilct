@@ -14,6 +14,7 @@
     <!-- Chart.js para o gráfico de nível de água -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ESTILOS EXISTENTES (mantidos integralmente) */
         * {
             margin: 0;
             padding: 0;
@@ -173,7 +174,7 @@
             width: 24px;
             height: 24px;
             object-fit: contain;
-            filter: brightness(0) invert(1); /* torna a imagem branca */
+            filter: brightness(0) invert(1);
         }
 
         .cart-badge {
@@ -789,6 +790,7 @@
         .status-aprovado { background: #E8F5E9; color: var(--verde); }
         .status-negado { background: #FFEBEE; color: var(--vermelho); }
         .status-entregue { background: #D4EDDA; color: #155724; }
+        .status-aguardando { background: #FEF9E7; color: #B7950B; } /* novo status */
 
         .tracking-items {
             margin-top: 20px;
@@ -996,9 +998,8 @@
                 </div>
             </div>
             <div class="header-icons">
-                <!-- Botão do carrinho com imagem -->
                 <button id="cart-button" onclick="app.openCart()" title="Carrinho de materiais">
-                    <img src="carrinho-de-compras (1).png" alt="Carrinho" style="width:24px; height:24px; filter: brightness(0) invert(1);">
+                    <img src="carrinho-de-compras (1).png" alt="Carrinho">
                     <span id="cart-count" class="cart-badge" style="display: none;">0</span>
                 </button>
                 <button id="admin-login-btn" class="admin-login-btn" onclick="app.toggleAdmin()">
@@ -1021,9 +1022,7 @@
                 <h2>🛒 Carrinho</h2>
                 <button onclick="app.closeCart()">×</button>
             </div>
-            <div class="cart-items" id="cart-items">
-                <!-- Itens serão inseridos aqui -->
-            </div>
+            <div class="cart-items" id="cart-items"></div>
             <div class="cart-total" id="cart-total">
                 <span>Total de itens:</span>
                 <span id="total-items">0</span>
@@ -1132,10 +1131,10 @@
         </div>
     </div>
 
-    <!-- Modal de Finalização (Checkout) -->
+    <!-- Modal de Finalização (Checkout) - Materiais -->
     <div class="modal-overlay" id="modal-checkout">
         <div class="modal">
-            <div class="modal-header">📦 Finalizar Pedido</div>
+            <div class="modal-header">📦 Finalizar Pedido de Materiais</div>
             <div class="modal-body">
                 <form id="form-pedido" onsubmit="event.preventDefault(); app.finalizarPedido();">
                     <div class="form-group">
@@ -1146,9 +1145,13 @@
                         <label>E-mail *</label>
                         <input type="email" id="pedido-email" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="pedido-setor-group">
                         <label>Setor / Laboratório *</label>
-                        <input type="text" id="pedido-setor" required>
+                        <!-- será preenchido via JS com dropdown de setores -->
+                    </div>
+                    <div class="form-group" id="outro-setor-group" style="display: none;">
+                        <label>Digite o setor</label>
+                        <input type="text" id="pedido-setor-outro">
                     </div>
                     <div class="form-group">
                         <label>Observações</label>
@@ -1207,9 +1210,7 @@
     <div class="modal-overlay" id="modal-detalhes-agua">
         <div class="modal">
             <div class="modal-header">📋 Detalhes da Solicitação</div>
-            <div class="modal-body" id="detalhes-agua-body">
-                <!-- preenchido via js -->
-            </div>
+            <div class="modal-body" id="detalhes-agua-body"></div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="app.closeModal('modal-detalhes-agua')">Fechar</button>
             </div>
@@ -1220,6 +1221,67 @@
     <div id="toast-notification" class="toast-notification">Item adicionado ao carrinho</div>
 
     <script>
+        // ==================== CONSTANTES ====================
+        const SETORES_PADRONIZADOS = [
+            "CT - ALMOXARIFADO",
+            "CT - ARQUIVO",
+            "CT - ASSESSORIA DE ADMINISTRAÇÃO",
+            "CT - ASSESSORIA DE EXTENSÃO",
+            "CT - BIBLIOTECA SETORIAL",
+            "CT - DIREÇÃO DE CENTRO",
+            "CT - SECRETARIA",
+            "CT - DEPARTAMENTO DE ARQUITETURA E URBANISMO (DAU)",
+            "CT - DEPARTAMENTO DE ENGENHARIA CIVIL E AMBIENTAL (DECA)",
+            "CT - DEPARTAMENTO DE ENGENHARIA DE ALIMENTOS (DEA)",
+            "CT - DEPARTAMENTO DE ENGENHARIA DE MATERIAIS (DEMAT)",
+            "CT - DEPARTAMENTO DE ENGENHARIA DE PRODUÇÃO (DEP)",
+            "CT - DEPARTAMENTO DE ENGENHARIA MECÂNICA (DEM)",
+            "CT - DEPARTAMENTO DE ENGENHARIA QUÍMICA (DEQ)",
+            "CT - COORDENAÇÃO DE ARQUITETURA E URBANISMO",
+            "CT - COORDENAÇÃO DE ENGENHARIA AMBIENTAL",
+            "CT - COORDENAÇÃO DE ENGENHARIA CIVIL",
+            "CT - COORDENAÇÃO DE ENGENHARIA DE ALIMENTOS",
+            "CT - COORDENAÇÃO DE ENGENHARIA DE MATERIAIS",
+            "CT - COORDENAÇÃO DE ENGENHARIA DE PRODUÇÃO",
+            "CT - COORDENAÇÃO DE ENGENHARIA MECÂNICA",
+            "CT - COORDENAÇÃO DE ENGENHARIA QUÍMICA",
+            "CT - COORDENAÇÃO DO CURSO DE QUÍMICA INDUSTRIAL",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ARQUITETURA E URBANISMO",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM CIÊNCIA E TECNOLOGIA DE ALIMENTOS (PPGCTA)",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA CIVIL E AMBIENTAL",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA DE PRODUÇÃO E SISTEMAS (PPGEPS)",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA MECÂNICA",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA QUÍMICA",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHARIA URBANA E AMBIENTAL",
+            "CT - PROGRAMA DE PÓS-GRADUAÇÃO EM CIÊNCIA E ENGENHARIA DE MATERIAIS (PPCEM)",
+            "CT - LABORATÓRIO DE ANÁLISE DE PROCESSOS QUÍMICOS",
+            "CT - LABORATÓRIO DE ANÁLISES QUÍMICAS DE ALIMENTOS",
+            "CT - LABORATÓRIO DE ANÁLISES E PESQUISAS DE BEBIDAS ALCOÓLICAS",
+            "CT - LABORATÓRIO DE CARACTERIZAÇÃO MICROESTRUTURAL",
+            "CT - LABORATÓRIO DE CARVÃO ATIVADO",
+            "CT - LABORATÓRIO DE CROMATOGRAFIA E QUIMIOMETRIA",
+            "CT - LABORATÓRIO DE ENSAIOS DE MATERIAIS E ESTRUTURAS (LABEME)",
+            "CT - LABORATÓRIO DE FENÔMENOS DE TRANSPORTE",
+            "CT - LABORATÓRIO DE HIDRÁULICA",
+            "CT - LABORATÓRIO DE INFORMÁTICA",
+            "CT - LABORATÓRIO DE INFORMÁTICA GRÁFICA",
+            "CT - LABORATÓRIO DE MATERIAIS METÁLICOS",
+            "CT - LABORATÓRIO DE MICROBIOLOGIA",
+            "CT - LABORATÓRIO DE MICROBIOLOGIA INDUSTRIAL",
+            "CT - LABORATÓRIO DE PROCESSAMENTO DE DERIVADOS DO LEITE",
+            "CT - LABORATÓRIO DE PROCESSOS MICROBIANOS EM ALIMENTOS",
+            "CT - LABORATÓRIO DE REATORES QUÍMICOS",
+            "CT - LABORATÓRIO DE RECURSOS HÍDRICOS E ENGENHARIA AMBIENTAL",
+            "CT - LABORATÓRIO DE SOLIDIFICAÇÃO RÁPIDA",
+            "CT - LABORATÓRIO DE TOPOGRAFIA",
+            "CT - CENTRO DE TECNOLOGIA (CT)",
+            "CT - DIVISÃO ACADÊMICA",
+            "CT - EMPRESA JÚNIOR",
+            "CT - FÓRMULA UFPB",
+            "CT - MOTORIUS MOTOSTUDENT",
+            "CT - NUPPA - LABORATÓRIO DE CONTROLE DE QUALIDADE"
+        ];
+
         const app = {
             currentUser: null,
             isAdmin: false,
@@ -1233,11 +1295,10 @@
                     'Papelaria',
                     'Informática',
                     'Limpeza',
-                    'Água mineral',
                     'Materiais de escritório',
                     'Higiene',
                     'Manutenção'
-                ],
+                ], // removido 'Água mineral' daqui
                 announcements: [],
                 waterStockMovements: [] // histórico de movimentações de água
             },
@@ -1309,7 +1370,7 @@
                     this.initializeDefaultData();
                 }
 
-                // Garantir que existe um produto de água mineral (para evitar falhas no controle de estoque)
+                // Garantir que existe um produto de água mineral (para controle de estoque) mas ele não aparecerá no catálogo
                 const aguaExists = this.db.products.some(p => p.name.includes('Água') || p.category === 'Água mineral');
                 if (!aguaExists) {
                     this.db.products.push({
@@ -1390,7 +1451,7 @@
                 }
             },
 
-            // ---------- NOVAS FUNÇÕES DE INTEGRAÇÃO COM API ----------
+            // ---------- FUNÇÕES DE INTEGRAÇÃO COM API ----------
             salvarDados: async function(dados) {
                 try {
                     const response = await fetch("https://script.google.com/macros/s/AKfycbxb1K9PqopwtRqvuPjP1yFiWz1ldQ-eNJSY_kjm0qOy8IVEbhu1-SWSRW4dtxXeR_Qe6g/exec", {
@@ -1426,7 +1487,7 @@
 
             atualizarGraficoAgua: function(quantidadeAtual) {
                 const canvas = document.getElementById('graficoAgua');
-                if (!canvas) return; // gráfico ainda não foi renderizado na tela
+                if (!canvas) return;
 
                 const ctx = canvas.getContext('2d');
                 if (this.grafico) {
@@ -1464,21 +1525,47 @@
 
             carregarEAtualizar: async function() {
                 const dados = await this.buscarDados();
-                // Verifica se os dados são um array (caso a API retorne um array de arrays)
                 let totalAgua = 0;
                 if (Array.isArray(dados)) {
-                    // Supondo que cada registro seja um array onde o índice 1 é o produto e índice 2 é a quantidade
                     totalAgua = dados
                         .filter(item => item[1] === "Água Mineral")
                         .reduce((soma, item) => soma + Number(item[2] || 0), 0);
                 } else if (dados && Array.isArray(dados.dados)) {
-                    // Caso a API retorne um objeto com campo "dados"
                     totalAgua = dados.dados
                         .filter(item => item[1] === "Água Mineral")
                         .reduce((soma, item) => soma + Number(item[2] || 0), 0);
                 }
-                // Atualiza o gráfico se ele existir na tela atual
                 this.atualizarGraficoAgua(totalAgua);
+            },
+
+            // ---------- FUNÇÕES DE SETOR (DROPDOWN COM OPÇÃO OUTRO) ----------
+            renderSetorDropdown: function(selectId, outroGroupId, outroInputId, required = true) {
+                const selectHtml = `<select id="${selectId}" class="setor-select" ${required ? 'required' : ''} onchange="app.toggleOutroSetor('${selectId}', '${outroGroupId}', '${outroInputId}')">
+                    <option value="">Selecione um setor</option>
+                    ${SETORES_PADRONIZADOS.map(s => `<option value="${s}">${s}</option>`).join('')}
+                    <option value="OUTRO">Outro (especificar)</option>
+                </select>`;
+                return selectHtml;
+            },
+
+            toggleOutroSetor: function(selectId, outroGroupId, outroInputId) {
+                const select = document.getElementById(selectId);
+                const outroGroup = document.getElementById(outroGroupId);
+                if (select.value === 'OUTRO') {
+                    outroGroup.style.display = 'block';
+                    document.getElementById(outroInputId).setAttribute('required', 'required');
+                } else {
+                    outroGroup.style.display = 'none';
+                    document.getElementById(outroInputId).removeAttribute('required');
+                }
+            },
+
+            getSetorValue: function(selectId, outroInputId) {
+                const select = document.getElementById(selectId);
+                if (select.value === 'OUTRO') {
+                    return document.getElementById(outroInputId).value.trim();
+                }
+                return select.value;
             },
 
             // ---------- FUNÇÕES DE AVISOS (ANUNCIOS) ----------
@@ -1642,7 +1729,7 @@
                 }
             },
 
-            // ---------- CATÁLOGO (com avisos) ----------
+            // ---------- CATÁLOGO (apenas materiais, sem água) ----------
             renderCatalog: function() {
                 const content = document.getElementById('main-content');
                 let html = this.renderActiveAnnouncements();
@@ -1658,6 +1745,9 @@
                 `;
 
                 this.db.products.forEach(p => {
+                    // Ignorar produtos da categoria Água mineral (para não misturar)
+                    if (p.category === 'Água mineral' || p.name.includes('Água Mineral')) return;
+
                     const status = p.stock === 0 ? 'zero' : (p.stock <= p.minStock ? 'low' : 'normal');
                     const statusText = p.stock === 0 ? 'Zerado' : (p.stock <= p.minStock ? 'Baixo' : 'Normal');
                     html += `
@@ -1868,13 +1958,18 @@
                     alert('Carrinho vazio');
                     return;
                 }
+                // Injetar o dropdown de setores no modal
+                const setorGroup = document.getElementById('pedido-setor-group');
+                setorGroup.innerHTML = '<label>Setor / Laboratório *</label>' + 
+                    this.renderSetorDropdown('pedido-setor', 'outro-setor-group', 'pedido-setor-outro', true);
+                document.getElementById('outro-setor-group').style.display = 'none';
                 this.openModal('modal-checkout');
             },
 
             finalizarPedido: function() {
                 const nome = document.getElementById('pedido-nome').value.trim();
                 const email = document.getElementById('pedido-email').value.trim();
-                const setor = document.getElementById('pedido-setor').value.trim();
+                const setor = this.getSetorValue('pedido-setor', 'pedido-setor-outro');
                 const obs = document.getElementById('pedido-obs').value.trim();
 
                 if (!nome || !email || !setor) {
@@ -1903,12 +1998,12 @@
                 };
 
                 this.db.requests.push(pedido);
-                // Salva o pedido na API (opcional)
                 this.salvarDados(pedido);
                 this.saveDatabase();
 
-                // Gerar PDF do pedido
+                // Gerar PDF do pedido e baixar automaticamente
                 this.gerarPDFPedidoMaterial(pedido);
+                this.baixarPDFRecente(); // download automático
 
                 // Limpar carrinho
                 this.cart = [];
@@ -1922,7 +2017,7 @@
                 this.openModal('modal-pedido-realizado');
             },
 
-            // ---------- NOVO MÓDULO: SOLICITAÇÃO DE ÁGUA MINERAL ----------
+            // ---------- MÓDULO DE SOLICITAÇÃO DE ÁGUA MINERAL ----------
             renderSolicitarAgua: function() {
                 const content = document.getElementById('main-content');
                 const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
@@ -1951,13 +2046,13 @@
                                 <label>E-mail do solicitante *</label>
                                 <input type="email" id="agua-email" required>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" id="agua-setor-group">
                                 <label>Setor / Laboratório *</label>
-                                <input type="text" id="agua-setor" required>
+                                ${this.renderSetorDropdown('agua-setor', 'agua-outro-setor-group', 'agua-setor-outro', true)}
                             </div>
-                            <div class="form-group">
-                                <label>Curso vinculado *</label>
-                                <input type="text" id="agua-curso" required>
+                            <div class="form-group" id="agua-outro-setor-group" style="display: none;">
+                                <label>Digite o setor</label>
+                                <input type="text" id="agua-setor-outro">
                             </div>
                             <div class="form-group">
                                 <label>Local de entrega *</label>
@@ -1994,7 +2089,6 @@
                     </div>
                 `;
                 content.innerHTML = html;
-                // Atualiza o gráfico com o estoque atual
                 if (aguaProduct) {
                     this.atualizarGraficoAgua(aguaProduct.stock);
                 }
@@ -2004,21 +2098,28 @@
             enviarSolicitacaoAgua: function() {
                 const nome = document.getElementById('agua-nome').value.trim();
                 const email = document.getElementById('agua-email').value.trim();
-                const setor = document.getElementById('agua-setor').value.trim();
-                const curso = document.getElementById('agua-curso').value.trim();
+                const setor = this.getSetorValue('agua-setor', 'agua-setor-outro');
                 const local = document.getElementById('agua-local').value.trim();
                 const complemento = document.getElementById('agua-complemento').value.trim();
                 const quantidade = parseInt(document.getElementById('agua-quantidade').value);
                 const validade = document.getElementById('agua-validade').value;
                 const obs = document.getElementById('agua-obs').value.trim();
 
-                if (!nome || !email || !setor || !curso || !local) {
+                if (!nome || !email || !setor || !local) {
                     alert('Preencha todos os campos obrigatórios.');
                     return;
                 }
 
                 // Gerar código de protocolo
                 const codigo = 'AGUA-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+                // Verificar estoque atual para definir status
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const estoqueAtual = aguaProduct ? aguaProduct.stock : 0;
+                let status = 'pendente';
+                if (estoqueAtual < quantidade) {
+                    status = 'aguardando_reposicao';
+                }
 
                 const solicitacao = {
                     id: Date.now(),
@@ -2027,15 +2128,14 @@
                     nome: nome,
                     email: email,
                     setor: setor,
-                    curso: curso,
                     local: local,
                     complemento: complemento,
                     quantidade: quantidade,
                     validade: validade || null,
                     observacoes: obs,
-                    status: 'pendente',
+                    status: status,
                     historico: [
-                        { data: new Date().toISOString(), acao: 'Solicitação criada', status: 'pendente' }
+                        { data: new Date().toISOString(), acao: 'Solicitação criada', status: status }
                     ]
                 };
 
@@ -2044,22 +2144,23 @@
 
                 // Salva na API
                 this.salvarAgua(quantidade, nome).then(() => {
-                    // Atualiza o gráfico após salvar
                     this.carregarEAtualizar();
                 });
 
-                // Gerar PDF da solicitação
+                // Gerar PDF da solicitação e baixar automaticamente
                 this.gerarPDFPedidoAgua(solicitacao);
+                this.baixarPDFRecente();
 
                 // Exibir modal de confirmação
                 document.getElementById('tracking-code-display').innerText = codigo;
                 this.openModal('modal-pedido-realizado');
 
-                // Limpar formulário (opcional)
+                // Limpar formulário
                 document.getElementById('form-agua-solicitacao').reset();
+                document.getElementById('agua-outro-setor-group').style.display = 'none';
             },
 
-            // ---------- GERAR PDF (ÁGUA) ----------
+            // ---------- GERAR PDF ----------
             gerarPDFPedidoAgua: function(solicitacao) {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
@@ -2076,19 +2177,17 @@
                 doc.text(`Nome: ${solicitacao.nome}`, 14, 62);
                 doc.text(`E-mail: ${solicitacao.email}`, 14, 70);
                 doc.text(`Setor: ${solicitacao.setor}`, 14, 78);
-                doc.text(`Curso: ${solicitacao.curso}`, 14, 86);
                 
                 doc.setFontSize(14);
-                doc.text('Detalhes da Solicitação', 14, 100);
+                doc.text('Detalhes da Solicitação', 14, 92);
                 doc.setFontSize(10);
-                doc.text(`Local de entrega: ${solicitacao.local} ${solicitacao.complemento ? '- ' + solicitacao.complemento : ''}`, 14, 110);
-                doc.text(`Quantidade: ${solicitacao.quantidade} garrafão(ões)`, 14, 118);
-                if (solicitacao.validade) doc.text(`Validade do garrafão vazio: ${solicitacao.validade}`, 14, 126);
-                if (solicitacao.observacoes) doc.text(`Observações: ${solicitacao.observacoes}`, 14, 134);
+                doc.text(`Local de entrega: ${solicitacao.local} ${solicitacao.complemento ? '- ' + solicitacao.complemento : ''}`, 14, 102);
+                doc.text(`Quantidade: ${solicitacao.quantidade} garrafão(ões)`, 14, 110);
+                if (solicitacao.validade) doc.text(`Validade do garrafão vazio: ${solicitacao.validade}`, 14, 118);
+                if (solicitacao.observacoes) doc.text(`Observações: ${solicitacao.observacoes}`, 14, 126);
                 
-                doc.text(`Status: ${solicitacao.status}`, 14, 150);
+                doc.text(`Status: ${solicitacao.status === 'aguardando_reposicao' ? 'Aguardando Reposição' : solicitacao.status}`, 14, 140);
                 
-                // Salvar como base64 para possível reutilização
                 const pdfBase64 = doc.output('datauristring');
                 solicitacao.pdfBase64 = pdfBase64;
                 this.recentPDF = pdfBase64;
@@ -2117,7 +2216,6 @@
                 doc.setFontSize(14);
                 doc.text('Itens Solicitados', 14, 92);
                 
-                // Tabela de itens
                 const tableColumn = ['Produto', 'Quantidade', 'Unidade'];
                 const tableRows = pedido.items.map(item => [item.productName, item.qty, item.unit]);
                 
@@ -2156,12 +2254,10 @@
             },
 
             enviarPDFEmail: function() {
-                // Simulação de envio por e-mail
                 alert('Funcionalidade de envio por e-mail simulada. O PDF seria anexado e enviado para o e-mail cadastrado.');
-                // Aqui poderia abrir o cliente de e-mail padrão ou integrar com alguma API
             },
 
-            // ---------- MINHAS SOLICITAÇÕES DE ÁGUA (COM FILTRO POR NOME) ----------
+            // ---------- MINHAS SOLICITAÇÕES DE ÁGUA ----------
             renderMinhasSolicitacoesAgua: function() {
                 const content = document.getElementById('main-content');
                 let html = `
@@ -2188,10 +2284,14 @@
                     html = '<p style="text-align:center; color:var(--texto-secundario);">Nenhuma solicitação encontrada.</p>';
                 } else {
                     solicitacoes.forEach(s => {
-                        const statusClass = s.status === 'pendente' ? 'status-pendente' : 
-                                            (s.status === 'aprovado' ? 'status-aprovado' : 
-                                            (s.status === 'entregue' ? 'status-entregue' : 'status-negado'));
-                        const statusText = s.status.charAt(0).toUpperCase() + s.status.slice(1);
+                        let statusClass = '';
+                        let statusText = s.status;
+                        if (s.status === 'pendente') { statusClass = 'status-pendente'; statusText = 'Pendente'; }
+                        else if (s.status === 'aprovado') { statusClass = 'status-aprovado'; statusText = 'Aprovado'; }
+                        else if (s.status === 'entregue') { statusClass = 'status-entregue'; statusText = 'Entregue'; }
+                        else if (s.status === 'negado') { statusClass = 'status-negado'; statusText = 'Negado'; }
+                        else if (s.status === 'aguardando_reposicao') { statusClass = 'status-aguardando'; statusText = 'Aguardando Reposição'; }
+                        
                         html += `
                             <div class="item-card" style="margin-bottom: 15px; display: block;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -2227,7 +2327,6 @@
                     <p><strong>Nome:</strong> ${s.nome}</p>
                     <p><strong>E-mail:</strong> ${s.email}</p>
                     <p><strong>Setor:</strong> ${s.setor}</p>
-                    <p><strong>Curso:</strong> ${s.curso}</p>
                     <p><strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
                     <p><strong>Quantidade:</strong> ${s.quantidade}</p>
                     <p><strong>Validade do garrafão:</strong> ${s.validade || 'Não informada'}</p>
@@ -2261,7 +2360,6 @@
                     alert('Digite um código');
                     return;
                 }
-                // Procura em pedidos gerais e em água
                 let pedido = this.db.requests.find(r => r.trackingCode === code);
                 let tipo = 'material';
                 if (!pedido) {
@@ -2276,7 +2374,6 @@
                 }
 
                 if (tipo === 'material') {
-                    // Exibe pedido de materiais (já existente)
                     const statusClass = pedido.status === 'pendente' ? 'status-pendente' : (pedido.status === 'aprovado' ? 'status-aprovado' : 'status-negado');
                     const statusText = pedido.status === 'pendente' ? 'Pendente' : (pedido.status === 'aprovado' ? 'Aprovado' : 'Negado');
                     let itemsHtml = '';
@@ -2300,11 +2397,14 @@
                         </div>
                     `;
                 } else {
-                    // Exibe pedido de água
-                    const statusClass = pedido.status === 'pendente' ? 'status-pendente' : 
-                                        (pedido.status === 'aprovado' ? 'status-aprovado' : 
-                                        (pedido.status === 'entregue' ? 'status-entregue' : 'status-negado'));
-                    const statusText = pedido.status.charAt(0).toUpperCase() + pedido.status.slice(1);
+                    let statusClass = '';
+                    let statusText = pedido.status;
+                    if (pedido.status === 'pendente') { statusClass = 'status-pendente'; statusText = 'Pendente'; }
+                    else if (pedido.status === 'aprovado') { statusClass = 'status-aprovado'; statusText = 'Aprovado'; }
+                    else if (pedido.status === 'entregue') { statusClass = 'status-entregue'; statusText = 'Entregue'; }
+                    else if (pedido.status === 'negado') { statusClass = 'status-negado'; statusText = 'Negado'; }
+                    else if (pedido.status === 'aguardando_reposicao') { statusClass = 'status-aguardando'; statusText = 'Aguardando Reposição'; }
+
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `
                         <div class="tracking-header">
@@ -2314,7 +2414,6 @@
                         <p><strong>Solicitante:</strong> ${pedido.nome}</p>
                         <p><strong>E-mail:</strong> ${pedido.email}</p>
                         <p><strong>Setor:</strong> ${pedido.setor}</p>
-                        <p><strong>Curso:</strong> ${pedido.curso}</p>
                         <p><strong>Local:</strong> ${pedido.local} ${pedido.complemento ? '- '+pedido.complemento : ''}</p>
                         <p><strong>Quantidade:</strong> ${pedido.quantidade} garrafão(ões)</p>
                         <p><strong>Data:</strong> ${pedido.data}</p>
@@ -2328,12 +2427,7 @@
             },
 
             // ---------- CONTROLE DE ESTOQUE DE ÁGUA (ADMIN) ----------
-            /**
-             * Atualiza o estoque de água mineral (adição ou remoção).
-             * @param {string} operation - 'add' para adicionar, 'remove' para remover.
-             */
             updateWaterStock: function(operation) {
-                // Apenas administradores podem executar esta ação
                 if (!this.isAdmin) {
                     this.showNotification('Acesso negado. Apenas administradores podem alterar estoque.', 'erro');
                     return;
@@ -2346,7 +2440,6 @@
                     return;
                 }
 
-                // Busca o produto de água (pode ter nome ou categoria variados)
                 const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 if (!aguaProduct) {
                     this.showNotification('Produto de água não encontrado no banco de dados.', 'erro');
@@ -2382,16 +2475,11 @@
 
                 this.showNotification(`Estoque atualizado: ${newStock} garrafões`, 'sucesso');
 
-                // Se a tela atual for a de solicitação de água, recarrega para mostrar o novo estoque
                 if (document.getElementById('form-agua-solicitacao')) {
                     this.renderSolicitarAgua();
-                } else {
-                    // Recarrega o painel admin se estiver visível
-                    if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
-                        this.renderAdminPanel();
-                    }
+                } else if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
+                    this.renderAdminPanel();
                 }
-                // Se a tela atual for a de solicitação de água, recarrega o gráfico
                 if (document.getElementById('form-agua-solicitacao')) {
                     const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
                     if (aguaProduct) {
@@ -2405,7 +2493,7 @@
                 const estoque = aguaProduct ? aguaProduct.stock : 0;
                 const minStock = aguaProduct ? aguaProduct.minStock : 5;
                 const lowStock = estoque <= minStock;
-                const movimentos = this.db.waterStockMovements.slice().reverse().slice(0, 10); // últimos 10
+                const movimentos = this.db.waterStockMovements.slice().reverse().slice(0, 10);
 
                 let html = `
                     <div class="water-stock-control">
@@ -2435,21 +2523,20 @@
                 return html;
             },
 
-            // ---------- ADMIN: PAINEL COM DASHBOARD E GERENCIAMENTO DE ÁGUA ----------
+            // ---------- ADMIN: PAINEL COM DASHBOARD E GERENCIAMENTO ----------
             renderAdminPanel: function() {
                 if (!this.isAdmin) {
                     alert('Acesso restrito');
                     return;
                 }
-                // Calcular estatísticas para dashboard
                 const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 const estoqueAgua = aguaProduct ? aguaProduct.stock : 0;
                 const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente').length;
                 const aprovados = this.db.waterRequests.filter(r => r.status === 'aprovado').length;
                 const entregues = this.db.waterRequests.filter(r => r.status === 'entregue').length;
                 const negados = this.db.waterRequests.filter(r => r.status === 'negado').length;
+                const aguardando = this.db.waterRequests.filter(r => r.status === 'aguardando_reposicao').length;
                 
-                // Consumo por setor (simplificado: top 3)
                 const setores = {};
                 this.db.waterRequests.forEach(r => {
                     if (r.status === 'entregue' || r.status === 'aprovado') {
@@ -2479,6 +2566,10 @@
                             <div class="label">Pendentes</div>
                         </div>
                         <div class="dashboard-card">
+                            <div class="number">${aguardando}</div>
+                            <div class="label">Aguardando Reposição</div>
+                        </div>
+                        <div class="dashboard-card">
                             <div class="number">${aprovados}</div>
                             <div class="label">Aprovados</div>
                         </div>
@@ -2490,7 +2581,7 @@
                             <div class="number">${negados}</div>
                             <div class="label">Negados</div>
                         </div>
-                        <div class="dashboard-card">
+                        <div class="dashboard-card" style="grid-column: span 2;">
                             <div class="number" style="font-size:1.2rem;">${topSetores}</div>
                             <div class="label">Consumo por setor</div>
                         </div>
@@ -2536,16 +2627,23 @@
                     </div>
                 `;
                 const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente');
+                const aguardando = this.db.waterRequests.filter(r => r.status === 'aguardando_reposicao');
                 const aprovadas = this.db.waterRequests.filter(r => r.status === 'aprovado');
                 const entregues = this.db.waterRequests.filter(r => r.status === 'entregue');
                 const negadas = this.db.waterRequests.filter(r => r.status === 'negado');
                 
-                if (pendentes.length === 0 && aprovadas.length === 0 && entregues.length === 0 && negadas.length === 0) {
+                if (pendentes.length === 0 && aguardando.length === 0 && aprovadas.length === 0 && entregues.length === 0 && negadas.length === 0) {
                     html += '<p>Nenhuma solicitação.</p>';
                 } else {
                     if (pendentes.length > 0) {
                         html += '<h4>Pendentes</h4>';
                         pendentes.forEach(s => {
+                            html += this.renderSolicitacaoAguaCard(s);
+                        });
+                    }
+                    if (aguardando.length > 0) {
+                        html += '<h4>Aguardando Reposição</h4>';
+                        aguardando.forEach(s => {
                             html += this.renderSolicitacaoAguaCard(s);
                         });
                     }
@@ -2572,12 +2670,16 @@
             },
 
             renderSolicitacaoAguaCard: function(s) {
-                const statusClass = s.status === 'pendente' ? 'status-pendente' : 
-                                    (s.status === 'aprovado' ? 'status-aprovado' : 
-                                    (s.status === 'entregue' ? 'status-entregue' : 'status-negado'));
-                const statusText = s.status.charAt(0).toUpperCase() + s.status.slice(1);
+                let statusClass = '';
+                let statusText = s.status;
+                if (s.status === 'pendente') { statusClass = 'status-pendente'; statusText = 'Pendente'; }
+                else if (s.status === 'aprovado') { statusClass = 'status-aprovado'; statusText = 'Aprovado'; }
+                else if (s.status === 'entregue') { statusClass = 'status-entregue'; statusText = 'Entregue'; }
+                else if (s.status === 'negado') { statusClass = 'status-negado'; statusText = 'Negado'; }
+                else if (s.status === 'aguardando_reposicao') { statusClass = 'status-aguardando'; statusText = 'Aguardando Reposição'; }
+
                 let actions = '';
-                if (s.status === 'pendente') {
+                if (s.status === 'pendente' || s.status === 'aguardando_reposicao') {
                     actions = `
                         <button class="action-btn primary" onclick="app.aprovarSolicitacaoAgua(${s.id})">✓ Aprovar</button>
                         <button class="btn-danger" onclick="app.negarSolicitacaoAgua(${s.id})">✗ Negar</button>
@@ -2596,7 +2698,7 @@
                         <p><strong>Data:</strong> ${s.data}</p>
                         <p><strong>Solicitante:</strong> ${s.nome} (${s.setor})</p>
                         <p><strong>E-mail:</strong> ${s.email}</p>
-                        <p><strong>Curso:</strong> ${s.curso} | <strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
+                        <p><strong>Local:</strong> ${s.local} ${s.complemento ? '- '+s.complemento : ''}</p>
                         <p><strong>Quantidade:</strong> ${s.quantidade} garrafão(ões)</p>
                         <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
                             ${actions}
@@ -2639,7 +2741,6 @@
                 }
                 req.status = 'entregue';
                 aguaProduct.stock -= req.quantidade;
-                // Registrar movimentação
                 this.db.waterStockMovements.push({
                     data: new Date().toISOString(),
                     tipo: 'remoção (entrega)',
