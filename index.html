@@ -994,8 +994,9 @@
                 </div>
             </div>
             <div class="header-icons">
+                <!-- Botão do carrinho com imagem -->
                 <button id="cart-button" onclick="app.openCart()" title="Carrinho de materiais">
-                    🛒
+                    <img src="carrinho-de-compras (1).png" alt="Carrinho" style="width:24px; height:24px; filter: brightness(0) invert(1);">
                     <span id="cart-count" class="cart-badge" style="display: none;">0</span>
                 </button>
                 <button id="admin-login-btn" class="admin-login-btn" onclick="app.toggleAdmin()">
@@ -1236,7 +1237,7 @@
                     'Manutenção'
                 ],
                 announcements: [],
-                waterStockMovements: [] // novo: histórico de movimentações de água
+                waterStockMovements: [] // histórico de movimentações de água
             },
             cart: [],
             recentPDF: null, // armazena o último PDF gerado para download
@@ -1301,6 +1302,25 @@
                 } else {
                     this.initializeDefaultData();
                 }
+
+                // Garantir que existe um produto de água mineral (para evitar falhas no controle de estoque)
+                const aguaExists = this.db.products.some(p => p.name.includes('Água') || p.category === 'Água mineral');
+                if (!aguaExists) {
+                    this.db.products.push({
+                        id: Date.now(),
+                        name: 'Água Mineral',
+                        description: 'Garrafão 20L',
+                        category: 'Água mineral',
+                        unit: 'garrafão',
+                        stock: 30,
+                        minStock: 5,
+                        location: 'C1',
+                        unitValue: 12.00,
+                        imageEmoji: '💧',
+                        imageBase64: null
+                    });
+                }
+
                 this.saveDatabase();
             },
 
@@ -2189,7 +2209,17 @@
             },
 
             // ---------- CONTROLE DE ESTOQUE DE ÁGUA (ADMIN) ----------
+            /**
+             * Atualiza o estoque de água mineral (adição ou remoção).
+             * @param {string} operation - 'add' para adicionar, 'remove' para remover.
+             */
             updateWaterStock: function(operation) {
+                // Apenas administradores podem executar esta ação
+                if (!this.isAdmin) {
+                    this.showNotification('Acesso negado. Apenas administradores podem alterar estoque.', 'erro');
+                    return;
+                }
+
                 const input = document.getElementById('water-stock-qty');
                 const qty = parseInt(input.value);
                 if (isNaN(qty) || qty <= 0) {
@@ -2197,9 +2227,10 @@
                     return;
                 }
 
-                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                // Busca o produto de água (pode ter nome ou categoria variados)
+                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 if (!aguaProduct) {
-                    this.showNotification('Produto de água não encontrado', 'erro');
+                    this.showNotification('Produto de água não encontrado no banco de dados.', 'erro');
                     return;
                 }
 
@@ -2232,16 +2263,19 @@
 
                 this.showNotification(`Estoque atualizado: ${newStock} garrafões`, 'sucesso');
 
-                // Re-renderizar o painel admin para atualizar a interface
-                if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
-                    this.renderAdminPanel();
+                // Se a tela atual for a de solicitação de água, recarrega para mostrar o novo estoque
+                if (document.getElementById('form-agua-solicitacao')) {
+                    this.renderSolicitarAgua();
                 } else {
-                    this.renderAdminWaterStock(); // se estiver em uma subpágina, mas por simplicidade, recarregamos o painel
+                    // Recarrega o painel admin se estiver visível
+                    if (document.getElementById('main-content').innerHTML.includes('water-stock-control')) {
+                        this.renderAdminPanel();
+                    }
                 }
             },
 
             renderAdminWaterStock: function() {
-                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 const estoque = aguaProduct ? aguaProduct.stock : 0;
                 const minStock = aguaProduct ? aguaProduct.minStock : 5;
                 const lowStock = estoque <= minStock;
@@ -2282,7 +2316,7 @@
                     return;
                 }
                 // Calcular estatísticas para dashboard
-                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 const estoqueAgua = aguaProduct ? aguaProduct.stock : 0;
                 const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente').length;
                 const aprovados = this.db.waterRequests.filter(r => r.status === 'aprovado').length;
@@ -2471,7 +2505,7 @@
             registrarEntregaAgua: function(id) {
                 const req = this.db.waterRequests.find(r => r.id === id);
                 if (!req || req.status !== 'aprovado') return;
-                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
                 if (!aguaProduct) return;
                 if (aguaProduct.stock < req.quantidade) {
                     alert('Estoque insuficiente para realizar a entrega. A solicitação permanecerá aprovada até que haja estoque.');
@@ -2715,8 +2749,8 @@
                 const isAdmin = this.isAdmin;
                 nav.innerHTML = `
                     <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
-                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="ícone.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
-                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="caixa-de-entrega.png" alt="Minhas Solicitações"></span><span>Minhas Solic.</span></button>
+                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
+                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solicitações"></span><span>Minhas Solic.</span></button>
                     <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
                     ${isAdmin ? `
                         <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span><img src="ç.png" alt="Admin"></span><span>Admin</span></button>
