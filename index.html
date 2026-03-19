@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0A4B8C">
-    <title>Água Fácil CT - Almoxarifado</title>
+    <title>Almoxarifado CT fácil</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -1071,8 +1071,10 @@
 <body>
     <!-- Splash Screen -->
     <div id="splash-screen">
-        <img src="icon.png" alt="Água Fácil CT" id="splash-logo">
-        <span>Água Fácil CT</span>
+        <!-- ALTERADO: Logotipo principal -->
+        <img src="Logotipo Almoxarifado CT UFPB.png" alt="Almoxarifado CT fácil" id="splash-logo">
+        <!-- ALTERADO: Nome do aplicativo -->
+        <span>Almoxarifado CT fácil</span>
     </div>
 
     <!-- App Container -->
@@ -1080,9 +1082,11 @@
         <!-- Header -->
         <div class="header">
             <div class="header-logo">
-                <img src="icon.png" alt="Logo" id="header-logo">
+                <!-- ALTERADO: Logotipo principal no header -->
+                <img src="Logotipo Almoxarifado CT UFPB.png" alt="Logo" id="header-logo">
                 <div class="header-title">
-                    <h1>Água Fácil CT</h1>
+                    <!-- ALTERADO: Nome do aplicativo -->
+                    <h1>Almoxarifado CT fácil</h1>
                     <p id="user-greeting">Almoxarifado</p>
                 </div>
             </div>
@@ -1533,6 +1537,7 @@
                         this.isAdmin = true;
                         document.getElementById('user-greeting').innerText = `Admin: ${this.currentUser.name}`;
                     } else {
+                        // ALTERADO: texto padrão (opcional, mas mantivemos "Solicitar Água Mineral")
                         document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                     }
                     this.updateAdminButtonIcon();
@@ -3759,7 +3764,8 @@
                         <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
                         <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solic."></span><span>Minhas Solic.</span></button>
                         <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
-                        <button class="nav-item ${active === 'ouvidoria' ? 'active' : ''}" onclick="app.renderOuvidoriaMenu()"><span><img src="ouvidoria-icon.png" alt="Ouvidoria"></span><span>Ouvidoria</span></button>
+                        <!-- ALTERADO: Ícone do botão Ouvidoria -->
+                        <button class="nav-item ${active === 'ouvidoria' ? 'active' : ''}" onclick="app.renderOuvidoriaMenu()"><span><img src="fones-de-ouvido.png" alt="Ouvidoria"></span><span>Ouvidoria</span></button>
                     `;
                 } else {
                     // Para admin, manter os mesmos 4 primeiros + Admin (e ouvidoria acessível pelo painel)
