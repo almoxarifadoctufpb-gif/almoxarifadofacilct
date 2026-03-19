@@ -68,8 +68,8 @@
         }
 
         #splash-screen img {
-            width: 200px;  /* AUMENTADO */
-            height: 200px; /* AUMENTADO */
+            width: 200px;
+            height: 200px;
             border-radius: 30px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -119,8 +119,8 @@
         }
 
         .header-logo img {
-            width: 60px;   /* AUMENTADO */
-            height: 60px;  /* AUMENTADO */
+            width: 60px;
+            height: 60px;
             border-radius: 12px;
             background: white;
             padding: 5px;
@@ -1668,6 +1668,9 @@
             concluido: 'Concluído'
         };
 
+        // NOVA URL DO WEB APP (substitua pela sua se necessário)
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwmwCJprBoFM6k2201omGykuHJl8YBt-KgFzq70CdVZOXBEZ5BL6lMDkKrZXSPyCd02EA/exec';
+
         const app = {
             currentUser: null,
             isAdmin: false,
@@ -1859,37 +1862,52 @@
                 }
             },
 
-            // ---------- FUNÇÕES DE INTEGRAÇÃO COM API ----------
-            salvarDados: async function(dados) {
+            // ---------- FUNÇÕES DE INTEGRAÇÃO COM API (ATUALIZADAS) ----------
+            salvarDados: async function(tipo, dados) {
                 try {
-                    const response = await fetch("https://script.google.com/macros/s/AKfycbxb1K9PqopwtRqvuPjP1yFiWz1ldQ-eNJSY_kjm0qOy8IVEbhu1-SWSRW4dtxXeR_Qe6g/exec", {
+                    const params = new URLSearchParams();
+                    params.append('action', 'write');
+                    params.append('tipo', tipo);
+                    params.append('dados', JSON.stringify(dados));
+                    
+                    const response = await fetch(API_URL, {
                         method: "POST",
-                        body: JSON.stringify(dados)
+                        body: params
                     });
-                    console.log("Salvo com sucesso na API");
-                    return await response.json();
+                    const result = await response.json();
+                    console.log(`Salvo na API (${tipo}):`, result);
+                    return result;
                 } catch (error) {
                     console.error("Erro ao salvar na API:", error);
+                    return { error: true, message: error.toString() };
                 }
             },
 
-            buscarDados: async function() {
+            buscarDados: async function(tipo, filtros = {}) {
                 try {
-                    const response = await fetch("https://script.google.com/macros/s/AKfycbxb1K9PqopwtRqvuPjP1yFiWz1ldQ-eNJSY_kjm0qOy8IVEbhu1-SWSRW4dtxXeR_Qe6g/exec");
-                    console.log("Dados carregados da API");
-                    return await response.json();
+                    const params = new URLSearchParams();
+                    params.append('action', 'read');
+                    params.append('tipo', tipo);
+                    if (Object.keys(filtros).length > 0) {
+                        params.append('filtro', JSON.stringify(filtros));
+                    }
+                    
+                    const response = await fetch(`${API_URL}?${params.toString()}`);
+                    const result = await response.json();
+                    return result;
                 } catch (error) {
                     console.error("Erro ao buscar da API:", error);
-                    return [];
+                    return { error: true, data: [] };
                 }
             },
 
             salvarAgua: async function(quantidade, usuario) {
-                return this.salvarDados({
+                return this.salvarDados('pedidosAgua', {
                     id: Date.now(),
                     produto: "Água Mineral",
                     quantidade: quantidade,
-                    usuario: usuario
+                    usuario: usuario,
+                    data: new Date().toISOString()
                 });
             },
 
@@ -1932,18 +1950,17 @@
             },
 
             carregarEAtualizar: async function() {
-                const dados = await this.buscarDados();
-                let totalAgua = 0;
-                if (Array.isArray(dados)) {
-                    totalAgua = dados
-                        .filter(item => item[1] === "Água Mineral")
-                        .reduce((soma, item) => soma + Number(item[2] || 0), 0);
-                } else if (dados && Array.isArray(dados.dados)) {
-                    totalAgua = dados.dados
-                        .filter(item => item[1] === "Água Mineral")
-                        .reduce((soma, item) => soma + Number(item[2] || 0), 0);
+                // Esta função pode ser usada para buscar dados da API e atualizar o gráfico
+                // Exemplo: buscar movimentações de água da API
+                const result = await this.buscarDados('pedidosAgua');
+                if (result.success && result.data) {
+                    // Processar dados para calcular estoque atual de água? Por enquanto mantém localStorage.
                 }
-                this.atualizarGraficoAgua(totalAgua);
+                // O gráfico ainda usa estoque do localStorage
+                const aguaProduct = this.db.products.find(p => p.name === 'Água Mineral' || p.category === 'Água mineral');
+                if (aguaProduct) {
+                    this.atualizarGraficoAgua(aguaProduct.stock);
+                }
             },
 
             // ---------- FUNÇÕES DE SETOR (DROPDOWN COM OPÇÃO OUTRO) ----------
@@ -2406,7 +2423,8 @@
                 };
 
                 this.db.requests.push(pedido);
-                this.salvarDados(pedido);
+                // Salvar na API
+                this.salvarDados('pedidosMateriais', pedido);
                 this.saveDatabase();
 
                 // Gerar PDF do pedido e baixar automaticamente
@@ -3097,8 +3115,6 @@
                         <button class="btn-danger" onclick="app.negarSolicitacaoAgua(${s.id})">✗ Negar</button>
                     `;
                 } else if (s.status === 'aprovado') {
-                    // Se já aprovado, não precisa de ação adicional (o estoque já foi descontado na aprovação)
-                    // A entrega será registrada separadamente? Mantemos a opção de registrar entrega se desejar.
                     actions = `
                         <button class="action-btn primary" onclick="app.registrarEntregaAgua(${s.id})">📦 Registrar Entrega</button>
                     `;
@@ -3123,7 +3139,6 @@
                 `;
             },
 
-            // ** FUNÇÃO MODIFICADA: Agora aprovar subtrai estoque imediatamente **
             aprovarSolicitacaoAgua: function(id) {
                 const req = this.db.waterRequests.find(r => r.id === id);
                 if (!req) return;
@@ -3162,6 +3177,8 @@
                 });
 
                 this.saveDatabase();
+                // Salvar na API
+                this.salvarDados('pedidosAgua', req);
                 this.abrirGerenciarSolicitacoesAgua();
                 alert(`Solicitação aprovada. Estoque atualizado: ${aguaProduct.stock} garrafões restantes.`);
             },
@@ -3173,11 +3190,11 @@
                     req.status = 'negado';
                     req.historico.push({ data: new Date().toISOString(), acao: 'Solicitação negada', status: 'negado' });
                     this.saveDatabase();
+                    this.salvarDados('pedidosAgua', req);
                     this.abrirGerenciarSolicitacoesAgua();
                 }
             },
 
-            // Registrar entrega (apenas para controle, sem alterar estoque pois já foi descontado na aprovação)
             registrarEntregaAgua: function(id) {
                 const req = this.db.waterRequests.find(r => r.id === id);
                 if (!req || req.status !== 'aprovado') return;
@@ -3185,6 +3202,7 @@
                 req.status = 'entregue';
                 req.historico.push({ data: new Date().toISOString(), acao: 'Entrega registrada', status: 'entregue' });
                 this.saveDatabase();
+                this.salvarDados('pedidosAgua', req);
                 this.abrirGerenciarSolicitacoesAgua();
                 alert('Entrega registrada com sucesso.');
             },
@@ -3344,6 +3362,7 @@
                     }
                 });
                 this.saveDatabase();
+                this.salvarDados('pedidosMateriais', req);
                 this.abrirListaTodosPedidos();
                 alert('Pedido aprovado e estoque atualizado.');
             },
@@ -3357,8 +3376,6 @@
             },
 
             // ---------- NOVO MÓDULO OUVIDORIA ----------
-
-            // Tela principal da Ouvidoria (menu)
             renderOuvidoriaMenu: function() {
                 const content = document.getElementById('main-content');
                 let html = `
@@ -3403,7 +3420,6 @@
                 this.renderBottomNav('ouvidoria');
             },
 
-            // Sugerir resposta rápida ao clicar em FAQ
             sugerirResposta: function(pergunta) {
                 const respostas = {
                     'Como faço para solicitar material?': 'Acesse o Catálogo, escolha os itens e adicione ao carrinho. Depois finalize o pedido preenchendo seus dados.',
@@ -3413,12 +3429,11 @@
                 alert(respostas[pergunta] || 'Consulte a equipe do almoxarifado.');
             },
 
-            // Sugerir categoria automaticamente baseada no tipo
             sugerirCategoriaManifestacao: function() {
                 const tipo = document.getElementById('manifestacao-tipo').value;
                 const categoriaSelect = document.getElementById('manifestacao-categoria');
                 if (tipo === 'reclamacao') {
-                    categoriaSelect.value = 'falta_material'; // sugestão, mas usuário pode mudar
+                    categoriaSelect.value = 'falta_material';
                 } else if (tipo === 'sugestao') {
                     categoriaSelect.value = 'outros';
                 } else if (tipo === 'elogio') {
@@ -3430,7 +3445,6 @@
                 }
             },
 
-            // Sugerir FAQ baseado no texto digitado
             sugerirFAQ: function(texto) {
                 const divSugestoes = document.getElementById('faq-sugestoes');
                 const palavras = texto.toLowerCase();
@@ -3443,7 +3457,6 @@
                 }
             },
 
-            // Toggle identificação anônima
             toggleIdentificacao: function() {
                 const anonimo = document.getElementById('manifestacao-anonimo').checked;
                 const divIdent = document.getElementById('manifestacao-identificacao');
@@ -3456,7 +3469,6 @@
                 }
             },
 
-            // Registrar nova manifestação
             registrarManifestacao: function() {
                 const tipo = document.getElementById('manifestacao-tipo').value;
                 const categoria = document.getElementById('manifestacao-categoria').value || 'outros';
@@ -3476,7 +3488,6 @@
                     return;
                 }
 
-                // Gerar código de protocolo
                 const codigo = 'OUV-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 
                 const manifestacao = {
@@ -3493,22 +3504,23 @@
                     historico: [
                         { data: new Date().toISOString(), acao: 'Manifestação registrada', status: 'recebido' }
                     ],
-                    anexo: null // futuramente podemos salvar base64
+                    anexo: null
                 };
 
-                // Se houver anexo, converter para base64 (simplificado)
                 if (arquivo) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         manifestacao.anexo = e.target.result;
                         this.db.complaints.push(manifestacao);
                         this.saveDatabase();
+                        this.salvarDados('manifestacoes', manifestacao);
                         this.aposRegistrarManifestacao(codigo);
                     };
                     reader.readAsDataURL(arquivo);
                 } else {
                     this.db.complaints.push(manifestacao);
                     this.saveDatabase();
+                    this.salvarDados('manifestacoes', manifestacao);
                     this.aposRegistrarManifestacao(codigo);
                 }
             },
@@ -3516,14 +3528,12 @@
             aposRegistrarManifestacao: function(codigo) {
                 this.closeModal('modal-manifestacao');
                 document.getElementById('tracking-code-display').innerText = codigo;
-                this.openModal('modal-pedido-realizado'); // reutiliza modal de confirmação
-                // Limpar formulário
+                this.openModal('modal-pedido-realizado');
                 document.getElementById('form-manifestacao').reset();
                 document.getElementById('manifestacao-identificacao').style.display = 'block';
                 document.getElementById('faq-sugestoes').innerHTML = '';
             },
 
-            // Listar minhas manifestações (baseado em nome ou email)
             renderMinhasManifestacoes: function() {
                 const content = document.getElementById('main-content');
                 let html = `
@@ -3575,7 +3585,6 @@
                 container.innerHTML = html;
             },
 
-            // Acompanhar manifestação por código (sem login)
             renderAcompanharManifestacaoPorCodigo: function() {
                 const content = document.getElementById('main-content');
                 content.innerHTML = `
@@ -3602,10 +3611,9 @@
                     resultadoDiv.innerHTML = '<p style="color: var(--vermelho);">Código não encontrado.</p>';
                     return;
                 }
-                this.acompanharManifestacao(manifestacao.id, true); // true indica que veio da busca por código
+                this.acompanharManifestacao(manifestacao.id, true);
             },
 
-            // Exibir detalhes e chat da manifestação
             acompanharManifestacao: function(id, isPublic = false) {
                 const manifestacao = this.db.complaints.find(m => m.id === id);
                 if (!manifestacao) return;
@@ -3634,7 +3642,6 @@
                 });
                 html += `</div>`;
 
-                // Se a manifestação não estiver concluída, permitir envio de nova mensagem
                 if (manifestacao.status !== 'concluido') {
                     html += `
                         <div style="display:flex; gap:10px; margin-top:15px;">
@@ -3644,7 +3651,6 @@
                     `;
                 } else {
                     html += `<p style="text-align:center; margin-top:20px;">Esta manifestação foi concluída. Agradecemos seu contato!</p>`;
-                    // Se concluída e ainda não avaliada, mostrar botão de avaliação
                     if (!manifestacao.avaliacao) {
                         html += `<button class="btn-primary" onclick="app.abrirAvaliacao(${id})">⭐ Avaliar atendimento</button>`;
                     }
@@ -3666,22 +3672,20 @@
                 const msg = {
                     id: Date.now(),
                     complaintId: id,
-                    remetente: 'usuario', // ou 'admin' quando for admin
+                    remetente: 'usuario',
                     texto: mensagem,
                     data: new Date().toISOString()
                 };
                 this.db.complaintMessages.push(msg);
                 this.saveDatabase();
-
-                // Atualizar histórico da manifestação
+                this.salvarDados('mensagensManifestacao', msg);
                 manifestacao.historico.push({ data: msg.data, acao: 'Nova mensagem do usuário', status: manifestacao.status });
                 this.saveDatabase();
+                this.salvarDados('manifestacoes', manifestacao);
 
-                // Recarregar o chat
                 this.acompanharManifestacao(id);
             },
 
-            // Função para admin responder (será chamada do painel)
             responderManifestacaoAdmin: function(id, mensagem) {
                 const manifestacao = this.db.complaints.find(m => m.id === id);
                 if (!manifestacao) return;
@@ -3694,24 +3698,24 @@
                     data: new Date().toISOString()
                 };
                 this.db.complaintMessages.push(msg);
+                this.saveDatabase();
+                this.salvarDados('mensagensManifestacao', msg);
                 manifestacao.historico.push({ data: msg.data, acao: 'Resposta do almoxarifado', status: manifestacao.status });
                 this.saveDatabase();
+                this.salvarDados('manifestacoes', manifestacao);
             },
 
-            // Alterar status da manifestação (admin)
             alterarStatusManifestacao: function(id, novoStatus) {
                 const manifestacao = this.db.complaints.find(m => m.id === id);
                 if (!manifestacao) return;
                 manifestacao.status = novoStatus;
                 manifestacao.historico.push({ data: new Date().toISOString(), acao: `Status alterado para ${STATUS_MANIFESTACAO[novoStatus]}`, status: novoStatus });
                 this.saveDatabase();
-                // Se concluído, notificar usuário? Por enquanto só salva.
+                this.salvarDados('manifestacoes', manifestacao);
             },
 
-            // Abrir modal de avaliação
             abrirAvaliacao: function(id) {
                 this.currentComplaintId = id;
-                // Reset estrelas
                 document.querySelectorAll('#rating-stars span').forEach(span => span.classList.remove('selected'));
                 document.getElementById('avaliacao-comentario').value = '';
                 this.openModal('modal-avaliar-manifestacao');
@@ -3732,16 +3736,15 @@
                         data: new Date().toISOString()
                     };
                     this.saveDatabase();
+                    this.salvarDados('manifestacoes', manifestacao);
                 }
                 this.closeModal('modal-avaliar-manifestacao');
                 alert('Avaliação registrada. Obrigado!');
-                // Se o modal de acompanhamento estiver aberto, atualiza
                 if (document.getElementById('modal-acompanhar-manifestacao').classList.contains('active')) {
                     this.acompanharManifestacao(this.currentComplaintId);
                 }
             },
 
-            // Painel admin para ouvidoria
             renderAdminOuvidoria: function() {
                 if (!this.isAdmin) return;
                 const content = document.getElementById('main-content');
@@ -3847,7 +3850,6 @@
             abrirAdminManifestacao: function(id) {
                 const manifestacao = this.db.complaints.find(m => m.id === id);
                 if (!manifestacao) return;
-                // Reutiliza o modal de acompanhamento, mas com opções admin
                 this.currentComplaintId = id;
                 const messages = this.db.complaintMessages.filter(msg => msg.complaintId === id).sort((a,b) => new Date(a.data) - new Date(b.data));
 
@@ -3873,7 +3875,6 @@
                 });
                 html += `</div>`;
 
-                // Campo para resposta do admin
                 html += `
                     <div style="display:flex; gap:10px; margin-top:15px;">
                         <textarea id="admin-mensagem-${id}" placeholder="Digite sua resposta..." style="flex:1; padding:10px; border-radius:16px; border:1px solid var(--cinza-borda);"></textarea>
@@ -3902,22 +3903,22 @@
                     data: new Date().toISOString()
                 };
                 this.db.complaintMessages.push(msg);
+                this.saveDatabase();
+                this.salvarDados('mensagensManifestacao', msg);
                 manifestacao.historico.push({ data: msg.data, acao: 'Resposta do almoxarifado', status: manifestacao.status });
                 this.saveDatabase();
+                this.salvarDados('manifestacoes', manifestacao);
 
-                // Recarregar
                 this.abrirAdminManifestacao(id);
             },
 
             alterarStatusManifestacaoAdmin: function(id, novoStatus) {
                 if (!novoStatus) return;
                 this.alterarStatusManifestacao(id, novoStatus);
-                this.filtrarManifestacoesAdmin(); // atualiza lista
+                this.filtrarManifestacoesAdmin();
             },
 
             // ---------- NOVO MÓDULO QR CODE ----------
-
-            // Tela principal do controle QR
             renderQRInventory: function() {
                 if (!this.isAdmin) {
                     alert('Acesso restrito a administradores.');
@@ -3935,7 +3936,6 @@
                         <button class="action-btn" onclick="app.renderQRItemList()">📋 Listar Itens</button>
                     </div>
                     <div id="qr-inventory-content">
-                        <!-- Aqui será mostrada a lista ou detalhes -->
                         ${this.renderQRDashboard()}
                     </div>
                 `;
@@ -3992,7 +3992,6 @@
                 const previewDiv = document.getElementById('qr-code-preview');
 
                 if (itemId) {
-                    // Edição
                     const item = this.db.qrItems.find(i => i.id === itemId);
                     if (!item) return;
                     title.innerText = '✏️ Editar Item QR';
@@ -4004,7 +4003,6 @@
                     locationField.value = item.location;
                     qtyField.value = item.currentQty;
                     minStockField.value = item.minStock;
-                    // Mostrar QR code existente
                     if (item.qrCodeData) {
                         previewGroup.style.display = 'block';
                         previewDiv.innerHTML = `<img src="${item.qrCodeData}" style="width:150px; height:150px;">`;
@@ -4012,7 +4010,6 @@
                         previewGroup.style.display = 'none';
                     }
                 } else {
-                    // Novo
                     title.innerText = '➕ Cadastrar Novo Item QR';
                     idField.value = '';
                     codeField.value = '';
@@ -4028,7 +4025,6 @@
             },
 
             sugerirCodigoQR: function() {
-                // Sugere um código baseado na categoria e próximo número
                 const category = document.getElementById('qr-item-category').value;
                 if (!category) return;
                 const prefix = category;
@@ -4059,10 +4055,8 @@
                     return;
                 }
 
-                // Se for novo, gerar código se não foi preenchido
                 let finalCode = code;
                 if (!finalCode) {
-                    // Gerar automático
                     const prefix = category;
                     const items = this.db.qrItems.filter(i => i.code.startsWith(prefix + '-'));
                     let maxNum = 0;
@@ -4076,7 +4070,6 @@
                     finalCode = `${prefix}-${nextNum}`;
                 }
 
-                // Gerar QR code
                 const qrData = this.generateQRCode(finalCode);
 
                 const item = {
@@ -4104,19 +4097,18 @@
                 }
 
                 this.saveDatabase();
+                this.salvarDados('itensQR', item);
                 this.closeModal('modal-qr-item');
-                this.renderQRInventory(); // volta para a tela principal
+                this.renderQRInventory();
                 alert('Item salvo com sucesso!');
             },
 
             generateQRCode: function(text) {
-                // Usa qrcode-generator para criar uma imagem QR
                 const qrcode = qrcodeGenerator(0, 'M');
                 qrcode.addData(text);
                 qrcode.make();
                 const cellSize = 4;
                 const imgData = qrcode.createImgTag(cellSize);
-                // Extrai o src da tag img
                 const srcMatch = imgData.match(/src="([^"]+)"/);
                 return srcMatch ? srcMatch[1] : '';
             },
@@ -4124,7 +4116,6 @@
             renderQRItemList: function() {
                 const contentDiv = document.getElementById('qr-inventory-content');
                 if (!contentDiv) {
-                    // Se não estiver na tela principal, redireciona
                     this.renderQRInventory();
                     setTimeout(() => this.renderQRItemList(), 100);
                     return;
@@ -4245,6 +4236,8 @@
                 };
                 this.db.qrTransactions.push(transaction);
                 this.saveDatabase();
+                this.salvarDados('movimentacoesQR', transaction);
+                this.salvarDados('itensQR', item);
 
                 this.closeModal('modal-qr-entry');
                 this.abrirQRItemDetail(itemId);
@@ -4287,6 +4280,8 @@
                 };
                 this.db.qrTransactions.push(transaction);
                 this.saveDatabase();
+                this.salvarDados('movimentacoesQR', transaction);
+                this.salvarDados('itensQR', item);
 
                 this.closeModal('modal-qr-exit');
                 this.abrirQRItemDetail(itemId);
@@ -4297,16 +4292,12 @@
                 const modal = document.getElementById('modal-qr-scanner');
                 this.openModal('modal-qr-scanner');
 
-                // Inicializar scanner
                 if (!this.html5QrCode) {
                     this.html5QrCode = new Html5Qrcode("qr-reader");
                 }
                 const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                    // Parar scanner
                     this.html5QrCode.stop().then(() => {
-                        // Fechar modal
                         this.closeModal('modal-qr-scanner');
-                        // Processar o código lido
                         this.processQRScan(decodedText);
                     }).catch(err => {
                         console.error(err);
@@ -4334,17 +4325,13 @@
             },
 
             processQRScan: function(code) {
-                // Procurar item pelo código
                 const item = this.db.qrItems.find(i => i.code === code);
                 if (item) {
-                    // Se encontrado, abrir detalhe
-                    this.renderQRInventory(); // volta para tela principal
+                    this.renderQRInventory();
                     setTimeout(() => this.abrirQRItemDetail(item.id), 100);
                 } else {
-                    // Não encontrado, perguntar se deseja cadastrar
                     if (confirm(`Código "${code}" não encontrado. Deseja cadastrar um novo item com este código?`)) {
                         this.abrirQRItemForm();
-                        // Preencher código no formulário
                         document.getElementById('qr-item-code').value = code;
                     }
                 }
@@ -4403,18 +4390,15 @@
                 const nav = document.getElementById('bottom-nav');
                 const isAdmin = this.isAdmin;
                 let html = '';
-                // Para não admin, exibir 5 itens: Catálogo, Solicitar Água, Minhas Solic., Rastrear, Ouvidoria
                 if (!isAdmin) {
                     html = `
                         <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
                         <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
                         <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solic."></span><span>Minhas Solic.</span></button>
                         <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
-                        <!-- ALTERADO: Ícone do botão Ouvidoria -->
                         <button class="nav-item ${active === 'ouvidoria' ? 'active' : ''}" onclick="app.renderOuvidoriaMenu()"><span><img src="fones-de-ouvido.png" alt="Ouvidoria"></span><span>Ouvidoria</span></button>
                     `;
                 } else {
-                    // Para admin, manter os mesmos 4 primeiros + Admin (e ouvidoria acessível pelo painel)
                     html = `
                         <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
                         <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
@@ -4441,13 +4425,10 @@
                         if (e.target === this) this.classList.remove('active');
                     });
                 });
-                // Evento para estrelas de avaliação
                 document.addEventListener('click', function(e) {
                     if (e.target.matches('#rating-stars span')) {
                         document.querySelectorAll('#rating-stars span').forEach(span => span.classList.remove('selected'));
                         e.target.classList.add('selected');
-                        let value = e.target.dataset.value;
-                        // Marcar estrelas anteriores também
                         let prev = e.target.previousElementSibling;
                         while (prev) {
                             prev.classList.add('selected');
