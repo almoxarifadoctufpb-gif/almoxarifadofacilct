@@ -790,7 +790,12 @@
         .status-aprovado { background: #E8F5E9; color: var(--verde); }
         .status-negado { background: #FFEBEE; color: var(--vermelho); }
         .status-entregue { background: #D4EDDA; color: #155724; }
-        .status-aguardando { background: #FEF9E7; color: #B7950B; } /* novo status */
+        .status-aguardando { background: #FEF9E7; color: #B7950B; }
+        /* NOVO MÓDULO OUVIDORIA - status */
+        .status-recebido { background: #E3F2FD; color: #0D47A1; }
+        .status-analise { background: #FFF3E0; color: #E65100; }
+        .status-atendimento { background: #E8F5E9; color: #1B5E20; }
+        .status-concluido { background: #E0E0E0; color: #424242; }
 
         .tracking-items {
             margin-top: 20px;
@@ -969,6 +974,90 @@
         }
         .toast-notification.show {
             opacity: 1;
+        }
+
+        /* NOVO MÓDULO OUVIDORIA - estilos adicionais */
+        .ouvidoria-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .ouvidoria-card {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--sombra-media);
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .ouvidoria-card:hover {
+            transform: translateY(-3px);
+        }
+        .ouvidoria-icon {
+            font-size: 2.5rem;
+            background: var(--azul-claro);
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .faq-item {
+            background: var(--cinza-claro);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .faq-item:hover {
+            background: var(--azul-claro);
+        }
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--cinza-borda);
+            border-radius: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 16px;
+            max-width: 80%;
+        }
+        .chat-message.user {
+            background: var(--azul-institucional);
+            color: white;
+            margin-left: auto;
+        }
+        .chat-message.admin {
+            background: var(--cinza-claro);
+            color: var(--texto-principal);
+        }
+        .chat-message small {
+            display: block;
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .rating-stars span {
+            transition: color 0.2s;
+        }
+        .rating-stars span:hover,
+        .rating-stars span.selected {
+            color: gold;
         }
 
         /* Responsividade */
@@ -1217,6 +1306,100 @@
         </div>
     </div>
 
+    <!-- NOVO MÓDULO OUVIDORIA - Modal de Manifestação (Registro) -->
+    <div class="modal-overlay" id="modal-manifestacao">
+        <div class="modal">
+            <div class="modal-header">📢 Registrar Manifestação</div>
+            <div class="modal-body">
+                <form id="form-manifestacao" onsubmit="event.preventDefault(); app.registrarManifestacao();">
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="manifestacao-tipo" required onchange="app.sugerirCategoriaManifestacao()">
+                            <option value="">Selecione</option>
+                            <option value="reclamacao">Reclamação</option>
+                            <option value="sugestao">Sugestão</option>
+                            <option value="elogio">Elogio</option>
+                            <option value="duvida">Dúvida</option>
+                            <option value="denuncia">Denúncia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria (opcional)</label>
+                        <select id="manifestacao-categoria">
+                            <option value="">Sugerir automaticamente</option>
+                            <option value="falta_material">Falta de material</option>
+                            <option value="atraso_entrega">Atraso na entrega</option>
+                            <option value="problema_sistema">Problema no sistema</option>
+                            <option value="atendimento">Atendimento</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <textarea id="manifestacao-descricao" rows="4" required onkeyup="app.sugerirFAQ(this.value)"></textarea>
+                        <div id="faq-sugestoes" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Anexo (opcional)</label>
+                        <input type="file" id="manifestacao-anexo" accept=".jpg,.jpeg,.png,.pdf">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="manifestacao-anonimo" onchange="app.toggleIdentificacao()">
+                        <label for="manifestacao-anonimo">Desejo permanecer anônimo</label>
+                    </div>
+                    <div id="manifestacao-identificacao">
+                        <div class="form-group">
+                            <label>Nome (opcional se anônimo)</label>
+                            <input type="text" id="manifestacao-nome">
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail (opcional se anônimo)</label>
+                            <input type="email" id="manifestacao-email">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-manifestacao')">Cancelar</button>
+                <button class="btn-primary" onclick="app.registrarManifestacao()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MÓDULO OUVIDORIA - Modal de Acompanhamento / Chat -->
+    <div class="modal-overlay" id="modal-acompanhar-manifestacao">
+        <div class="modal">
+            <div class="modal-header">💬 Acompanhar Manifestação</div>
+            <div class="modal-body" id="acompanhar-manifestacao-body"></div>
+            <div class="modal-footer" id="acompanhar-manifestacao-footer"></div>
+        </div>
+    </div>
+
+    <!-- NOVO MÓDULO OUVIDORIA - Modal de Avaliação -->
+    <div class="modal-overlay" id="modal-avaliar-manifestacao">
+        <div class="modal">
+            <div class="modal-header">⭐ Avaliar Atendimento</div>
+            <div class="modal-body">
+                <p>Como você avalia o atendimento da sua manifestação?</p>
+                <div class="rating-stars" id="rating-stars">
+                    <span data-value="1">★</span>
+                    <span data-value="2">★</span>
+                    <span data-value="3">★</span>
+                    <span data-value="4">★</span>
+                    <span data-value="5">★</span>
+                </div>
+                <div class="form-group">
+                    <label>Comentário (opcional)</label>
+                    <textarea id="avaliacao-comentario" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-avaliar-manifestacao')">Agora não</button>
+                <button class="btn-primary" onclick="app.avaliarManifestacao()">Enviar avaliação</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast de notificação -->
     <div id="toast-notification" class="toast-notification">Item adicionado ao carrinho</div>
 
@@ -1282,6 +1465,28 @@
             "CT - NUPPA - LABORATÓRIO DE CONTROLE DE QUALIDADE"
         ];
 
+        // NOVO MÓDULO OUVIDORIA - Tipos de manifestação e categorias
+        const TIPOS_MANIFESTACAO = {
+            reclamacao: 'Reclamação',
+            sugestao: 'Sugestão',
+            elogio: 'Elogio',
+            duvida: 'Dúvida',
+            denuncia: 'Denúncia'
+        };
+        const CATEGORIAS_MANIFESTACAO = [
+            'Falta de material',
+            'Atraso na entrega',
+            'Problema no sistema',
+            'Atendimento',
+            'Outros'
+        ];
+        const STATUS_MANIFESTACAO = {
+            recebido: 'Recebido',
+            analise: 'Em análise',
+            atendimento: 'Em atendimento',
+            concluido: 'Concluído'
+        };
+
         const app = {
             currentUser: null,
             isAdmin: false,
@@ -1300,11 +1505,16 @@
                     'Manutenção'
                 ], // removido 'Água mineral' daqui
                 announcements: [],
-                waterStockMovements: [] // histórico de movimentações de água
+                waterStockMovements: [], // histórico de movimentações de água
+                // NOVO MÓDULO OUVIDORIA
+                complaints: [], // manifestações
+                complaintMessages: [] // mensagens das manifestações
             },
             cart: [],
             recentPDF: null, // armazena o último PDF gerado para download
             grafico: null, // instância do Chart
+            // NOVO MÓDULO OUVIDORIA - variável para armazenar ID da manifestação em acompanhamento
+            currentComplaintId: null,
 
             init: function() {
                 try {
@@ -1356,6 +1566,9 @@
                     if (!Array.isArray(this.db.movements)) this.db.movements = [];
                     if (!Array.isArray(this.db.announcements)) this.db.announcements = [];
                     if (!Array.isArray(this.db.waterStockMovements)) this.db.waterStockMovements = [];
+                    // NOVO MÓDULO OUVIDORIA - inicializar arrays
+                    if (!Array.isArray(this.db.complaints)) this.db.complaints = [];
+                    if (!Array.isArray(this.db.complaintMessages)) this.db.complaintMessages = [];
                     
                     this.db.products.forEach(p => {
                         if (!p.description) p.description = 'Sem descrição';
@@ -1413,6 +1626,9 @@
                 this.db.movements = [];
                 this.db.announcements = [];
                 this.db.waterStockMovements = [];
+                // NOVO MÓDULO OUVIDORIA - dados iniciais vazios
+                this.db.complaints = [];
+                this.db.complaintMessages = [];
                 this.saveDatabase();
             },
 
@@ -2552,6 +2768,8 @@
                         <button class="action-btn" onclick="app.abrirGerenciarSolicitacoesAgua()">💧 Solicitações de Água</button>
                         <button class="action-btn" onclick="app.renderAnnouncementsList()">📢 Avisos</button>
                         <button class="action-btn" onclick="app.abrirListaTodosPedidos()">📋 Todos os Pedidos (Materiais)</button>
+                        <!-- NOVO MÓDULO OUVIDORIA - botão para gestão de manifestações -->
+                        <button class="action-btn" onclick="app.renderAdminOuvidoria()">📢 Ouvidoria</button>
                     </div>
 
                     <h3>Dashboard - Água Mineral</h3>
@@ -2922,6 +3140,565 @@
                 }
             },
 
+            // ---------- NOVO MÓDULO OUVIDORIA ----------
+
+            // Tela principal da Ouvidoria (menu)
+            renderOuvidoriaMenu: function() {
+                const content = document.getElementById('main-content');
+                let html = `
+                    <h3 style="margin-bottom: 20px;">📢 Ouvidoria</h3>
+                    <div class="ouvidoria-menu">
+                        <div class="ouvidoria-card" onclick="app.openModal('modal-manifestacao')">
+                            <div class="ouvidoria-icon">📝</div>
+                            <div>
+                                <h4>Registrar manifestação</h4>
+                                <p style="color: var(--texto-secundario);">Reclamação, sugestão, elogio, dúvida ou denúncia</p>
+                            </div>
+                        </div>
+                        <div class="ouvidoria-card" onclick="app.renderMinhasManifestacoes()">
+                            <div class="ouvidoria-icon">📋</div>
+                            <div>
+                                <h4>Minhas manifestações</h4>
+                                <p style="color: var(--texto-secundario);">Acompanhe suas solicitações</p>
+                            </div>
+                        </div>
+                        <div class="ouvidoria-card" onclick="app.renderAcompanharManifestacaoPorCodigo()">
+                            <div class="ouvidoria-icon">🔍</div>
+                            <div>
+                                <h4>Acompanhar por código</h4>
+                                <p style="color: var(--texto-secundario);">Informe o protocolo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <h4>Perguntas frequentes</h4>
+                        <div class="faq-item" onclick="app.sugerirResposta('Como faço para solicitar material?')">
+                            Como faço para solicitar material?
+                        </div>
+                        <div class="faq-item" onclick="app.sugerirResposta('Onde vejo o andamento do meu pedido?')">
+                            Onde vejo o andamento do meu pedido?
+                        </div>
+                        <div class="faq-item" onclick="app.sugerirResposta('Qual o horário de funcionamento do almoxarifado?')">
+                            Qual o horário de funcionamento do almoxarifado?
+                        </div>
+                    </div>
+                `;
+                content.innerHTML = html;
+                this.renderBottomNav('ouvidoria');
+            },
+
+            // Sugerir resposta rápida ao clicar em FAQ
+            sugerirResposta: function(pergunta) {
+                const respostas = {
+                    'Como faço para solicitar material?': 'Acesse o Catálogo, escolha os itens e adicione ao carrinho. Depois finalize o pedido preenchendo seus dados.',
+                    'Onde vejo o andamento do meu pedido?': 'Use a opção "Rastrear" no menu inferior e informe o código de protocolo recebido.',
+                    'Qual o horário de funcionamento do almoxarifado?': 'O almoxarifado funciona de segunda a sexta, das 8h às 17h.'
+                };
+                alert(respostas[pergunta] || 'Consulte a equipe do almoxarifado.');
+            },
+
+            // Sugerir categoria automaticamente baseada no tipo
+            sugerirCategoriaManifestacao: function() {
+                const tipo = document.getElementById('manifestacao-tipo').value;
+                const categoriaSelect = document.getElementById('manifestacao-categoria');
+                if (tipo === 'reclamacao') {
+                    categoriaSelect.value = 'falta_material'; // sugestão, mas usuário pode mudar
+                } else if (tipo === 'sugestao') {
+                    categoriaSelect.value = 'outros';
+                } else if (tipo === 'elogio') {
+                    categoriaSelect.value = 'atendimento';
+                } else if (tipo === 'duvida') {
+                    categoriaSelect.value = 'outros';
+                } else if (tipo === 'denuncia') {
+                    categoriaSelect.value = 'outros';
+                }
+            },
+
+            // Sugerir FAQ baseado no texto digitado
+            sugerirFAQ: function(texto) {
+                const divSugestoes = document.getElementById('faq-sugestoes');
+                const palavras = texto.toLowerCase();
+                if (palavras.includes('material') || palavras.includes('pedido')) {
+                    divSugestoes.innerHTML = '<p style="color: var(--info);">📌 Dica: Para solicitar materiais, utilize o catálogo.</p>';
+                } else if (palavras.includes('atraso')) {
+                    divSugestoes.innerHTML = '<p style="color: var(--info);">📌 Dica: Informe o código do pedido para agilizar a análise.</p>';
+                } else {
+                    divSugestoes.innerHTML = '';
+                }
+            },
+
+            // Toggle identificação anônima
+            toggleIdentificacao: function() {
+                const anonimo = document.getElementById('manifestacao-anonimo').checked;
+                const divIdent = document.getElementById('manifestacao-identificacao');
+                if (anonimo) {
+                    divIdent.style.display = 'none';
+                    document.getElementById('manifestacao-nome').required = false;
+                    document.getElementById('manifestacao-email').required = false;
+                } else {
+                    divIdent.style.display = 'block';
+                }
+            },
+
+            // Registrar nova manifestação
+            registrarManifestacao: function() {
+                const tipo = document.getElementById('manifestacao-tipo').value;
+                const categoria = document.getElementById('manifestacao-categoria').value || 'outros';
+                const descricao = document.getElementById('manifestacao-descricao').value.trim();
+                const anonimo = document.getElementById('manifestacao-anonimo').checked;
+                const nome = anonimo ? 'Anônimo' : document.getElementById('manifestacao-nome').value.trim();
+                const email = anonimo ? null : document.getElementById('manifestacao-email').value.trim();
+                const arquivo = document.getElementById('manifestacao-anexo').files[0];
+
+                if (!tipo || !descricao) {
+                    alert('Preencha tipo e descrição.');
+                    return;
+                }
+
+                if (!anonimo && (!nome || !email)) {
+                    alert('Preencha nome e e-mail ou marque anônimo.');
+                    return;
+                }
+
+                // Gerar código de protocolo
+                const codigo = 'OUV-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+                const manifestacao = {
+                    id: Date.now(),
+                    codigo: codigo,
+                    tipo: tipo,
+                    categoria: categoria,
+                    descricao: descricao,
+                    anonimo: anonimo,
+                    nome: nome,
+                    email: email,
+                    data: new Date().toISOString(),
+                    status: 'recebido',
+                    historico: [
+                        { data: new Date().toISOString(), acao: 'Manifestação registrada', status: 'recebido' }
+                    ],
+                    anexo: null // futuramente podemos salvar base64
+                };
+
+                // Se houver anexo, converter para base64 (simplificado)
+                if (arquivo) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        manifestacao.anexo = e.target.result;
+                        this.db.complaints.push(manifestacao);
+                        this.saveDatabase();
+                        this.aposRegistrarManifestacao(codigo);
+                    };
+                    reader.readAsDataURL(arquivo);
+                } else {
+                    this.db.complaints.push(manifestacao);
+                    this.saveDatabase();
+                    this.aposRegistrarManifestacao(codigo);
+                }
+            },
+
+            aposRegistrarManifestacao: function(codigo) {
+                this.closeModal('modal-manifestacao');
+                document.getElementById('tracking-code-display').innerText = codigo;
+                this.openModal('modal-pedido-realizado'); // reutiliza modal de confirmação
+                // Limpar formulário
+                document.getElementById('form-manifestacao').reset();
+                document.getElementById('manifestacao-identificacao').style.display = 'block';
+                document.getElementById('faq-sugestoes').innerHTML = '';
+            },
+
+            // Listar minhas manifestações (baseado em nome ou email)
+            renderMinhasManifestacoes: function() {
+                const content = document.getElementById('main-content');
+                let html = `
+                    <h3 style="margin-bottom:20px;">📋 Minhas Manifestações</h3>
+                    <button class="btn-secondary" onclick="app.renderOuvidoriaMenu()" style="margin-bottom:20px;">← Voltar</button>
+                    <div style="margin-bottom:20px;">
+                        <input type="text" id="filtro-nome-manifestacao" placeholder="Digite seu nome ou e-mail" style="width:100%; padding:12px; border:1px solid var(--cinza-borda); border-radius:16px;">
+                        <button class="btn-primary" style="margin-top:10px;" onclick="app.filtrarMinhasManifestacoes()">Buscar</button>
+                    </div>
+                    <div id="lista-minhas-manifestacoes"></div>
+                `;
+                content.innerHTML = html;
+                this.renderBottomNav('ouvidoria');
+            },
+
+            filtrarMinhasManifestacoes: function() {
+                const filtro = document.getElementById('filtro-nome-manifestacao').value.toLowerCase();
+                const container = document.getElementById('lista-minhas-manifestacoes');
+                if (!filtro) {
+                    container.innerHTML = '<p>Digite um nome ou e-mail para buscar.</p>';
+                    return;
+                }
+                const manifestacoes = this.db.complaints.filter(m => 
+                    (!m.anonimo && (m.nome.toLowerCase().includes(filtro) || (m.email && m.email.toLowerCase().includes(filtro))))
+                ).slice().reverse();
+
+                if (manifestacoes.length === 0) {
+                    container.innerHTML = '<p>Nenhuma manifestação encontrada para este nome/e-mail.</p>';
+                    return;
+                }
+
+                let html = '';
+                manifestacoes.forEach(m => {
+                    let statusClass = 'status-' + m.status;
+                    let statusText = STATUS_MANIFESTACAO[m.status] || m.status;
+                    html += `
+                        <div class="item-card" style="margin-bottom: 15px; display: block;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${m.codigo}</strong>
+                                <span class="tracking-status ${statusClass}">${statusText}</span>
+                            </div>
+                            <p><strong>Tipo:</strong> ${TIPOS_MANIFESTACAO[m.tipo] || m.tipo}</p>
+                            <p><strong>Data:</strong> ${new Date(m.data).toLocaleDateString()}</p>
+                            <p><strong>Descrição:</strong> ${m.descricao.substring(0, 80)}${m.descricao.length > 80 ? '...' : ''}</p>
+                            <button class="action-btn" onclick="app.acompanharManifestacao(${m.id})">Acompanhar</button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            },
+
+            // Acompanhar manifestação por código (sem login)
+            renderAcompanharManifestacaoPorCodigo: function() {
+                const content = document.getElementById('main-content');
+                content.innerHTML = `
+                    <h3 style="margin-bottom:20px;">🔍 Acompanhar por Código</h3>
+                    <button class="btn-secondary" onclick="app.renderOuvidoriaMenu()" style="margin-bottom:20px;">← Voltar</button>
+                    <div style="margin-bottom:20px;">
+                        <input type="text" id="codigo-acompanhar" placeholder="Digite o código da manifestação" style="width:100%; padding:12px; border:1px solid var(--cinza-borda); border-radius:16px;">
+                        <button class="btn-primary" style="margin-top:10px;" onclick="app.buscarManifestacaoPorCodigo()">Buscar</button>
+                    </div>
+                    <div id="resultado-acompanhar"></div>
+                `;
+                this.renderBottomNav('ouvidoria');
+            },
+
+            buscarManifestacaoPorCodigo: function() {
+                const codigo = document.getElementById('codigo-acompanhar').value.trim().toUpperCase();
+                const resultadoDiv = document.getElementById('resultado-acompanhar');
+                if (!codigo) {
+                    resultadoDiv.innerHTML = '<p>Digite um código.</p>';
+                    return;
+                }
+                const manifestacao = this.db.complaints.find(m => m.codigo === codigo);
+                if (!manifestacao) {
+                    resultadoDiv.innerHTML = '<p style="color: var(--vermelho);">Código não encontrado.</p>';
+                    return;
+                }
+                this.acompanharManifestacao(manifestacao.id, true); // true indica que veio da busca por código
+            },
+
+            // Exibir detalhes e chat da manifestação
+            acompanharManifestacao: function(id, isPublic = false) {
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+                this.currentComplaintId = id;
+
+                const messages = this.db.complaintMessages.filter(msg => msg.complaintId === id).sort((a,b) => new Date(a.data) - new Date(b.data));
+
+                const body = document.getElementById('acompanhar-manifestacao-body');
+                let html = `
+                    <p><strong>Código:</strong> ${manifestacao.codigo}</p>
+                    <p><strong>Tipo:</strong> ${TIPOS_MANIFESTACAO[manifestacao.tipo] || manifestacao.tipo}</p>
+                    <p><strong>Status:</strong> <span class="tracking-status status-${manifestacao.status}">${STATUS_MANIFESTACAO[manifestacao.status] || manifestacao.status}</span></p>
+                    <p><strong>Descrição:</strong> ${manifestacao.descricao}</p>
+                    ${manifestacao.anexo ? `<p><a href="${manifestacao.anexo}" target="_blank">📎 Ver anexo</a></p>` : ''}
+                    <div class="chat-messages" id="chat-messages-${id}">
+                `;
+                messages.forEach(msg => {
+                    const classe = msg.remetente === 'usuario' ? 'user' : 'admin';
+                    html += `
+                        <div class="chat-message ${classe}">
+                            <strong>${msg.remetente === 'usuario' ? (manifestacao.anonimo ? 'Anônimo' : manifestacao.nome) : 'Almoxarifado'}:</strong>
+                            <p>${msg.texto}</p>
+                            <small>${new Date(msg.data).toLocaleString()}</small>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                // Se a manifestação não estiver concluída, permitir envio de nova mensagem
+                if (manifestacao.status !== 'concluido') {
+                    html += `
+                        <div style="display:flex; gap:10px; margin-top:15px;">
+                            <textarea id="nova-mensagem-${id}" placeholder="Digite sua mensagem..." style="flex:1; padding:10px; border-radius:16px; border:1px solid var(--cinza-borda);"></textarea>
+                            <button class="btn-primary" onclick="app.enviarMensagemManifestacao(${id})">Enviar</button>
+                        </div>
+                    `;
+                } else {
+                    html += `<p style="text-align:center; margin-top:20px;">Esta manifestação foi concluída. Agradecemos seu contato!</p>`;
+                    // Se concluída e ainda não avaliada, mostrar botão de avaliação
+                    if (!manifestacao.avaliacao) {
+                        html += `<button class="btn-primary" onclick="app.abrirAvaliacao(${id})">⭐ Avaliar atendimento</button>`;
+                    }
+                }
+
+                body.innerHTML = html;
+                document.getElementById('acompanhar-manifestacao-footer').innerHTML = `
+                    <button class="btn-secondary" onclick="app.closeModal('modal-acompanhar-manifestacao')">Fechar</button>
+                `;
+                this.openModal('modal-acompanhar-manifestacao');
+            },
+
+            enviarMensagemManifestacao: function(id) {
+                const mensagem = document.getElementById(`nova-mensagem-${id}`).value.trim();
+                if (!mensagem) return;
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+
+                const msg = {
+                    id: Date.now(),
+                    complaintId: id,
+                    remetente: 'usuario', // ou 'admin' quando for admin
+                    texto: mensagem,
+                    data: new Date().toISOString()
+                };
+                this.db.complaintMessages.push(msg);
+                this.saveDatabase();
+
+                // Atualizar histórico da manifestação
+                manifestacao.historico.push({ data: msg.data, acao: 'Nova mensagem do usuário', status: manifestacao.status });
+                this.saveDatabase();
+
+                // Recarregar o chat
+                this.acompanharManifestacao(id);
+            },
+
+            // Função para admin responder (será chamada do painel)
+            responderManifestacaoAdmin: function(id, mensagem) {
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+
+                const msg = {
+                    id: Date.now(),
+                    complaintId: id,
+                    remetente: 'admin',
+                    texto: mensagem,
+                    data: new Date().toISOString()
+                };
+                this.db.complaintMessages.push(msg);
+                manifestacao.historico.push({ data: msg.data, acao: 'Resposta do almoxarifado', status: manifestacao.status });
+                this.saveDatabase();
+            },
+
+            // Alterar status da manifestação (admin)
+            alterarStatusManifestacao: function(id, novoStatus) {
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+                manifestacao.status = novoStatus;
+                manifestacao.historico.push({ data: new Date().toISOString(), acao: `Status alterado para ${STATUS_MANIFESTACAO[novoStatus]}`, status: novoStatus });
+                this.saveDatabase();
+                // Se concluído, notificar usuário? Por enquanto só salva.
+            },
+
+            // Abrir modal de avaliação
+            abrirAvaliacao: function(id) {
+                this.currentComplaintId = id;
+                // Reset estrelas
+                document.querySelectorAll('#rating-stars span').forEach(span => span.classList.remove('selected'));
+                document.getElementById('avaliacao-comentario').value = '';
+                this.openModal('modal-avaliar-manifestacao');
+            },
+
+            avaliarManifestacao: function() {
+                const estrelas = document.querySelectorAll('#rating-stars span.selected').length;
+                if (estrelas === 0) {
+                    alert('Selecione uma avaliação (1 a 5 estrelas).');
+                    return;
+                }
+                const comentario = document.getElementById('avaliacao-comentario').value.trim();
+                const manifestacao = this.db.complaints.find(m => m.id === this.currentComplaintId);
+                if (manifestacao) {
+                    manifestacao.avaliacao = {
+                        estrelas: estrelas,
+                        comentario: comentario,
+                        data: new Date().toISOString()
+                    };
+                    this.saveDatabase();
+                }
+                this.closeModal('modal-avaliar-manifestacao');
+                alert('Avaliação registrada. Obrigado!');
+                // Se o modal de acompanhamento estiver aberto, atualiza
+                if (document.getElementById('modal-acompanhar-manifestacao').classList.contains('active')) {
+                    this.acompanharManifestacao(this.currentComplaintId);
+                }
+            },
+
+            // Painel admin para ouvidoria
+            renderAdminOuvidoria: function() {
+                if (!this.isAdmin) return;
+                const content = document.getElementById('main-content');
+                let html = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3>📢 Gestão de Ouvidoria</h3>
+                        <button class="btn-secondary" onclick="app.renderAdminPanel()">← Voltar</button>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <h4>Indicadores</h4>
+                        <div class="dashboard-cards">
+                            <div class="dashboard-card">
+                                <div class="number">${this.db.complaints.length}</div>
+                                <div class="label">Total</div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="number">${this.db.complaints.filter(m => m.status === 'recebido').length}</div>
+                                <div class="label">Recebidos</div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="number">${this.db.complaints.filter(m => m.status === 'analise').length}</div>
+                                <div class="label">Em análise</div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="number">${this.db.complaints.filter(m => m.status === 'atendimento').length}</div>
+                                <div class="label">Em atendimento</div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="number">${this.db.complaints.filter(m => m.status === 'concluido').length}</div>
+                                <div class="label">Concluídos</div>
+                            </div>
+                        </div>
+                        <h4 style="margin-top:20px;">Filtrar</h4>
+                        <select id="filtro-status-manifestacao" onchange="app.filtrarManifestacoesAdmin()">
+                            <option value="">Todos</option>
+                            <option value="recebido">Recebido</option>
+                            <option value="analise">Em análise</option>
+                            <option value="atendimento">Em atendimento</option>
+                            <option value="concluido">Concluído</option>
+                        </select>
+                        <select id="filtro-tipo-manifestacao" onchange="app.filtrarManifestacoesAdmin()">
+                            <option value="">Todos os tipos</option>
+                            <option value="reclamacao">Reclamação</option>
+                            <option value="sugestao">Sugestão</option>
+                            <option value="elogio">Elogio</option>
+                            <option value="duvida">Dúvida</option>
+                            <option value="denuncia">Denúncia</option>
+                        </select>
+                    </div>
+                    <div id="lista-manifestacoes-admin"></div>
+                `;
+                content.innerHTML = html;
+                this.filtrarManifestacoesAdmin();
+                this.renderBottomNav('admin');
+            },
+
+            filtrarManifestacoesAdmin: function() {
+                const statusFiltro = document.getElementById('filtro-status-manifestacao')?.value;
+                const tipoFiltro = document.getElementById('filtro-tipo-manifestacao')?.value;
+                let lista = this.db.complaints.slice().reverse();
+                if (statusFiltro) {
+                    lista = lista.filter(m => m.status === statusFiltro);
+                }
+                if (tipoFiltro) {
+                    lista = lista.filter(m => m.tipo === tipoFiltro);
+                }
+                const container = document.getElementById('lista-manifestacoes-admin');
+                if (!container) return;
+                if (lista.length === 0) {
+                    container.innerHTML = '<p>Nenhuma manifestação encontrada.</p>';
+                    return;
+                }
+                let html = '';
+                lista.forEach(m => {
+                    let statusClass = 'status-' + m.status;
+                    let statusText = STATUS_MANIFESTACAO[m.status] || m.status;
+                    html += `
+                        <div class="item-card" style="margin-bottom: 15px; display: block;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${m.codigo}</strong>
+                                <span class="tracking-status ${statusClass}">${statusText}</span>
+                            </div>
+                            <p><strong>Tipo:</strong> ${TIPOS_MANIFESTACAO[m.tipo] || m.tipo}</p>
+                            <p><strong>Data:</strong> ${new Date(m.data).toLocaleDateString()}</p>
+                            <p><strong>Solicitante:</strong> ${m.anonimo ? 'Anônimo' : m.nome} ${m.email ? `(${m.email})` : ''}</p>
+                            <p><strong>Descrição:</strong> ${m.descricao.substring(0, 80)}...</p>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <button class="action-btn" onclick="app.abrirAdminManifestacao(${m.id})">👁️ Ver</button>
+                                <select onchange="app.alterarStatusManifestacaoAdmin(${m.id}, this.value)">
+                                    <option value="">Mudar status</option>
+                                    <option value="recebido">Recebido</option>
+                                    <option value="analise">Em análise</option>
+                                    <option value="atendimento">Em atendimento</option>
+                                    <option value="concluido">Concluído</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            },
+
+            abrirAdminManifestacao: function(id) {
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+                // Reutiliza o modal de acompanhamento, mas com opções admin
+                this.currentComplaintId = id;
+                const messages = this.db.complaintMessages.filter(msg => msg.complaintId === id).sort((a,b) => new Date(a.data) - new Date(b.data));
+
+                const body = document.getElementById('acompanhar-manifestacao-body');
+                let html = `
+                    <p><strong>Código:</strong> ${manifestacao.codigo}</p>
+                    <p><strong>Tipo:</strong> ${TIPOS_MANIFESTACAO[manifestacao.tipo] || manifestacao.tipo}</p>
+                    <p><strong>Status:</strong> <span class="tracking-status status-${manifestacao.status}">${STATUS_MANIFESTACAO[manifestacao.status] || manifestacao.status}</span></p>
+                    <p><strong>Solicitante:</strong> ${manifestacao.anonimo ? 'Anônimo' : manifestacao.nome} ${manifestacao.email ? `(${manifestacao.email})` : ''}</p>
+                    <p><strong>Descrição:</strong> ${manifestacao.descricao}</p>
+                    ${manifestacao.anexo ? `<p><a href="${manifestacao.anexo}" target="_blank">📎 Ver anexo</a></p>` : ''}
+                    <div class="chat-messages" id="chat-messages-${id}">
+                `;
+                messages.forEach(msg => {
+                    const classe = msg.remetente === 'usuario' ? 'user' : 'admin';
+                    html += `
+                        <div class="chat-message ${classe}">
+                            <strong>${msg.remetente === 'usuario' ? (manifestacao.anonimo ? 'Anônimo' : manifestacao.nome) : 'Almoxarifado'}:</strong>
+                            <p>${msg.texto}</p>
+                            <small>${new Date(msg.data).toLocaleString()}</small>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                // Campo para resposta do admin
+                html += `
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <textarea id="admin-mensagem-${id}" placeholder="Digite sua resposta..." style="flex:1; padding:10px; border-radius:16px; border:1px solid var(--cinza-borda);"></textarea>
+                        <button class="btn-primary" onclick="app.responderManifestacaoAdmin(${id})">Enviar</button>
+                    </div>
+                `;
+
+                body.innerHTML = html;
+                document.getElementById('acompanhar-manifestacao-footer').innerHTML = `
+                    <button class="btn-secondary" onclick="app.closeModal('modal-acompanhar-manifestacao')">Fechar</button>
+                `;
+                this.openModal('modal-acompanhar-manifestacao');
+            },
+
+            responderManifestacaoAdmin: function(id) {
+                const mensagem = document.getElementById(`admin-mensagem-${id}`).value.trim();
+                if (!mensagem) return;
+                const manifestacao = this.db.complaints.find(m => m.id === id);
+                if (!manifestacao) return;
+
+                const msg = {
+                    id: Date.now(),
+                    complaintId: id,
+                    remetente: 'admin',
+                    texto: mensagem,
+                    data: new Date().toISOString()
+                };
+                this.db.complaintMessages.push(msg);
+                manifestacao.historico.push({ data: msg.data, acao: 'Resposta do almoxarifado', status: manifestacao.status });
+                this.saveDatabase();
+
+                // Recarregar
+                this.abrirAdminManifestacao(id);
+            },
+
+            alterarStatusManifestacaoAdmin: function(id, novoStatus) {
+                if (!novoStatus) return;
+                this.alterarStatusManifestacao(id, novoStatus);
+                this.filtrarManifestacoesAdmin(); // atualiza lista
+            },
+
             // ---------- LOGIN / LOGOUT ----------
             openAdminLogin: function() {
                 document.getElementById('admin-email').value = 'admin@ufpb.br';
@@ -2974,15 +3751,27 @@
             renderBottomNav: function(active) {
                 const nav = document.getElementById('bottom-nav');
                 const isAdmin = this.isAdmin;
-                nav.innerHTML = `
-                    <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
-                    <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
-                    <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solicitações"></span><span>Minhas Solic.</span></button>
-                    <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
-                    ${isAdmin ? `
+                let html = '';
+                // Para não admin, exibir 5 itens: Catálogo, Solicitar Água, Minhas Solic., Rastrear, Ouvidoria
+                if (!isAdmin) {
+                    html = `
+                        <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
+                        <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
+                        <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solic."></span><span>Minhas Solic.</span></button>
+                        <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
+                        <button class="nav-item ${active === 'ouvidoria' ? 'active' : ''}" onclick="app.renderOuvidoriaMenu()"><span><img src="ouvidoria-icon.png" alt="Ouvidoria"></span><span>Ouvidoria</span></button>
+                    `;
+                } else {
+                    // Para admin, manter os mesmos 4 primeiros + Admin (e ouvidoria acessível pelo painel)
+                    html = `
+                        <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatório.png" alt="Catálogo"></span><span>Catálogo</span></button>
+                        <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Solicitar Água</span></button>
+                        <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solic."></span><span>Minhas Solic.</span></button>
+                        <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
                         <button class="nav-item ${active === 'admin' ? 'active' : ''}" onclick="app.renderAdminPanel()"><span><img src="ç.png" alt="Admin"></span><span>Admin</span></button>
-                    ` : ''}
-                `;
+                    `;
+                }
+                nav.innerHTML = html;
             },
 
             // ---------- UTILITÁRIOS ----------
@@ -2999,6 +3788,20 @@
                     modal.addEventListener('click', function(e) {
                         if (e.target === this) this.classList.remove('active');
                     });
+                });
+                // Evento para estrelas de avaliação
+                document.addEventListener('click', function(e) {
+                    if (e.target.matches('#rating-stars span')) {
+                        document.querySelectorAll('#rating-stars span').forEach(span => span.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        let value = e.target.dataset.value;
+                        // Marcar estrelas anteriores também
+                        let prev = e.target.previousElementSibling;
+                        while (prev) {
+                            prev.classList.add('selected');
+                            prev = prev.previousElementSibling;
+                        }
+                    }
                 });
             }
         };
