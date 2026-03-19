@@ -13,6 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <!-- Chart.js para o gráfico de nível de água -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QR Code libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         /* ESTILOS EXISTENTES (mantidos integralmente) */
         * {
@@ -1060,6 +1063,46 @@
             color: gold;
         }
 
+        /* NOVOS ESTILOS PARA QR CODE */
+        .qr-item-card {
+            background: var(--branco);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--sombra-media);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .qr-code-img {
+            width: 80px;
+            height: 80px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid var(--cinza-borda);
+        }
+        .qr-item-info {
+            flex: 1;
+        }
+        .qr-item-info h4 {
+            margin-bottom: 5px;
+        }
+        .qr-item-info p {
+            font-size: 0.9rem;
+            color: var(--texto-secundario);
+        }
+        .scanner-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #qr-reader {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
         /* Responsividade */
         @media (max-width: 400px) {
             .catalog-grid {
@@ -1072,7 +1115,7 @@
     <!-- Splash Screen -->
     <div id="splash-screen">
         <!-- ALTERADO: Logotipo principal -->
-        <img src="Logotipo Almoxarifado CT UFPB.png" alt="Almoxarifado CT fácil" id="splash-logo">
+        <img src="Logo almoxarifado.png" alt="Almoxarifado CT fácil" id="splash-logo">
         <!-- ALTERADO: Nome do aplicativo -->
         <span>Almoxarifado CT fácil</span>
     </div>
@@ -1083,7 +1126,7 @@
         <div class="header">
             <div class="header-logo">
                 <!-- ALTERADO: Logotipo principal no header -->
-                <img src="Logotipo Almoxarifado CT UFPB.png" alt="Logo" id="header-logo">
+                <img src="Logo almoxarifado.png" alt="Logo" id="header-logo">
                 <div class="header-title">
                     <!-- ALTERADO: Nome do aplicativo -->
                     <h1>Almoxarifado CT fácil</h1>
@@ -1404,6 +1447,140 @@
         </div>
     </div>
 
+    <!-- NOVOS MODAIS PARA CONTROLE DE ESTOQUE QR -->
+    <!-- Modal para cadastro/edição de item QR -->
+    <div class="modal-overlay" id="modal-qr-item">
+        <div class="modal">
+            <div class="modal-header" id="modal-qr-item-title">➕ Novo Item QR</div>
+            <div class="modal-body">
+                <form id="form-qr-item" onsubmit="event.preventDefault(); app.salvarQRItem();">
+                    <input type="hidden" id="qr-item-id" value="">
+                    <div class="form-group">
+                        <label>Código (gerado automaticamente)</label>
+                        <input type="text" id="qr-item-code" readonly placeholder="Será gerado ao salvar">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome do Item *</label>
+                        <input type="text" id="qr-item-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria *</label>
+                        <select id="qr-item-category" required onchange="app.sugerirCodigoQR()">
+                            <option value="">Selecione</option>
+                            <option value="MAT">MAT - Material</option>
+                            <option value="PER">PER - Perecível</option>
+                            <option value="LIM">LIM - Limpeza</option>
+                            <option value="AGUA">AGUA - Água</option>
+                            <option value="OUT">OUT - Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unidade de Medida *</label>
+                        <input type="text" id="qr-item-unit" required placeholder="ex: un, cx, kg">
+                    </div>
+                    <div class="form-group">
+                        <label>Localização *</label>
+                        <input type="text" id="qr-item-location" required placeholder="Ex: Estante B2">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade Atual *</label>
+                        <input type="number" id="qr-item-qty" required min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Estoque Mínimo *</label>
+                        <input type="number" id="qr-item-minstock" required min="0" value="5">
+                    </div>
+                    <div class="form-group" id="qr-code-preview-group" style="display: none;">
+                        <label>QR Code Gerado</label>
+                        <div id="qr-code-preview" style="text-align: center;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-qr-item')">Cancelar</button>
+                <button class="btn-primary" onclick="app.salvarQRItem()">Salvar Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para scanner QR Code -->
+    <div class="modal-overlay" id="modal-qr-scanner">
+        <div class="modal">
+            <div class="modal-header">📷 Escanear QR Code</div>
+            <div class="modal-body">
+                <div id="qr-reader" style="width: 100%;"></div>
+                <div id="qr-reader-results" style="text-align: center; margin-top: 10px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeQRScanner()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para entrada de estoque -->
+    <div class="modal-overlay" id="modal-qr-entry">
+        <div class="modal">
+            <div class="modal-header">➕ Registrar Entrada</div>
+            <div class="modal-body">
+                <form id="form-qr-entry" onsubmit="event.preventDefault(); app.confirmarEntrada();">
+                    <input type="hidden" id="entry-item-id" value="">
+                    <div class="form-group">
+                        <label>Item</label>
+                        <p id="entry-item-name"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade recebida *</label>
+                        <input type="number" id="entry-qty" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" id="entry-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Fornecedor</label>
+                        <input type="text" id="entry-supplier">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-qr-entry')">Cancelar</button>
+                <button class="btn-primary" onclick="app.confirmarEntrada()">Confirmar Entrada</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para saída de estoque -->
+    <div class="modal-overlay" id="modal-qr-exit">
+        <div class="modal">
+            <div class="modal-header">➖ Registrar Saída</div>
+            <div class="modal-body">
+                <form id="form-qr-exit" onsubmit="event.preventDefault(); app.confirmarSaida();">
+                    <input type="hidden" id="exit-item-id" value="">
+                    <div class="form-group">
+                        <label>Item</label>
+                        <p id="exit-item-name"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade retirada *</label>
+                        <input type="number" id="exit-qty" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" id="exit-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Setor solicitante</label>
+                        <input type="text" id="exit-sector">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal('modal-qr-exit')">Cancelar</button>
+                <button class="btn-primary" onclick="app.confirmarSaida()">Confirmar Saída</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast de notificação -->
     <div id="toast-notification" class="toast-notification">Item adicionado ao carrinho</div>
 
@@ -1512,13 +1689,18 @@
                 waterStockMovements: [], // histórico de movimentações de água
                 // NOVO MÓDULO OUVIDORIA
                 complaints: [], // manifestações
-                complaintMessages: [] // mensagens das manifestações
+                complaintMessages: [], // mensagens das manifestações
+                // NOVO MÓDULO QR CODE
+                qrItems: [], // itens cadastrados para controle por QR
+                qrTransactions: [] // movimentações de entrada/saída dos itens QR
             },
             cart: [],
             recentPDF: null, // armazena o último PDF gerado para download
             grafico: null, // instância do Chart
             // NOVO MÓDULO OUVIDORIA - variável para armazenar ID da manifestação em acompanhamento
             currentComplaintId: null,
+            // NOVO MÓDULO QR CODE - variáveis para scanner
+            html5QrCode: null,
 
             init: function() {
                 try {
@@ -1574,6 +1756,9 @@
                     // NOVO MÓDULO OUVIDORIA - inicializar arrays
                     if (!Array.isArray(this.db.complaints)) this.db.complaints = [];
                     if (!Array.isArray(this.db.complaintMessages)) this.db.complaintMessages = [];
+                    // NOVO MÓDULO QR CODE - inicializar arrays
+                    if (!Array.isArray(this.db.qrItems)) this.db.qrItems = [];
+                    if (!Array.isArray(this.db.qrTransactions)) this.db.qrTransactions = [];
                     
                     this.db.products.forEach(p => {
                         if (!p.description) p.description = 'Sem descrição';
@@ -1634,6 +1819,9 @@
                 // NOVO MÓDULO OUVIDORIA - dados iniciais vazios
                 this.db.complaints = [];
                 this.db.complaintMessages = [];
+                // NOVO MÓDULO QR CODE - dados iniciais vazios
+                this.db.qrItems = [];
+                this.db.qrTransactions = [];
                 this.saveDatabase();
             },
 
@@ -2775,6 +2963,8 @@
                         <button class="action-btn" onclick="app.abrirListaTodosPedidos()">📋 Todos os Pedidos (Materiais)</button>
                         <!-- NOVO MÓDULO OUVIDORIA - botão para gestão de manifestações -->
                         <button class="action-btn" onclick="app.renderAdminOuvidoria()">📢 Ouvidoria</button>
+                        <!-- NOVO MÓDULO QR CODE - botão para controle de estoque por QR -->
+                        <button class="action-btn" onclick="app.renderQRInventory()">📷 Controle QR</button>
                     </div>
 
                     <h3>Dashboard - Água Mineral</h3>
@@ -3702,6 +3892,441 @@
                 if (!novoStatus) return;
                 this.alterarStatusManifestacao(id, novoStatus);
                 this.filtrarManifestacoesAdmin(); // atualiza lista
+            },
+
+            // ---------- NOVO MÓDULO QR CODE ----------
+
+            // Tela principal do controle QR
+            renderQRInventory: function() {
+                if (!this.isAdmin) {
+                    alert('Acesso restrito a administradores.');
+                    return;
+                }
+                const content = document.getElementById('main-content');
+                let html = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3>📷 Controle de Estoque por QR Code</h3>
+                        <button class="btn-secondary" onclick="app.renderAdminPanel()">← Voltar ao Painel</button>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                        <button class="action-btn primary" onclick="app.abrirQRItemForm()">➕ Cadastrar Novo Item</button>
+                        <button class="action-btn" onclick="app.abrirQRScanner()">📷 Escanear QR Code</button>
+                        <button class="action-btn" onclick="app.renderQRItemList()">📋 Listar Itens</button>
+                    </div>
+                    <div id="qr-inventory-content">
+                        <!-- Aqui será mostrada a lista ou detalhes -->
+                        ${this.renderQRDashboard()}
+                    </div>
+                `;
+                content.innerHTML = html;
+                this.renderBottomNav('admin');
+            },
+
+            renderQRDashboard: function() {
+                const totalItens = this.db.qrItems.length;
+                const estoqueBaixo = this.db.qrItems.filter(i => i.currentQty <= i.minStock).length;
+                const totalEntradas = this.db.qrTransactions.filter(t => t.type === 'entrada').length;
+                const totalSaidas = this.db.qrTransactions.filter(t => t.type === 'saida').length;
+                return `
+                    <div class="dashboard-cards" style="margin-top:20px;">
+                        <div class="dashboard-card">
+                            <div class="number">${totalItens}</div>
+                            <div class="label">Itens cadastrados</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number">${estoqueBaixo}</div>
+                            <div class="label">Estoque baixo</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number">${totalEntradas}</div>
+                            <div class="label">Entradas</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="number">${totalSaidas}</div>
+                            <div class="label">Saídas</div>
+                        </div>
+                    </div>
+                    <h4 style="margin-top:20px;">Últimas movimentações</h4>
+                    <div class="stock-history">
+                        ${this.db.qrTransactions.slice().reverse().slice(0, 5).map(t => {
+                            const item = this.db.qrItems.find(i => i.id === t.itemId);
+                            return `<div class="history-item"><span>${new Date(t.date).toLocaleDateString()}</span><span>${t.type === 'entrada' ? '+' : '-'} ${t.qty} - ${item ? item.name : '?'}</span></div>`;
+                        }).join('') || '<p>Nenhuma movimentação.</p>'}
+                    </div>
+                `;
+            },
+
+            abrirQRItemForm: function(itemId = null) {
+                const modal = document.getElementById('modal-qr-item');
+                const title = document.getElementById('modal-qr-item-title');
+                const idField = document.getElementById('qr-item-id');
+                const codeField = document.getElementById('qr-item-code');
+                const nameField = document.getElementById('qr-item-name');
+                const categoryField = document.getElementById('qr-item-category');
+                const unitField = document.getElementById('qr-item-unit');
+                const locationField = document.getElementById('qr-item-location');
+                const qtyField = document.getElementById('qr-item-qty');
+                const minStockField = document.getElementById('qr-item-minstock');
+                const previewGroup = document.getElementById('qr-code-preview-group');
+                const previewDiv = document.getElementById('qr-code-preview');
+
+                if (itemId) {
+                    // Edição
+                    const item = this.db.qrItems.find(i => i.id === itemId);
+                    if (!item) return;
+                    title.innerText = '✏️ Editar Item QR';
+                    idField.value = item.id;
+                    codeField.value = item.code;
+                    nameField.value = item.name;
+                    categoryField.value = item.category;
+                    unitField.value = item.unit;
+                    locationField.value = item.location;
+                    qtyField.value = item.currentQty;
+                    minStockField.value = item.minStock;
+                    // Mostrar QR code existente
+                    if (item.qrCodeData) {
+                        previewGroup.style.display = 'block';
+                        previewDiv.innerHTML = `<img src="${item.qrCodeData}" style="width:150px; height:150px;">`;
+                    } else {
+                        previewGroup.style.display = 'none';
+                    }
+                } else {
+                    // Novo
+                    title.innerText = '➕ Cadastrar Novo Item QR';
+                    idField.value = '';
+                    codeField.value = '';
+                    nameField.value = '';
+                    categoryField.value = '';
+                    unitField.value = '';
+                    locationField.value = '';
+                    qtyField.value = '0';
+                    minStockField.value = '5';
+                    previewGroup.style.display = 'none';
+                }
+                this.openModal('modal-qr-item');
+            },
+
+            sugerirCodigoQR: function() {
+                // Sugere um código baseado na categoria e próximo número
+                const category = document.getElementById('qr-item-category').value;
+                if (!category) return;
+                const prefix = category;
+                const items = this.db.qrItems.filter(i => i.code.startsWith(prefix + '-'));
+                let maxNum = 0;
+                items.forEach(i => {
+                    const parts = i.code.split('-');
+                    if (parts.length === 2 && !isNaN(parts[1])) {
+                        maxNum = Math.max(maxNum, parseInt(parts[1]));
+                    }
+                });
+                const nextNum = (maxNum + 1).toString().padStart(3, '0');
+                document.getElementById('qr-item-code').value = `${prefix}-${nextNum}`;
+            },
+
+            salvarQRItem: function() {
+                const id = document.getElementById('qr-item-id').value;
+                const code = document.getElementById('qr-item-code').value.trim();
+                const name = document.getElementById('qr-item-name').value.trim();
+                const category = document.getElementById('qr-item-category').value;
+                const unit = document.getElementById('qr-item-unit').value.trim();
+                const location = document.getElementById('qr-item-location').value.trim();
+                const qty = parseInt(document.getElementById('qr-item-qty').value) || 0;
+                const minStock = parseInt(document.getElementById('qr-item-minstock').value) || 5;
+
+                if (!name || !category || !unit || !location) {
+                    alert('Preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                // Se for novo, gerar código se não foi preenchido
+                let finalCode = code;
+                if (!finalCode) {
+                    // Gerar automático
+                    const prefix = category;
+                    const items = this.db.qrItems.filter(i => i.code.startsWith(prefix + '-'));
+                    let maxNum = 0;
+                    items.forEach(i => {
+                        const parts = i.code.split('-');
+                        if (parts.length === 2 && !isNaN(parts[1])) {
+                            maxNum = Math.max(maxNum, parseInt(parts[1]));
+                        }
+                    });
+                    const nextNum = (maxNum + 1).toString().padStart(3, '0');
+                    finalCode = `${prefix}-${nextNum}`;
+                }
+
+                // Gerar QR code
+                const qrData = this.generateQRCode(finalCode);
+
+                const item = {
+                    id: id ? parseInt(id) : Date.now(),
+                    code: finalCode,
+                    name: name,
+                    category: category,
+                    unit: unit,
+                    location: location,
+                    currentQty: qty,
+                    minStock: minStock,
+                    qrCodeData: qrData,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (id) {
+                    const index = this.db.qrItems.findIndex(i => i.id === parseInt(id));
+                    if (index !== -1) {
+                        item.createdAt = this.db.qrItems[index].createdAt;
+                        this.db.qrItems[index] = item;
+                    }
+                } else {
+                    this.db.qrItems.push(item);
+                }
+
+                this.saveDatabase();
+                this.closeModal('modal-qr-item');
+                this.renderQRInventory(); // volta para a tela principal
+                alert('Item salvo com sucesso!');
+            },
+
+            generateQRCode: function(text) {
+                // Usa qrcode-generator para criar uma imagem QR
+                const qrcode = qrcodeGenerator(0, 'M');
+                qrcode.addData(text);
+                qrcode.make();
+                const cellSize = 4;
+                const imgData = qrcode.createImgTag(cellSize);
+                // Extrai o src da tag img
+                const srcMatch = imgData.match(/src="([^"]+)"/);
+                return srcMatch ? srcMatch[1] : '';
+            },
+
+            renderQRItemList: function() {
+                const contentDiv = document.getElementById('qr-inventory-content');
+                if (!contentDiv) {
+                    // Se não estiver na tela principal, redireciona
+                    this.renderQRInventory();
+                    setTimeout(() => this.renderQRItemList(), 100);
+                    return;
+                }
+                let html = '<h4>Itens cadastrados</h4>';
+                if (this.db.qrItems.length === 0) {
+                    html += '<p>Nenhum item cadastrado.</p>';
+                } else {
+                    this.db.qrItems.forEach(item => {
+                        const lowStock = item.currentQty <= item.minStock;
+                        html += `
+                            <div class="qr-item-card" onclick="app.abrirQRItemDetail(${item.id})">
+                                <img src="${item.qrCodeData}" class="qr-code-img" alt="QR Code">
+                                <div class="qr-item-info">
+                                    <h4>${item.name} (${item.code})</h4>
+                                    <p>Estoque: ${item.currentQty} ${item.unit} ${lowStock ? '<span class="stock-badge low">Baixo</span>' : ''}</p>
+                                    <p>Local: ${item.location}</p>
+                                </div>
+                                <button class="action-btn" onclick="event.stopPropagation(); app.abrirQRItemForm(${item.id})">✏️</button>
+                            </div>
+                        `;
+                    });
+                }
+                contentDiv.innerHTML = html;
+            },
+
+            abrirQRItemDetail: function(itemId) {
+                const item = this.db.qrItems.find(i => i.id === itemId);
+                if (!item) return;
+                const contentDiv = document.getElementById('qr-inventory-content');
+                const transactions = this.db.qrTransactions.filter(t => t.itemId === itemId).slice().reverse();
+                let html = `
+                    <button class="btn-secondary" onclick="app.renderQRInventory()">← Voltar</button>
+                    <div style="display:flex; gap:20px; margin-top:20px; flex-wrap:wrap;">
+                        <div style="flex:1;">
+                            <img src="${item.qrCodeData}" style="width:200px; height:200px; border:1px solid var(--cinza-borda); padding:10px; border-radius:16px;">
+                        </div>
+                        <div style="flex:2;">
+                            <h3>${item.name}</h3>
+                            <p><strong>Código:</strong> ${item.code}</p>
+                            <p><strong>Categoria:</strong> ${item.category}</p>
+                            <p><strong>Localização:</strong> ${item.location}</p>
+                            <p><strong>Estoque atual:</strong> ${item.currentQty} ${item.unit}</p>
+                            <p><strong>Estoque mínimo:</strong> ${item.minStock}</p>
+                            ${item.currentQty <= item.minStock ? '<p style="color: var(--vermelho);">⚠️ Estoque baixo!</p>' : ''}
+                            <div style="display:flex; gap:10px; margin-top:20px;">
+                                <button class="btn-primary" onclick="app.abrirEntradaQR(${item.id})">➕ Entrada</button>
+                                <button class="btn-primary" onclick="app.abrirSaidaQR(${item.id})" ${item.currentQty === 0 ? 'disabled' : ''}>➖ Saída</button>
+                                <button class="btn-secondary" onclick="window.print()">🖨️ Imprimir Etiqueta</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 style="margin-top:30px;">Histórico de Movimentações</h4>
+                    <div class="stock-history">
+                        ${transactions.length === 0 ? '<p>Nenhuma movimentação.</p>' : ''}
+                        ${transactions.map(t => `
+                            <div class="history-item">
+                                <span>${new Date(t.date).toLocaleString()}</span>
+                                <span>${t.type === 'entrada' ? 'Entrada' : 'Saída'} de ${t.qty} ${item.unit}</span>
+                                <span>${t.supplier || t.sector || ''}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                contentDiv.innerHTML = html;
+            },
+
+            abrirEntradaQR: function(itemId) {
+                const item = this.db.qrItems.find(i => i.id === itemId);
+                if (!item) return;
+                document.getElementById('entry-item-id').value = itemId;
+                document.getElementById('entry-item-name').innerText = item.name;
+                document.getElementById('entry-qty').value = 1;
+                document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('entry-supplier').value = '';
+                this.openModal('modal-qr-entry');
+            },
+
+            abrirSaidaQR: function(itemId) {
+                const item = this.db.qrItems.find(i => i.id === itemId);
+                if (!item) return;
+                document.getElementById('exit-item-id').value = itemId;
+                document.getElementById('exit-item-name').innerText = item.name;
+                document.getElementById('exit-qty').value = 1;
+                document.getElementById('exit-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('exit-sector').value = '';
+                this.openModal('modal-qr-exit');
+            },
+
+            confirmarEntrada: function() {
+                const itemId = parseInt(document.getElementById('entry-item-id').value);
+                const qty = parseInt(document.getElementById('entry-qty').value);
+                const date = document.getElementById('entry-date').value;
+                const supplier = document.getElementById('entry-supplier').value.trim();
+
+                if (!qty || qty <= 0) {
+                    alert('Quantidade inválida.');
+                    return;
+                }
+
+                const item = this.db.qrItems.find(i => i.id === itemId);
+                if (!item) return;
+
+                const oldQty = item.currentQty;
+                item.currentQty += qty;
+                item.updatedAt = new Date().toISOString();
+
+                const transaction = {
+                    id: Date.now(),
+                    itemId: itemId,
+                    type: 'entrada',
+                    qty: qty,
+                    date: date,
+                    supplier: supplier,
+                    previousQty: oldQty,
+                    newQty: item.currentQty,
+                    user: this.currentUser ? this.currentUser.name : 'Admin'
+                };
+                this.db.qrTransactions.push(transaction);
+                this.saveDatabase();
+
+                this.closeModal('modal-qr-entry');
+                this.abrirQRItemDetail(itemId);
+                this.showNotification('Entrada registrada com sucesso!');
+            },
+
+            confirmarSaida: function() {
+                const itemId = parseInt(document.getElementById('exit-item-id').value);
+                const qty = parseInt(document.getElementById('exit-qty').value);
+                const date = document.getElementById('exit-date').value;
+                const sector = document.getElementById('exit-sector').value.trim();
+
+                if (!qty || qty <= 0) {
+                    alert('Quantidade inválida.');
+                    return;
+                }
+
+                const item = this.db.qrItems.find(i => i.id === itemId);
+                if (!item) return;
+
+                if (item.currentQty < qty) {
+                    alert('Estoque insuficiente.');
+                    return;
+                }
+
+                const oldQty = item.currentQty;
+                item.currentQty -= qty;
+                item.updatedAt = new Date().toISOString();
+
+                const transaction = {
+                    id: Date.now(),
+                    itemId: itemId,
+                    type: 'saida',
+                    qty: qty,
+                    date: date,
+                    sector: sector,
+                    previousQty: oldQty,
+                    newQty: item.currentQty,
+                    user: this.currentUser ? this.currentUser.name : 'Admin'
+                };
+                this.db.qrTransactions.push(transaction);
+                this.saveDatabase();
+
+                this.closeModal('modal-qr-exit');
+                this.abrirQRItemDetail(itemId);
+                this.showNotification('Saída registrada com sucesso!');
+            },
+
+            abrirQRScanner: function() {
+                const modal = document.getElementById('modal-qr-scanner');
+                this.openModal('modal-qr-scanner');
+
+                // Inicializar scanner
+                if (!this.html5QrCode) {
+                    this.html5QrCode = new Html5Qrcode("qr-reader");
+                }
+                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                    // Parar scanner
+                    this.html5QrCode.stop().then(() => {
+                        // Fechar modal
+                        this.closeModal('modal-qr-scanner');
+                        // Processar o código lido
+                        this.processQRScan(decodedText);
+                    }).catch(err => {
+                        console.error(err);
+                    });
+                };
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                this.html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, (errorMessage) => {
+                    // ignore
+                }).catch(err => {
+                    alert('Erro ao iniciar a câmera: ' + err);
+                });
+            },
+
+            closeQRScanner: function() {
+                if (this.html5QrCode) {
+                    this.html5QrCode.stop().then(() => {
+                        this.closeModal('modal-qr-scanner');
+                    }).catch(err => {
+                        console.error(err);
+                        this.closeModal('modal-qr-scanner');
+                    });
+                } else {
+                    this.closeModal('modal-qr-scanner');
+                }
+            },
+
+            processQRScan: function(code) {
+                // Procurar item pelo código
+                const item = this.db.qrItems.find(i => i.code === code);
+                if (item) {
+                    // Se encontrado, abrir detalhe
+                    this.renderQRInventory(); // volta para tela principal
+                    setTimeout(() => this.abrirQRItemDetail(item.id), 100);
+                } else {
+                    // Não encontrado, perguntar se deseja cadastrar
+                    if (confirm(`Código "${code}" não encontrado. Deseja cadastrar um novo item com este código?`)) {
+                        this.abrirQRItemForm();
+                        // Preencher código no formulário
+                        document.getElementById('qr-item-code').value = code;
+                    }
+                }
             },
 
             // ---------- LOGIN / LOGOUT ----------
