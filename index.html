@@ -68,8 +68,8 @@
         }
 
         #splash-screen img {
-            width: 150px;
-            height: 150px;
+            width: 200px;  /* AUMENTADO */
+            height: 200px; /* AUMENTADO */
             border-radius: 30px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -119,8 +119,8 @@
         }
 
         .header-logo img {
-            width: 48px;
-            height: 48px;
+            width: 60px;   /* AUMENTADO */
+            height: 60px;  /* AUMENTADO */
             border-radius: 12px;
             background: white;
             padding: 5px;
@@ -1719,7 +1719,6 @@
                         this.isAdmin = true;
                         document.getElementById('user-greeting').innerText = `Admin: ${this.currentUser.name}`;
                     } else {
-                        // ALTERADO: texto padrão (opcional, mas mantivemos "Solicitar Água Mineral")
                         document.getElementById('user-greeting').innerText = 'Solicitar Água Mineral';
                     }
                     this.updateAdminButtonIcon();
@@ -3098,6 +3097,8 @@
                         <button class="btn-danger" onclick="app.negarSolicitacaoAgua(${s.id})">✗ Negar</button>
                     `;
                 } else if (s.status === 'aprovado') {
+                    // Se já aprovado, não precisa de ação adicional (o estoque já foi descontado na aprovação)
+                    // A entrega será registrada separadamente? Mantemos a opção de registrar entrega se desejar.
                     actions = `
                         <button class="action-btn primary" onclick="app.registrarEntregaAgua(${s.id})">📦 Registrar Entrega</button>
                     `;
@@ -3122,14 +3123,47 @@
                 `;
             },
 
+            // ** FUNÇÃO MODIFICADA: Agora aprovar subtrai estoque imediatamente **
             aprovarSolicitacaoAgua: function(id) {
                 const req = this.db.waterRequests.find(r => r.id === id);
                 if (!req) return;
+
+                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
+                if (!aguaProduct) {
+                    alert('Erro: Produto de água não encontrado.');
+                    return;
+                }
+
+                // Verificar se há estoque suficiente
+                if (aguaProduct.stock < req.quantidade) {
+                    alert(`Estoque insuficiente para aprovar. Disponível: ${aguaProduct.stock} garrafão(ões).`);
+                    return;
+                }
+
+                // Subtrair do estoque
+                aguaProduct.stock -= req.quantidade;
+
+                // Registrar movimentação no histórico de água
+                this.db.waterStockMovements.push({
+                    data: new Date().toISOString(),
+                    tipo: 'remoção (aprovação)',
+                    quantidade: req.quantidade,
+                    estoqueResultante: aguaProduct.stock,
+                    usuario: this.currentUser ? this.currentUser.name : 'Admin',
+                    solicitacao: req.codigo
+                });
+
+                // Atualizar status da solicitação
                 req.status = 'aprovado';
-                req.historico.push({ data: new Date().toISOString(), acao: 'Solicitação aprovada', status: 'aprovado' });
+                req.historico.push({ 
+                    data: new Date().toISOString(), 
+                    acao: `Solicitação aprovada. Estoque baixado: ${req.quantidade} garrafões`, 
+                    status: 'aprovado' 
+                });
+
                 this.saveDatabase();
                 this.abrirGerenciarSolicitacoesAgua();
-                alert('Solicitação aprovada. Aguardando registro de entrega.');
+                alert(`Solicitação aprovada. Estoque atualizado: ${aguaProduct.stock} garrafões restantes.`);
             },
 
             negarSolicitacaoAgua: function(id) {
@@ -3143,29 +3177,16 @@
                 }
             },
 
+            // Registrar entrega (apenas para controle, sem alterar estoque pois já foi descontado na aprovação)
             registrarEntregaAgua: function(id) {
                 const req = this.db.waterRequests.find(r => r.id === id);
                 if (!req || req.status !== 'aprovado') return;
-                const aguaProduct = this.db.products.find(p => p.name.includes('Água') || p.category === 'Água mineral');
-                if (!aguaProduct) return;
-                if (aguaProduct.stock < req.quantidade) {
-                    alert('Estoque insuficiente para realizar a entrega. A solicitação permanecerá aprovada até que haja estoque.');
-                    return;
-                }
+
                 req.status = 'entregue';
-                aguaProduct.stock -= req.quantidade;
-                this.db.waterStockMovements.push({
-                    data: new Date().toISOString(),
-                    tipo: 'remoção (entrega)',
-                    quantidade: req.quantidade,
-                    estoqueResultante: aguaProduct.stock,
-                    usuario: this.currentUser ? this.currentUser.name : 'Admin',
-                    solicitacao: req.codigo
-                });
                 req.historico.push({ data: new Date().toISOString(), acao: 'Entrega registrada', status: 'entregue' });
                 this.saveDatabase();
                 this.abrirGerenciarSolicitacoesAgua();
-                alert('Entrega registrada. Estoque atualizado.');
+                alert('Entrega registrada com sucesso.');
             },
 
             // ---------- FUNÇÕES ADMIN EXISTENTES (adaptadas) ----------
