@@ -11,9 +11,7 @@
  
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
- 
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- 
  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 
@@ -268,8 +266,16 @@
  .scanner-container { width: 100%; max-width: 400px; margin: 0 auto; }
  #qr-reader { width: 100%; border-radius: 16px; overflow: hidden; }
 
- /* BOTÃO WHATSAPP FLUTUANTE - agora sem link direto, mas com interação */
- .whatsapp-float { position: fixed; width: 55px; height: 55px; bottom: 80px; right: 20px; background-color: #25d366; color: #FFF; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: var(--sombra-media); z-index: 1000; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.2s; cursor: pointer; border: none; }
+ /* BOTÃO WHATSAPP FLUTUANTE - imagem */
+ .whatsapp-float {
+  position: fixed; width: 55px; height: 55px; bottom: 80px; right: 20px;
+  background-color: #25d366; color: #FFF; border-radius: 50px;
+  text-align: center; font-size: 30px; box-shadow: var(--sombra-media);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  text-decoration: none; transition: transform 0.2s; cursor: pointer; border: none;
+  overflow: hidden;
+ }
+ .whatsapp-float img { width: 32px; height: 32px; object-fit: contain; }
  .whatsapp-float:active { transform: scale(0.95); }
 
  /* Responsividade */
@@ -295,6 +301,10 @@
     <button id="cart-button" onclick="app.openCart()" title="Carrinho de materiais">
      <img src="carrinho-de-compras (1).png" alt="Carrinho">
      <span id="cart-count" class="cart-badge" style="display: none;">0</span>
+    </button>
+    <!-- Botão de download no cabeçalho (nova posição) -->
+    <button id="download-pdf-btn" onclick="app.baixarPDFRecente()" title="Baixar PDF do último pedido">
+     <img src="baixar-para-unidade-de-armazenamento.png" alt="Baixar PDF">
     </button>
     <button id="admin-login-btn" class="admin-login-btn" onclick="app.toggleAdmin()">
      <img src="administrador.png" alt="Admin" id="admin-icon-img">
@@ -492,7 +502,10 @@
     <p style="font-weight: 600;">Código de confirmação:</p>
     <p id="tracking-code-display" style="font-size: 2rem; font-weight: 700; color: var(--azul-institucional); background: var(--azul-claro); padding: 15px; border-radius: 20px; margin: 20px 0;">AGUA-123ABC</p>
     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-     <button class="btn-primary" onclick="app.baixarPDFRecente()">📥 Baixar PDF</button>
+     <!-- Botão de download com imagem (substituído) -->
+     <button class="btn-primary" onclick="app.baixarPDFRecente()" style="display: flex; align-items: center; gap: 8px;">
+      <img src="baixar-para-unidade-de-armazenamento.png" alt="Baixar PDF" style="width: 20px; height: 20px;"> Baixar PDF
+     </button>
      <button class="btn-secondary" onclick="app.enviarPDFEmail()">📧 Enviar por E-mail</button>
     </div>
    </div>
@@ -763,8 +776,10 @@
 
  <div id="toast-notification" class="toast-notification">Item adicionado ao carrinho</div>
  
- <!-- Botão WhatsApp flutuante agora é um botão interativo (não mais link) -->
- <button class="whatsapp-float" id="whatsapp-float-btn" title="Fale Conosco">💬</button>
+ <!-- Botão WhatsApp flutuante com imagem -->
+ <button class="whatsapp-float" id="whatsapp-float-btn" title="Fale Conosco">
+  <img src="whatsapp.png" alt="WhatsApp">
+ </button>
 
  <script>
  // ==================== CONSTANTES ====================
@@ -816,7 +831,7 @@
  const CATEGORIAS_MANIFESTACAO = [ 'Falta de material', 'Atraso na entrega', 'Problema no sistema', 'Atendimento', 'Outros' ];
  const STATUS_MANIFESTACAO = { recebido: 'Recebido', analise: 'Em análise', atendimento: 'Em atendimento', concluido: 'Concluído' };
 
- // URL da nova planilha (substituindo a anterior)
+ // URL da planilha (substitua pela URL do seu Web App)
  const API_URL = 'https://script.google.com/macros/s/AKfycbyssvq7_OdqeZKTY38KghD_cC1gcE3s8MPOU2W9FDo7GuTD3QlK8Ng7TGzpx1AX9YRsVQ/exec';
 
  const app = {
@@ -836,7 +851,7 @@
    complaintMessages: [],
    qrItems: [],
    qrTransactions: [],
-   whatsappLogs: [] // para registrar interações
+   whatsappLogs: []
   },
   cart: [],
   recentPDF: null,
@@ -933,12 +948,10 @@
     this.db.products.push({ id: Date.now(), name: 'Água Mineral', description: 'Garrafão 20L', category: 'Água mineral', unit: 'garrafão', stock: 30, minStock: 5, location: 'C1', unitValue: 12.00, imageEmoji: '💧', imageBase64: null });
    }
 
-   // Credenciais atualizadas: login = almoxarifadoCT, senha = almoxarifado1989
    const masterExists = this.db.users.find(u => u.email === 'almoxarifadoCT');
    if (!masterExists) {
       this.db.users.push({ id: 1, name: 'Administrador Geral', email: 'almoxarifadoCT', password: btoa('almoxarifado1989'), siape: '00000', sector: 'Almoxarifado', role: 'admin' });
    } else {
-      // Atualiza a senha caso exista com credencial antiga
       const master = this.db.users.find(u => u.email === 'almoxarifadoCT');
       if (master && master.password !== btoa('almoxarifado1989')) {
          master.password = btoa('almoxarifado1989');
@@ -949,7 +962,6 @@
   },
 
   initializeDefaultData: function() {
-   // Senhas padronizadas em Base64
    this.db.users = [
     { id: 1, name: 'Administrador Geral', email: 'almoxarifadoCT', password: btoa('almoxarifado1989'), siape: '1234567', sector: 'Almoxarifado', role: 'admin' },
     { id: 2, name: 'João Entregador', email: 'entregador', password: btoa('123'), siape: '7654321', sector: 'Logística', role: 'entregador' },
@@ -977,9 +989,8 @@
    catch (error) { console.error('Erro ao salvar no localStorage:', error); alert('Erro ao salvar. O espaço de armazenamento pode estar cheio.'); }
   },
 
-  // ------------------- WhatsApp Melhorado -------------------
+  // ------------------- WhatsApp -------------------
   abrirMenuWhatsApp: function() {
-   // Pré-preencher mensagem baseada no assunto selecionado e dados do usuário
    this.atualizarMensagemWhatsApp();
    this.openModal('modal-whatsapp-menu');
   },
@@ -1012,7 +1023,7 @@
 
   abrirWhatsApp: function() {
    const mensagem = document.getElementById('whatsapp-mensagem').value;
-   const numero = '558332167082'; // número fixo
+   const numero = '558332167082';
    const texto = encodeURIComponent(mensagem);
    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
    let url = '';
@@ -1022,7 +1033,6 @@
      url = `https://web.whatsapp.com/send?phone=${numero}&text=${texto}`;
    }
    
-   // Registrar log de interação
    const log = {
      data: new Date().toISOString(),
      usuario: this.currentUser ? this.currentUser.name : 'Visitante',
@@ -1032,7 +1042,6 @@
    this.db.whatsappLogs.push(log);
    this.saveDatabase();
    
-   // Abrir WhatsApp
    window.open(url, '_blank');
    this.closeModal('modal-whatsapp-menu');
    this.showNotification('Abrindo WhatsApp...');
@@ -1836,13 +1845,12 @@
    const pendentes = this.db.waterRequests.filter(r => r.status === 'pendente');
    const aguardando = this.db.waterRequests.filter(r => r.status === 'aguardando_reposicao');
    const aprovadas = this.db.waterRequests.filter(r => r.status === 'aprovado');
-   const entregues = this.db.waterRequests.filter(r => r.status === 'entregue' || r.status === 'confirmado'); // Agrupa para entregador ver
+   const entregues = this.db.waterRequests.filter(r => r.status === 'entregue' || r.status === 'confirmado');
    const negadas = this.db.waterRequests.filter(r => r.status === 'negado');
    
    if (pendentes.length === 0 && aguardando.length === 0 && aprovadas.length === 0 && entregues.length === 0 && negadas.length === 0) {
     html += '<p>Nenhuma solicitação.</p>';
    } else {
-    // Entregador foca principalmente em Aprovadas (Para entregar)
     if (aprovadas.length > 0) { html += '<h4>Aprovadas (aguardando entrega)</h4>'; aprovadas.forEach(s => { html += this.renderSolicitacaoAguaCard(s); }); }
     if (this.isAdmin) {
         if (pendentes.length > 0) { html += '<h4>Pendentes</h4>'; pendentes.forEach(s => { html += this.renderSolicitacaoAguaCard(s); }); }
@@ -1872,7 +1880,6 @@
     actions = `
     <button class="action-btn primary" onclick="app.registrarEntregaAgua(${s.id})">📦 Registrar Entrega</button>`;
    } else if ((this.isAdmin || this.isEntregador) && s.status === 'entregue') {
-    // Admin override confirm or Entregador self confirm
     actions = `
     <button class="action-btn primary" style="background: var(--verde);" onclick="app.confirmarRecebimentoAgua(${s.id})">✅ Confirmar Recebimento</button>`;
    }
