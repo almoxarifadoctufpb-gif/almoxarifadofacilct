@@ -1,48 +1,3 @@
-Foi realizada uma melhoria significativa no botão de contato via WhatsApp, tornando a comunicação mais inteligente e integrada ao sistema. Também foram atualizadas as credenciais de acesso do administrador conforme solicitado. Todas as alterações foram feitas de forma incremental, preservando 100% das funcionalidades existentes e garantindo compatibilidade total.
-
-## 🔧 Principais Alterações Realizadas
-
-### 1. **Atualização das Credenciais de Administrador**
-- **Login:** `almoxarifadoCT`  
-- **Senha:** `almoxarifado1989`  
-- A mudança foi aplicada tanto na inicialização do banco de dados local quanto na validação de login, mantendo a compatibilidade com os usuários já cadastrados.
-
-### 2. **Botão WhatsApp Inteligente**
-Substituímos o link simples por um sistema interativo que:
-
-- **Abre um menu com opções de assunto** (Dúvidas sobre pedidos, Problema no sistema, Solicitação de material, Outros).
-- **Pré-preenche a mensagem automaticamente** com:
-  - Nome do usuário logado (se disponível)
-  - Setor (se disponível)
-  - Assunto selecionado
-- **Detecta o dispositivo** – abre no app do WhatsApp (celular) ou no WhatsApp Web (computador).
-- **Registra internamente o clique** no sistema (armazenado no localStorage), permitindo futura auditoria.
-
-### 3. **Nova Interface de Contato**
-- Um modal (`modal-whatsapp-menu`) foi adicionado com opções claras e um campo de mensagem personalizável.
-- O botão flutuante do WhatsApp agora abre esse modal em vez de redirecionar diretamente.
-
-### 4. **Preservação Total do Sistema Existente**
-- Nenhuma função original foi removida ou alterada indevidamente.
-- A nova funcionalidade foi adicionada como uma extensão independente, sem impactar o fluxo de catálogo, solicitações de água, ouvidoria, controle de estoque, etc.
-
----
-
-## 🧪 Como Testar
-
-1. **Acesse a aplicação** – a tela de splash aparece e depois o conteúdo normal.
-2. **Clique no botão 💬** no canto inferior direito.
-3. **Escolha um assunto** – o sistema já tentará preencher seu nome e setor se você estiver logado.
-4. **Envie a mensagem** – será aberto o WhatsApp com o texto personalizado.
-5. **Verifique as credenciais de admin** – use `almoxarifadoCT` / `almoxarifado1989` para acessar o painel administrativo.
-
----
-
-## 📁 Código Completo (HTML/CSS/JS)
-
-O código abaixo substitui o anterior, mantendo todas as funcionalidades e adicionando as melhorias solicitadas.
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -2650,4 +2605,3 @@ O código abaixo substitui o anterior, mantendo todas as funcionalidades e adici
  </script>
 </body>
 </html>
-```
