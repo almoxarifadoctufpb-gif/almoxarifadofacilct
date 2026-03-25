@@ -14,6 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <style>
+    /* ========== ESTILOS COMPLETOS (original) ========== */
     * {
       margin: 0;
       padding: 0;
@@ -1116,7 +1117,7 @@
     <nav class="bottom-nav" id="bottom-nav"></nav>
   </div>
 
-  <!-- Modais -->
+  <!-- Modais (todos mantidos do original) -->
   <div class="cart-overlay" id="cart-overlay">
     <div class="cart-panel">
       <div class="cart-header">
@@ -1650,6 +1651,18 @@
         }
       },
 
+      // ================= NOVA FUNÇÃO: CONSULTAR POSIÇÃO NA FILA =================
+      consultarPosicaoFila: async function(codigo) {
+        try {
+          const response = await fetch(`${API_URL}?action=queue&codigo=${encodeURIComponent(codigo)}`);
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Erro ao consultar fila:", error);
+          return { success: false, error: error.toString() };
+        }
+      },
+
       // ---------- WhatsApp ----------
       abrirMenuWhatsApp: function() {
         this.atualizarMensagemWhatsApp();
@@ -1717,6 +1730,7 @@
         }
       },
 
+      // ================= FUNÇÃO SALVAR DADOS (CORRIGIDA) =================
       salvarDados: async function(tipo, dados) {
         try {
           const payload = {
@@ -1727,7 +1741,7 @@
           const response = await fetch(API_URL, {
             method: "POST",
             body: JSON.stringify(payload),
-            headers: { "Content-Type": "text/plain" } // Importante: Apps Script espera texto puro
+            headers: { "Content-Type": "application/json" }
           });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const result = await response.json();
@@ -2267,6 +2281,7 @@
         document.getElementById('agua-setor-group').innerHTML = `<label>Setor / Laboratório *</label> ${selectSetores}`;
       },
 
+      // ================= FUNÇÃO ENVIAR SOLICITAÇÃO ÁGUA (COM CONSULTA DE FILA) =================
       enviarSolicitacaoAgua: async function() {
         const nome = document.getElementById('agua-nome').value.trim();
         const email = document.getElementById('agua-email').value.trim();
@@ -2285,7 +2300,7 @@
         const codigo = 'AGUA-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 
         const solicitacao = {
-          id: Date.now(),
+          tipo: "agua", // IMPORTANTE: campo tipo
           codigo: codigo,
           data: new Date().toISOString().split('T')[0],
           nome: nome,
@@ -2303,23 +2318,16 @@
         this.db.waterRequests.push(solicitacao);
         this.saveDatabase();
 
-        const apiResult = await this.salvarDados('pedidosAgua', {
-          tipo: 'agua',
-          nome: nome,
-          email: email,
-          setor: setor,
-          quantidade: quantidade,
-          local: local,
-          validade: validade,
-          observacoes: obs,
-          codigo: codigo,
-          status: 'pendente'
-        });
-
+        const apiResult = await this.salvarDados('pedidosAgua', solicitacao);
         if (apiResult.error) {
           alert('Solicitação registrada localmente, mas houve erro ao enviar para a planilha.');
         } else {
           console.log('Solicitação de água sincronizada');
+          // Consulta a posição na fila
+          const queueInfo = await this.consultarPosicaoFila(codigo);
+          if (queueInfo.success && queueInfo.position) {
+            this.showNotification(`Você está na posição ${queueInfo.position} da fila. Total pendentes: ${queueInfo.totalPending}`, 'info');
+          }
         }
 
         this.gerarPDFPedidoAgua(solicitacao);
@@ -2428,9 +2436,21 @@
         container.innerHTML = html;
       },
 
-      verDetalhesAgua: function(id) {
+      // ================= FUNÇÃO VER DETALHES ÁGUA (COM POSIÇÃO NA FILA) =================
+      verDetalhesAgua: async function(id) {
         const s = this.db.waterRequests.find(r => r.id === id);
         if (!s) return;
+
+        let queueHtml = '';
+        if (s.status === 'pendente' || s.status === 'aguardando_reposicao') {
+          const queueInfo = await this.consultarPosicaoFila(s.codigo);
+          if (queueInfo.success && queueInfo.position) {
+            queueHtml = `<p><strong>Posição na fila:</strong> ${queueInfo.position} de ${queueInfo.totalPending} pedidos pendentes</p>`;
+          } else if (queueInfo.error) {
+            console.warn('Erro ao consultar fila:', queueInfo.error);
+          }
+        }
+
         const body = document.getElementById('detalhes-agua-body');
         let historicoHtml = '';
         if (s.historico && s.historico.length) {
@@ -2442,6 +2462,7 @@
         body.innerHTML = `
           <p><strong>Código:</strong> ${s.codigo}</p>
           <p><strong>Data:</strong> ${s.data}</p>
+          ${queueHtml}
           <p><strong>Nome:</strong> ${s.nome}</p>
           <p><strong>E-mail:</strong> ${s.email}</p>
           <p><strong>Setor:</strong> ${s.setor}</p>
@@ -3040,6 +3061,7 @@
         if (!anonimo && (!nome || !email)) { alert('Preencha nome e e-mail ou marque anônimo.'); return; }
         const codigo = 'OUV-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
         const manifestacao = {
+          tipo: "manifestacao",
           id: Date.now(), codigo: codigo, tipo: tipo, categoria: categoria, descricao: descricao,
           anonimo: anonimo, nome: nome, email: email, data: new Date().toISOString(),
           status: 'recebido', historico: [{ data: new Date().toISOString(), acao: 'Manifestação registrada', status: 'recebido' }],
