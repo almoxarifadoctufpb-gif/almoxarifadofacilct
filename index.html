@@ -1084,6 +1084,17 @@
         grid-template-columns: 1fr;
       }
     }
+    /* Fila pública - adicional */
+    .fila-publica-container ul {
+      padding-left: 0;
+    }
+    .fila-publica-container .item-card {
+      transition: transform 0.1s ease;
+    }
+    .fila-publica-container .item-card:hover {
+      transform: translateX(4px);
+      border-left-color: var(--azul-institucional);
+    }
   </style>
 </head>
 <body>
@@ -1551,6 +1562,13 @@
           this.updateAdminButtonIcon();
           this.carregarEAtualizar();
           document.getElementById('whatsapp-float-btn').onclick = () => this.abrirMenuWhatsApp();
+
+          // Atualização automática da fila pública a cada 5 segundos
+          setInterval(() => {
+            if (document.querySelector('[data-screen="fila"]')) {
+              app.renderFilaPublica();
+            }
+          }, 5000);
         } catch (error) {
           console.error('Erro na inicialização:', error);
           alert('Ocorreu um erro ao carregar o aplicativo. Tente recarregar a página.');
@@ -3720,6 +3738,80 @@
         }
       },
 
+      // ================= NOVA FUNÇÃO: FILA PÚBLICA DE SOLICITAÇÕES DE ÁGUA =================
+      renderFilaPublica: function() {
+        const content = document.getElementById('main-content');
+        // Obtém as solicitações de água e ordena por data (mais antigas primeiro)
+        const solicitacoes = [...this.db.waterRequests].sort((a, b) => new Date(a.data) - new Date(b.data));
+
+        let html = `
+          <div data-screen="fila" class="fila-publica-container">
+            <h2 style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+              <span>🚰</span> Fila de Solicitações de Água Mineral
+            </h2>
+            <div style="margin-bottom: 20px;">
+              <button class="btn-secondary" onclick="app.atualizarFilaManual()" style="display: inline-flex; align-items: center; gap: 5px;">
+                🔄 Atualizar agora
+              </button>
+            </div>
+            <div id="fila-lista" style="max-height: 70vh; overflow-y: auto; border-radius: 16px;">
+        `;
+
+        if (solicitacoes.length === 0) {
+          html += '<p style="text-align: center; padding: 30px;">Nenhuma solicitação registrada no momento.</p>';
+        } else {
+          html += '<ul class="item-list" style="list-style: none;">';
+          solicitacoes.forEach((s, index) => {
+            // Determina classe do status
+            let statusClass = '';
+            let statusText = s.status;
+            switch (s.status) {
+              case 'pendente': statusClass = 'status-pendente'; statusText = 'Pendente'; break;
+              case 'aprovado': statusClass = 'status-aprovado'; statusText = 'Aprovado'; break;
+              case 'entregue': statusClass = 'status-entregue'; statusText = 'Entregue'; break;
+              case 'confirmado': statusClass = 'status-confirmado'; statusText = 'Confirmado'; break;
+              case 'negado': statusClass = 'status-negado'; statusText = 'Negado'; break;
+              case 'aguardando_reposicao': statusClass = 'status-aguardando'; statusText = 'Aguardando Reposição'; break;
+              default: statusClass = 'status-analise'; statusText = s.status;
+            }
+
+            // Exibe posição apenas para solicitações pendentes ou em aprovação
+            const mostraPosicao = (s.status === 'pendente' || s.status === 'aguardando_reposicao');
+            const posicao = mostraPosicao ? `<span style="background: var(--azul-claro); padding: 4px 12px; border-radius: 30px; font-weight: bold;">#${index + 1}</span>` : '';
+
+            html += `
+              <li class="item-card" style="margin-bottom: 15px; display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <div style="display: flex; gap: 12px; align-items: center;">
+                    <strong>${s.codigo}</strong>
+                    ${posicao}
+                  </div>
+                  <span class="tracking-status ${statusClass}">${statusText.toUpperCase()}</span>
+                </div>
+                <p><strong>Solicitante:</strong> ${s.nome}</p>
+                <p><strong>Data:</strong> ${new Date(s.data).toLocaleDateString()} às ${new Date(s.data).toLocaleTimeString()}</p>
+                <p><strong>Local:</strong> ${s.local} ${s.complemento ? '- ' + s.complemento : ''}</p>
+                <p><strong>Quantidade:</strong> ${s.quantidade} garrafão(ões)</p>
+                ${s.observacoes ? `<p><strong>Obs:</strong> ${s.observacoes}</p>` : ''}
+              </li>
+            `;
+          });
+          html += '</ul>';
+        }
+
+        html += `
+            </div>
+          </div>
+        `;
+        content.innerHTML = html;
+        this.renderBottomNav('fila');
+      },
+
+      atualizarFilaManual: function() {
+        this.renderFilaPublica();
+        this.showNotification('Lista atualizada!');
+      },
+
       openAdminLogin: function() {
         document.getElementById('admin-email').value = 'almoxarifadoCT';
         document.getElementById('admin-password').value = '';
@@ -3796,6 +3888,7 @@
             <button class="nav-item ${active === 'catalog' ? 'active' : ''}" onclick="app.renderCatalog()"><span><img src="Relatorio.png" alt="Catálogo"></span><span>Catálogo</span></button>
             <button class="nav-item ${active === 'agua' ? 'active' : ''}" onclick="app.renderSolicitarAgua()"><span><img src="copo-de-agua.png" alt="Solicitar Água"></span><span>Água</span></button>
             <button class="nav-item ${active === 'minhas-solicitacoes' ? 'active' : ''}" onclick="app.renderMinhasSolicitacoesAgua()"><span><img src="estoque-pronto.png" alt="Minhas Solic."></span><span>Minhas Solic.</span></button>
+            <button class="nav-item ${active === 'fila' ? 'active' : ''}" onclick="app.renderFilaPublica()"><span><span>🚰</span></span><span>Fila</span></button>
             <button class="nav-item ${active === 'track' ? 'active' : ''}" onclick="app.renderTrackOrder()"><span><img src="lupa.png" alt="Rastrear"></span><span>Rastrear</span></button>
             <button class="nav-item ${active === 'ouvidoria' ? 'active' : ''}" onclick="app.renderOuvidoriaMenu()"><span><img src="fones-de-ouvido.png" alt="Ouvidoria"></span><span>Ouvidoria</span></button>
           `;
