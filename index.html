@@ -370,6 +370,9 @@
       justify-content: flex-end;
       z-index: 2000;
     }
+    .cart-overlay.active {
+      display: flex;
+    }
     .cart-panel {
       background: #12121C;
       width: 100%;
@@ -444,6 +447,9 @@
       align-items: center;
       z-index: 3000;
     }
+    .modal-overlay.active {
+      display: flex;
+    }
     .modal {
       background: rgba(22, 22, 34, 0.95);
       backdrop-filter: blur(20px);
@@ -504,7 +510,7 @@
       box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
     }
 
-    /* Bottom Nav */
+    /* Bottom Nav - NOVO ESTILO ANIMADO */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -514,6 +520,7 @@
       backdrop-filter: blur(20px);
       display: flex;
       justify-content: space-around;
+      align-items: center;
       padding: 8px 12px 20px;
       border-top: 1px solid var(--glass-border);
       border-radius: 32px 32px 0 0;
@@ -526,24 +533,45 @@
       gap: 4px;
       background: none;
       border: none;
-      color: var(--text-secondary);
+      color: #9CA3AF;
       font-size: 0.7rem;
       font-weight: 500;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 40px;
-      transition: var(--transition);
+      transition: all 0.2s ease;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #16A085, #8CC63F);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+      border-radius: 40px;
+    }
+    .nav-item:hover::before {
+      opacity: 0.2;
     }
     .nav-item.active {
       color: white;
-      background: rgba(59,130,246,0.2);
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, #16A085, #8CC63F);
+      box-shadow: 0 4px 12px rgba(22, 160, 133, 0.3);
     }
     .nav-item img {
       width: 24px;
       height: 24px;
       filter: brightness(0) invert(0.8);
-      transition: var(--transition);
+      transition: filter 0.2s, transform 0.2s;
+    }
+    .nav-item:hover img {
+      transform: scale(1.1);
     }
     .nav-item.active img {
       filter: brightness(0) invert(1);
@@ -719,7 +747,7 @@
   <!-- MODAIS (IDs mantidos conforme original) -->
   <div class="cart-overlay" id="cart-overlay"><div class="cart-panel"><div class="cart-header"><h2>🛒 Carrinho</h2><button onclick="app.closeCart()">×</button></div><div class="cart-items" id="cart-items"></div><div class="cart-total" id="cart-total"><span>Total de itens:</span><span id="total-items">0</span></div><div class="cart-footer"><button class="btn-secondary" onclick="app.clearCart()">Limpar</button><button class="btn-primary" onclick="app.openCheckoutModal()">Finalizar</button></div></div></div>
   <div class="modal-overlay" id="modal-produto"><div class="modal"><div class="modal-header" id="modal-produto-title">➕ Novo Produto</div><div class="modal-body"><form id="form-produto" onsubmit="event.preventDefault(); app.salvarProduto();"><input type="hidden" id="produto-id"><div class="form-group"><label>Nome *</label><input type="text" id="produto-nome" required></div><div class="form-group"><label>Categoria</label><select id="produto-categoria"></select></div><div class="form-group"><label>Descrição</label><textarea id="produto-descricao" rows="2"></textarea></div><div class="form-group"><label>Unidade (ex: un, resma, cx) *</label><input type="text" id="produto-unidade" required value="un"></div><div class="form-group"><label>Estoque Atual *</label><input type="number" id="produto-estoque" required min="0" value="0"></div><div class="form-group"><label>Estoque Mínimo</label><input type="number" id="produto-minstock" min="0" value="5"></div><div class="form-group"><label>Localização</label><input type="text" id="produto-localizacao"></div><div class="form-group"><label>Valor Unitário (R$)</label><input type="number" id="produto-valor" step="0.01" min="0" value="0.00"></div><div class="form-group"><label>Foto do Produto</label><input type="file" id="produto-foto" accept="image/*" onchange="app.previewImage(event)"><div id="image-preview" class="image-preview"><span>Pré-visualização</span></div></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-produto')">Cancelar</button><button class="btn-primary" onclick="app.salvarProduto()">Salvar Produto</button></div></div></div>
-  <div class="modal-overlay" id="modal-aviso"><div class="modal"><div class="modal-header">📢 Novo Aviso</div><div class="modal-body"><form id="form-aviso"><input type="hidden" id="aviso-id"><div class="form-group"><label>Título *</label><input type="text" id="aviso-titulo" required></div><div class="form-group"><label>Mensagem *</label><textarea id="aviso-mensagem" rows="3" required></textarea></div><div class="form-group"><label>Data de início</label><input type="date" id="aviso-inicio"></div><div class="form-group"><label>Data de término</label><input type="date" id="aviso-termino"></div><div class="form-group"><label>Prioridade *</label><select id="aviso-prioridade" required><option value="info">📘 Informativo</option><option value="warning">⚠️ Atenção</option><option value="urgent">🚨 Urgente</option></select></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-aviso')">Cancelar</button><button class="btn-primary" onclick="app.salvarAviso()">Salvar Aviso</button></div></div></div>
+  <div class="modal-overlay" id="modal-aviso"><div class="modal"><div class="modal-header" id="modal-aviso-title">📢 Novo Aviso</div><div class="modal-body"><form id="form-aviso"><input type="hidden" id="aviso-id"><div class="form-group"><label>Título *</label><input type="text" id="aviso-titulo" required></div><div class="form-group"><label>Mensagem *</label><textarea id="aviso-mensagem" rows="3" required></textarea></div><div class="form-group"><label>Data de início</label><input type="date" id="aviso-inicio"></div><div class="form-group"><label>Data de término</label><input type="date" id="aviso-termino"></div><div class="form-group"><label>Prioridade *</label><select id="aviso-prioridade" required><option value="info">📘 Informativo</option><option value="warning">⚠️ Atenção</option><option value="urgent">🚨 Urgente</option></select></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-aviso')">Cancelar</button><button class="btn-primary" onclick="app.salvarAviso()">Salvar Aviso</button></div></div></div>
   <div class="modal-overlay" id="modal-checkout"><div class="modal"><div class="modal-header">📦 Finalizar Pedido</div><div class="modal-body"><form id="form-pedido"><div class="form-group"><label>Nome completo *</label><input type="text" id="pedido-nome" required></div><div class="form-group"><label>E-mail *</label><input type="email" id="pedido-email" required></div><div class="form-group" id="pedido-setor-group"><label>Setor / Laboratório *</label></div><div class="form-group" id="outro-setor-group" style="display: none;"><label>Digite o setor</label><input type="text" id="pedido-setor-outro"></div><div class="form-group"><label>Observações</label><textarea id="pedido-obs" rows="2"></textarea></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-checkout')">Cancelar</button><button class="btn-primary" onclick="app.finalizarPedido()">Solicitar</button></div></div></div>
   <div class="modal-overlay" id="modal-admin-login"><div class="modal"><div class="modal-header">🔒 Área de Acesso</div><div class="modal-body"><div class="form-group"><label>Login *</label><input type="text" id="admin-email" value="almoxarifadoCT"></div><div class="form-group"><label>Senha *</label><input type="password" id="admin-password"></div></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-admin-login')">Cancelar</button><button class="btn-primary" onclick="app.adminLogin()">Entrar</button></div></div></div>
   <div class="modal-overlay" id="modal-usuarios"><div class="modal"><div class="modal-header">👥 Gerenciar Permissões</div><div class="modal-body" id="usuarios-body"></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-usuarios')">Fechar</button></div></div></div>
@@ -728,7 +756,7 @@
   <div class="modal-overlay" id="modal-manifestacao"><div class="modal"><div class="modal-header">📢 Registrar Manifestação</div><div class="modal-body"><form id="form-manifestacao"><div class="form-group"><label>Tipo *</label><select id="manifestacao-tipo" required onchange="app.sugerirCategoriaManifestacao()"><option value="">Selecione</option><option value="reclamacao">Reclamação</option><option value="sugestao">Sugestão</option><option value="elogio">Elogio</option><option value="duvida">Dúvida</option><option value="denuncia">Denúncia</option></select></div><div class="form-group"><label>Categoria</label><select id="manifestacao-categoria"><option value="">Sugerir automaticamente</option><option value="falta_material">Falta de material</option><option value="atraso_entrega">Atraso na entrega</option><option value="problema_sistema">Problema no sistema</option><option value="atendimento">Atendimento</option><option value="outros">Outros</option></select></div><div class="form-group"><label>Descrição *</label><textarea id="manifestacao-descricao" rows="4" required onkeyup="app.sugerirFAQ(this.value)"></textarea><div id="faq-sugestoes"></div></div><div class="form-group"><label>Anexo</label><input type="file" id="manifestacao-anexo"></div><div class="form-group"><label><input type="checkbox" id="manifestacao-anonimo" onchange="app.toggleIdentificacao()"> Desejo permanecer anônimo</label></div><div id="manifestacao-identificacao"><div class="form-group"><label>Nome</label><input type="text" id="manifestacao-nome"></div><div class="form-group"><label>E-mail</label><input type="email" id="manifestacao-email"></div></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-manifestacao')">Cancelar</button><button class="btn-primary" onclick="app.registrarManifestacao()">Enviar</button></div></div></div>
   <div class="modal-overlay" id="modal-acompanhar-manifestacao"><div class="modal"><div class="modal-header">📬 Acompanhar Manifestação</div><div class="modal-body" id="acompanhar-manifestacao-body"></div><div class="modal-footer" id="acompanhar-manifestacao-footer"><button class="btn-secondary" onclick="app.closeModal('modal-acompanhar-manifestacao')">Fechar</button></div></div></div>
   <div class="modal-overlay" id="modal-avaliar-manifestacao"><div class="modal"><div class="modal-header">⭐ Avalie o Atendimento</div><div class="modal-body"><p>Como você avalia o atendimento recebido?</p><div class="rating-stars" id="rating-stars"><span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span></div><div class="form-group"><label>Comentário</label><textarea id="avaliacao-comentario" rows="3"></textarea></div></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-avaliar-manifestacao')">Agora não</button><button class="btn-primary" onclick="app.avaliarManifestacao()">Enviar avaliação</button></div></div></div>
-  <div class="modal-overlay" id="modal-qr-item"><div class="modal"><div class="modal-header">➕ Novo Item QR</div><div class="modal-body"><form id="form-qr-item"><input type="hidden" id="qr-item-id"><div class="form-group"><label>Código</label><input type="text" id="qr-item-code" readonly placeholder="Será gerado"></div><div class="form-group"><label>Nome *</label><input type="text" id="qr-item-name" required></div><div class="form-group"><label>Categoria *</label><select id="qr-item-category" required onchange="app.sugerirCodigoQR()"><option value="">Selecione</option><option value="MAT">MAT - Material</option><option value="PER">PER - Perceível</option><option value="LIM">LIM - Limpeza</option><option value="AGUA">AGUA - Água</option><option value="OUT">OUT - Outros</option></select></div><div class="form-group"><label>Unidade *</label><input type="text" id="qr-item-unit" required></div><div class="form-group"><label>Localização *</label><input type="text" id="qr-item-location" required></div><div class="form-group"><label>Quantidade *</label><input type="number" id="qr-item-qty" required min="0" value="0"></div><div class="form-group"><label>Estoque Mínimo *</label><input type="number" id="qr-item-minstock" required min="0" value="5"></div><div id="qr-code-preview-group" style="display:none;"><label>QR Code Gerado</label><div id="qr-code-preview"></div></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-qr-item')">Cancelar</button><button class="btn-primary" onclick="app.salvarQRItem()">Salvar Item</button></div></div></div>
+  <div class="modal-overlay" id="modal-qr-item"><div class="modal"><div class="modal-header" id="modal-qr-item-title">➕ Novo Item QR</div><div class="modal-body"><form id="form-qr-item"><input type="hidden" id="qr-item-id"><div class="form-group"><label>Código</label><input type="text" id="qr-item-code" readonly placeholder="Será gerado"></div><div class="form-group"><label>Nome *</label><input type="text" id="qr-item-name" required></div><div class="form-group"><label>Categoria *</label><select id="qr-item-category" required onchange="app.sugerirCodigoQR()"><option value="">Selecione</option><option value="MAT">MAT - Material</option><option value="PER">PER - Perceível</option><option value="LIM">LIM - Limpeza</option><option value="AGUA">AGUA - Água</option><option value="OUT">OUT - Outros</option></select></div><div class="form-group"><label>Unidade *</label><input type="text" id="qr-item-unit" required></div><div class="form-group"><label>Localização *</label><input type="text" id="qr-item-location" required></div><div class="form-group"><label>Quantidade *</label><input type="number" id="qr-item-qty" required min="0" value="0"></div><div class="form-group"><label>Estoque Mínimo *</label><input type="number" id="qr-item-minstock" required min="0" value="5"></div><div id="qr-code-preview-group" style="display:none;"><label>QR Code Gerado</label><div id="qr-code-preview"></div></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-qr-item')">Cancelar</button><button class="btn-primary" onclick="app.salvarQRItem()">Salvar Item</button></div></div></div>
   <div class="modal-overlay" id="modal-qr-scanner"><div class="modal"><div class="modal-header">Escanear QR Code</div><div class="modal-body"><div id="qr-reader" style="width:100%"></div><div id="qr-reader-results"></div></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeQRScanner()">Fechar</button></div></div></div>
   <div class="modal-overlay" id="modal-qr-entry"><div class="modal"><div class="modal-header">➕ Registrar Entrada</div><div class="modal-body"><form id="form-qr-entry"><input type="hidden" id="entry-item-id"><div class="form-group"><label>Item</label><p id="entry-item-name"></p></div><div class="form-group"><label>Quantidade *</label><input type="number" id="entry-qty" required min="1"></div><div class="form-group"><label>Data</label><input type="date" id="entry-date" required></div><div class="form-group"><label>Fornecedor</label><input type="text" id="entry-supplier"></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-qr-entry')">Cancelar</button><button class="btn-primary" onclick="app.confirmarEntrada()">Confirmar Entrada</button></div></div></div>
   <div class="modal-overlay" id="modal-qr-exit"><div class="modal"><div class="modal-header">➖ Registrar Saída</div><div class="modal-body"><form id="form-qr-exit"><input type="hidden" id="exit-item-id"><div class="form-group"><label>Item</label><p id="exit-item-name"></p></div><div class="form-group"><label>Quantidade *</label><input type="number" id="exit-qty" required min="1"></div><div class="form-group"><label>Data</label><input type="date" id="exit-date" required></div><div class="form-group"><label>Setor solicitante</label><input type="text" id="exit-sector"></div></form></div><div class="modal-footer"><button class="btn-secondary" onclick="app.closeModal('modal-qr-exit')">Cancelar</button><button class="btn-primary" onclick="app.confirmarSaida()">Confirmar Saída</button></div></div></div>
@@ -737,8 +765,8 @@
   <button class="whatsapp-float" id="whatsapp-float-btn"><img src="whatsapp.png" alt="WhatsApp" style="width: 28px;"></button>
 
   <script>
-    // ============================= CÓDIGO ORIGINAL COMPLETO =============================
-    // ATENÇÃO: SUBSTITUA PELAS URLS QUE VOCÊ OBTEVE AO PUBLICAR OS APPS SCRIPTS
+    // ============================= CÓDIGO ORIGINAL COMPLETO CORRIGIDO =============================
+    // URLs das APIs (substitua pelas suas)
     const SETORES_API_URL = 'https://script.google.com/macros/s/AKfycbzPEp5R7iR_YBpT7U76nE01YXERU2slrzosddHCkJI65Ny05JOES4IQP_N3dUd1cbO/exec';
     const API_URL = 'https://script.google.com/macros/s/AKfycbxBSEFEWMnGm1GQgOjKUCvmN8FyRV2WHKwd8dU_ZLiik4KioEljYWV3KDIfdBrEVWSwcg/exec';
     
@@ -814,9 +842,10 @@
     
       hideSplash: function() {
         setTimeout(() => {
-          document.getElementById('splash-screen').style.opacity = '0';
+          const splash = document.getElementById('splash-screen');
+          splash.style.opacity = '0';
           setTimeout(() => {
-            document.getElementById('splash-screen').style.display = 'none';
+            splash.style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
           }, 500);
         }, 2000);
@@ -1262,11 +1291,6 @@
         }
         this.updateCartCount();
         this.saveCart();
-        if (event && event.target) {
-          const btn = event.target;
-          btn.style.backgroundColor = '#27ae60';
-          setTimeout(() => btn.style.backgroundColor = "", 200);
-        }
         this.showNotification('Item adicionado ao carrinho!');
       },
     
