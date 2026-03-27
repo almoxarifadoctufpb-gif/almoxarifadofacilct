@@ -718,7 +718,7 @@
     <img src="logo definitiva e pronto.png" alt="Almox CT UFPB" id="splash-logo">
     <span>Almox CT UFPB</span>
   </div>
-  <div class="app-container" id="app-container" style="display: none;">
+  <div class="app-container" id="app-container">
     <div class="header">
       <div class="header-logo">
         <img src="reciclar.png" alt="Logo" id="header-logo">
@@ -2415,6 +2415,157 @@
     };
     
     app.init();
+  </script>
+  <!-- NOVA TELA DE BOAS-VINDAS ADICIONADA SEM ALTERAR CÓDIGO EXISTENTE -->
+  <style>
+    /* Estilos exclusivos para a welcome screen */
+    #welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 70% 30%, rgba(20, 30, 70, 0.98), rgba(5, 5, 20, 0.98));
+      backdrop-filter: blur(20px);
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s linear 0.5s, opacity 0.5s ease;
+    }
+    #welcome-screen.active {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    .welcome-card {
+      background: rgba(20, 20, 35, 0.85);
+      backdrop-filter: blur(25px);
+      border-radius: 56px;
+      max-width: 460px;
+      width: 88%;
+      padding: 40px 28px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+      animation: fadeSlideUp 0.6s ease-out;
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .welcome-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      background: linear-gradient(145deg, #fff, #a0c0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .welcome-card h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFFFFF, #C084FC);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 20px;
+    }
+    .welcome-card p {
+      color: #cfd9ff;
+      line-height: 1.5;
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+    #enter-app {
+      background: linear-gradient(95deg, #3B82F6, #8B5CF6);
+      border: none;
+      padding: 14px 28px;
+      border-radius: 48px;
+      font-weight: 600;
+      font-size: 1rem;
+      width: auto;
+      min-width: 200px;
+      margin-top: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+      color: white;
+    }
+    #enter-app:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px rgba(59,130,246,0.5);
+    }
+  </style>
+  <div id="welcome-screen">
+    <div class="welcome-card">
+      <div class="welcome-icon">🎉</div>
+      <h2>Seja bem-vindo ao nosso app!</h2>
+      <p>Estamos muito felizes em ter você por aqui! 🚀<br><br>
+      Este espaço foi criado para facilitar seu dia a dia, trazendo praticidade, organização e rapidez em tudo o que você precisa.</p>
+      <p>Explore as funcionalidades, aproveite os recursos disponíveis e, sempre que precisar, estaremos aqui para ajudar.</p>
+      <button id="enter-app">Entrar no sistema</button>
+    </div>
+  </div>
+  <script>
+    (function() {
+      // Aguarda o splash terminar (o app já tem um timeout de 2s + 500ms para esconder)
+      // Monitora o desaparecimento do splash e mostra a welcome screen (apenas uma vez)
+      let welcomeShown = false;
+      const welcomeDiv = document.getElementById('welcome-screen');
+      const appContainer = document.getElementById('app-container');
+      const enterBtn = document.getElementById('enter-app');
+      
+      // Força o app-container a iniciar oculto
+      if (appContainer) appContainer.style.display = 'none';
+      
+      // Função para mostrar a tela de boas-vindas após o splash sumir
+      function showWelcome() {
+        if (welcomeShown) return;
+        const splash = document.getElementById('splash-screen');
+        if (!splash || splash.style.display === 'none') {
+          // Splash já sumiu
+          const welcomeSeen = localStorage.getItem('welcomeSeen_v2');
+          if (!welcomeSeen) {
+            welcomeDiv.classList.add('active');
+            welcomeShown = true;
+          } else {
+            // Já viu antes, mostra app direto
+            if (appContainer) appContainer.style.display = 'block';
+          }
+        } else {
+          // Aguarda o splash sumir (observador)
+          const observer = new MutationObserver(function(mutations) {
+            if (splash.style.display === 'none') {
+              observer.disconnect();
+              const welcomeSeen = localStorage.getItem('welcomeSeen_v2');
+              if (!welcomeSeen) {
+                welcomeDiv.classList.add('active');
+                welcomeShown = true;
+              } else {
+                if (appContainer) appContainer.style.display = 'block';
+              }
+            }
+          });
+          observer.observe(splash, { attributes: true, attributeFilter: ['style'] });
+        }
+      }
+      
+      // Verifica periodicamente até o app.init chamar hideSplash
+      setTimeout(showWelcome, 1000);
+      // Garantia extra: depois de 3 segundos tenta novamente
+      setTimeout(showWelcome, 3000);
+      
+      // Botão de entrar
+      if (enterBtn) {
+        enterBtn.addEventListener('click', function() {
+          localStorage.setItem('welcomeSeen_v2', 'true');
+          welcomeDiv.classList.remove('active');
+          if (appContainer) appContainer.style.display = 'block';
+        });
+      }
+    })();
   </script>
 </body>
 </html>
